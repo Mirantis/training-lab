@@ -1,3 +1,8 @@
-.terraform
-*.tfstate
-*.tfstate.backup
+# Terraform caching files
+terraform/openstack/.terraform
+# Terraform temporary state files
+terraform/openstack/*.tfstate
+# Terraform temporary state files backup
+terraform/openstack/*.tfstate.backup
+# Terraforms variables
+terraform/openstack/*.tfvars
