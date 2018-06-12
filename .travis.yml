@@ -1,0 +1,25 @@
+sudo: required
+
+# Install jq
+addons:
+  apt:
+    packages:
+    - jq
+
+install:
+  - gem install awesome_bot
+  - TERRAFORM_LATEST_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')
+  - curl --silent --location https://releases.hashicorp.com/terraform/${TERRAFORM_LATEST_VERSION}/terraform_${TERRAFORM_LATEST_VERSION}_linux_amd64.zip --output /tmp/terraform_linux_amd64.zip
+  - sudo unzip -o /tmp/terraform_linux_amd64.zip -d /usr/local/bin/
+
+script:
+  - test -f $HOME/.ssh/id_rsa || ( install -m 0700 -d $HOME/.ssh && ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N "" )
+  - terraform init terraform/openstack
+  - terraform validate
+      -var openstack_tenant_name=test
+      -var openstack_user_name=test
+      -var openstack_auth_url=https://test:5000/v2.0
+      -var openstack_compute_keypair_name=test
+      -var openstack_password=test
+      terraform/openstack
+  - awesome_bot --allow-dupe --allow-redirect --skip-save-results `find . -name *.md`
