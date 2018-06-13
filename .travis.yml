@@ -13,15 +13,9 @@ install:
   - sudo unzip -o /tmp/terraform_linux_amd64.zip -d /usr/local/bin/
 
 script:
-  - test -f $HOME/.ssh/id_rsa || ( install -m 0700 -d $HOME/.ssh && ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N "" )
+  #- test -f $HOME/.ssh/id_rsa || ( install -m 0700 -d $HOME/.ssh && ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N "" )
   - terraform init terraform/openstack
-  - terraform validate
-      -var openstack_auth_url=https://test:5000/v2.0
-      -var openstack_compute_instance_image_name=test
-      -var openstack_compute_instance_flavor_name=test
-      -var openstack_password=test
-      -var openstack_tenant_name=test
-      -var openstack_user_name=test
-      -var prefix=test
-      terraform/openstack
+  - terraform validate -check-variables=false terraform/openstack
+  - terraform init terraform/azure
+  - terraform validate -check-variables=false terraform/azure
   - awesome_bot --allow-dupe --allow-redirect --skip-save-results `find . -name *.md`
