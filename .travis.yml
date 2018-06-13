@@ -16,10 +16,12 @@ script:
   - test -f $HOME/.ssh/id_rsa || ( install -m 0700 -d $HOME/.ssh && ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N "" )
   - terraform init terraform/openstack
   - terraform validate
+      -var openstack_auth_url=https://test:5000/v2.0
+      -var openstack_compute_instance_image_name=test
+      -var openstack_compute_instance_flavor_name=test
+      -var openstack_password=test
       -var openstack_tenant_name=test
       -var openstack_user_name=test
-      -var openstack_auth_url=https://test:5000/v2.0
-      -var openstack_compute_keypair_name=test
-      -var openstack_password=test
+      -var prefix=test
       terraform/openstack
   - awesome_bot --allow-dupe --allow-redirect --skip-save-results `find . -name *.md`
