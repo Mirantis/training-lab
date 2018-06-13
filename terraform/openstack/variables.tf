@@ -20,12 +20,8 @@ variable "openstack_networking_network_external_network_name" {
   default = "public"
 }
 
-variable "openstack_networking_subnet" {
-  default = "192.168.0.0/24"
-}
-
 variable "openstack_networking_subnet_cidr" {
-  default = "192.168.1.1/24"
+  default = "192.168.250.0/24"
 }
 
 variable "openstack_networking_subnet_dns_nameservers" {
