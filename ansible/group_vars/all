@@ -1,0 +1,13 @@
+default_username: ubuntu
+
+# Number of Training Environment
+environment_count: 1
+
+ssh_public_key: ~/.ssh/id_rsa.pub
+
+# Number of Virtual Machines
+vm_count: 3
+
+packages:
+  - libvirt-bin
+  - qemu-kvm

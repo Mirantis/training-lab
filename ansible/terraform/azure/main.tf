@@ -1,5 +1,5 @@
 # Configure the Azure Provider
-provider "azurerm" { }
+provider "azurerm" {}
 
 # Create a resource group
 resource "azurerm_resource_group" "rg" {
@@ -91,9 +91,25 @@ resource "azurerm_virtual_machine" "vm" {
 
   os_profile_linux_config {
     disable_password_authentication = false
+
     ssh_keys {
-      path = "/home/${var.username}/.ssh/authorized_keys"
+      path     = "/home/${var.username}/.ssh/authorized_keys"
       key_data = "${file(var.ssh_public_key)}"
     }
   }
+}
+
+
+output "vm_name" {
+  value       = "${azurerm_virtual_machine.vm.*.name}"
+}
+
+output "vm_private_ip" {
+  description = "Private IPs for all VMs"
+  value       = "${azurerm_network_interface.nic.*.private_ip_address}"
+}
+
+output "vm_public_ip" {
+  description = "Public IPs for all VMs"
+  value       = "${azurerm_public_ip.pip.*.ip_address}"
 }

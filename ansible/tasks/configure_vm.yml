@@ -1,0 +1,95 @@
+- name: Add ssh key to authorized key for root
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', ssh_public_key) }}"
+
+- name: "Build hosts file"
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '{{ hostvars[item].ansible_hostname }}'
+    line: "{{ hostvars[item].ansible_default_ipv4.address }} {{ hostvars[item].ansible_hostname }}"
+  when: hostvars[item].ansible_default_ipv4.address is defined and hostvars[item].ansible_hostname is defined
+  loop: "{{ ansible_play_batch }}"
+
+- name: Update all packages
+  apt:
+    upgrade: dist
+    update_cache: yes
+
+- name: Check if reboot is necessery to boot to the latest kernel
+  shell: LATEST_INSTALLED_KERNEL=$(ls -t -1 /boot/vmlinuz-* | head -1 | sed 's@.*/vmlinuz-\(.*\)@\1@'); RUNNING_KERNEL=$(uname -r); if [ "$LATEST_INSTALLED_KERNEL" != "$RUNNING_KERNEL" ]; then echo reboot; fi
+  changed_when: false
+  register: latest_kernel_check
+
+- block:
+  - name: Reboot machine to boot to latest kernel
+    shell: sleep 2 && shutdown -r now "Ansible triggered reboot"
+    async: 1
+    poll: 0
+    ignore_errors: true
+
+  - name: Wait for system to boot up
+    wait_for:
+      host: "{{ ansible_host }}"
+      port: "{{ ansible_port | default('22') }}"
+      search_regex: OpenSSH
+      delay: 10
+    connection: local
+    become: False
+  when: latest_kernel_check.stdout is search("reboot")
+
+- name: Install packages
+  apt:
+    name: "{{ item }}"
+  loop: "{{ packages }}"
+
+- name: Set IP forward
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+
+- name: Configure libvirt daemon
+  blockinfile:
+    path: /etc/libvirt/libvirtd.conf
+    block: |
+      listen_tls = 0
+      listen_tcp = 1
+      listen_addr = "0.0.0.0"
+      auth_tcp = "none"
+  notify:
+    - restart libvirt
+
+- name: Configure libvirt daemon
+  lineinfile:
+    path: /etc/default/libvirt-bin
+    regexp: '^libvirtd_opts'
+    line: libvirtd_opts="--listen --config /etc/libvirt/libvirtd.conf"
+  notify:
+    - restart libvirt
+
+# #!/bin/bash -eux
+
+# DOMAIN="1.edu.mirantis.net"
+
+# (
+# mkdir /var/lib/libvirt/images/cfg01/
+# #http://images.mirantis.com/
+# wget -c "http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-proposed.qcow2" -O /var/lib/libvirt/images/cfg01/cfg01-day01.qcow2
+# wget ... cfg01-config.iso -O /var/lib/libvirt/images/cfg01/cfg01.iso
+
+# export MCP_VERSION="master"
+# wget https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/${MCP_VERSION}/predefine-vm/define-vm.sh
+# chmod 0755 define-vm.sh
+
+# export VM_NAME="cfg01.${DOMAIN}"
+# export VM_SOURCE_DISK="/var/lib/libvirt/images/cfg01/system.qcow2"
+# export VM_CONFIG_DISK="/var/lib/libvirt/images/cfg01/cfg01-config.iso"
+# export VM_MGM_BRIDGE_NAME="br-mgm"
+# export VM_CTL_BRIDGE_NAME="br-ctl"
+# export VM_MEM_KB="4194304"
+# export VM_CPUS="2"
+# ./define-vm.sh
+
+# virsh start cfg01.${DOMAIN}
+# ) 2>&1 | tee /tmp/kvm01.sh.log

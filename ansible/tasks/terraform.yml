@@ -1,0 +1,28 @@
+- name: Save terrafrom variables to file
+  template:
+    src: templates/terraform.tfvars.j2
+    dest: terraform/{{ cloud_platform }}/terraform.tfvars
+
+- name: Change infrastructure using terraform (this may take a long time...)
+  terraform:
+    state: "{{ terraform_state }}"
+    project_path: terraform/{{ cloud_platform }}/
+  register: terraform_apply_output
+
+- block:
+  - name: Add hosts created by terraform
+    add_host:
+      name: "{{ item.0 }}"
+      hostname: "{{ item.1 }}"
+      groups: terraform
+    loop: "{{ terraform_apply_output.outputs.vm_public_ip.value|product(terraform_apply_output.outputs.vm_name.value)|list }}"
+    changed_when: false
+
+  - name: Wait for all VMs to boot
+    wait_for:
+      host: "{{ item }}"
+      port: "22"
+      search_regex: OpenSSH
+      delay: 1
+    loop: "{{ terraform_apply_output.outputs.vm_public_ip.value }}"
+  when: terraform_apply_output.state == 'present'

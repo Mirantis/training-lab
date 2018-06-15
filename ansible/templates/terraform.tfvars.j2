@@ -1,0 +1,16 @@
+{% if cloud_platform == 'azure' %}
+azure_tags                             = {{ azure_tags }}
+{% endif %}
+{% if cloud_platform == 'openstack' %}
+openstack_auth_url                     = "{{ openstack_auth_url }}"
+openstack_compute_instance_flavor_name = "{{ openstack_compute_instance_flavor_name }}"
+openstack_compute_keypair_public_key   = "{{ ssh_public_key }}"
+openstack_password                     = "{{ openstack_password }}"
+openstack_tenant_name                  = "{{ openstack_tenant_name }}"
+openstack_user_name                    = "{{ openstack_user_name }}"
+{% endif %}
+environment_count                      = {{ environment_count }}
+prefix                                 = "{{ prefix }}"
+ssh_public_key                         = "{{ ssh_public_key }}"
+username                               = "{{ default_username }}"
+vm_count                               = {{ vm_count }}

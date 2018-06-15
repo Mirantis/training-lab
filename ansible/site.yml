@@ -1,0 +1,28 @@
+---
+- name: Use terraform to chnage the infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  vars_files:
+    - vars/secrets.yml
+
+  tasks:
+    - include_tasks: tasks/terraform.yml
+
+
+- name: Configure VMs created by terraform
+  hosts: terraform
+  user: "{{ default_username }}"
+  become: true
+
+  tasks:
+    - include_tasks: tasks/configure_vm.yml
+
+  handlers:
+    - name: restart libvirt
+      service:
+        name: libvirtd
+        enabled: yes
+        state: restarted
+

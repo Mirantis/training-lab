@@ -6,10 +6,10 @@ variable "openstack_auth_url" {
   description = "The endpoint url to connect to OpenStack"
 }
 
-variable "openstack_compute_instance_flavor_name" {
-}
+variable "openstack_compute_instance_flavor_name" {}
 
 variable "openstack_compute_instance_image_name" {
+  default = "ubuntu-16-04-x64-201804032121"
 }
 
 variable "openstack_compute_keypair_public_key" {
@@ -48,7 +48,12 @@ variable "prefix" {
   default = "terraform"
 }
 
+variable "username" {
+  description = "Username which will be used for connecting to VM"
+  default     = "ubuntu"
+}
+
 variable "vm_count" {
   description = "Number of VMs which should be created"
-  default = 3
+  default     = 1
 }

@@ -34,10 +34,10 @@ variable "ssh_public_key" {
 
 variable "username" {
   description = "Username which will be created on the VM"
-  default = "student"
+  default     = "ubuntu"
 }
 
 variable "vm_count" {
   description = "Number of VMs which should be created"
-  default = 3
+  default     = 1
 }

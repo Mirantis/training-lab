@@ -14,8 +14,8 @@ install:
 
 script:
   #- test -f $HOME/.ssh/id_rsa || ( install -m 0700 -d $HOME/.ssh && ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N "" )
-  - terraform init terraform/openstack
-  - terraform validate -check-variables=false terraform/openstack
-  - terraform init terraform/azure
-  - terraform validate -check-variables=false terraform/azure
+  - terraform init ansible/terraform/openstack
+  - terraform validate -check-variables=false ansible/terraform/openstack
+  - terraform init ansible/terraform/azure
+  - terraform validate -check-variables=false ansible/terraform/azure
   - awesome_bot --allow-dupe --allow-redirect --skip-save-results `find . -name *.md`

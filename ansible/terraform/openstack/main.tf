@@ -46,29 +46,43 @@ resource "openstack_networking_router_interface_v2" "router-interface" {
 
 # Create floating IP for nodes
 resource "openstack_networking_floatingip_v2" "floatingips" {
-    count = "${var.vm_count * var.environment_count}"
-    pool  = "${var.openstack_networking_floatingip}"
-}
-
-# Associate floating IP with nodes
-resource "openstack_compute_floatingip_associate_v2" "floatingips-associate" {
-    count       = "${var.vm_count * var.environment_count}"
-    floating_ip = "${element(openstack_networking_floatingip_v2.floatingips.*.address, count.index)}"
-    instance_id = "${element(openstack_compute_instance_v2.vms.*.id, count.index)}"
-    fixed_ip    = "${element(openstack_compute_instance_v2.vms.*.network.0.fixed_ip_v4, count.index)}"
+  count = "${var.vm_count * var.environment_count}"
+  pool  = "${var.openstack_networking_floatingip}"
 }
 
 # Create nodes
 resource "openstack_compute_instance_v2" "vms" {
-    count       = "${var.vm_count * var.environment_count}"
-    name        = "${format("%s-%02d-kvm%02d", var.prefix, count.index % var.environment_count + 1, count.index / var.environment_count + 1)}"
-    image_name  = "${var.openstack_compute_instance_image_name}"
-    flavor_name = "${var.openstack_compute_instance_flavor_name}"
-    key_pair    = "${openstack_compute_keypair_v2.keypair.name}"
+  count       = "${var.vm_count * var.environment_count}"
+  name        = "${format("%s-%02d-kvm%02d", var.prefix, count.index % var.environment_count + 1, count.index / var.environment_count + 1)}"
+  image_name  = "${var.openstack_compute_instance_image_name}"
+  flavor_name = "${var.openstack_compute_instance_flavor_name}"
+  key_pair    = "${openstack_compute_keypair_v2.keypair.name}"
+  user_data   = "#cloud-config\nusers:\n  - name: ubuntu\n    ssh_authorized_keys:\n      - ${file(var.openstack_compute_keypair_public_key)}"
 
-    network {
-        uuid           = "${openstack_networking_network_v2.private-network.id}"
-        fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 10 * (count.index % var.environment_count + 1) + (count.index / var.environment_count + 1 ))}"
-        access_network = true
-    }
+  network {
+    uuid           = "${openstack_networking_network_v2.private-network.id}"
+    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 10 * (count.index % var.environment_count + 1) + (count.index / var.environment_count + 1 ))}"
+    access_network = true
+  }
+}
+
+# Associate floating IP with nodes
+resource "openstack_compute_floatingip_associate_v2" "floatingips-associate" {
+  count       = "${var.vm_count * var.environment_count}"
+  floating_ip = "${element(openstack_networking_floatingip_v2.floatingips.*.address, count.index)}"
+  instance_id = "${element(openstack_compute_instance_v2.vms.*.id, count.index)}"
+}
+
+output "vm_name" {
+  value = "${openstack_compute_instance_v2.vms.*.name}"
+}
+
+output "vm_public_ip" {
+  description = "The actual IP address allocated for the resource"
+  value       = "${openstack_networking_floatingip_v2.floatingips.*.address}"
+}
+
+output "vm_private_ip" {
+  description = "Private IPs for all VMs"
+  value       = "${openstack_compute_instance_v2.vms.*.network.0.fixed_ip_v4}"
 }
