@@ -2,29 +2,39 @@
 
 [![Build Status](https://travis-ci.org/Mirantis/training-lab.svg?branch=master)](https://travis-ci.org/Mirantis/training-lab)
 
-## Openstack
+You will need to have Terrafrom, az-cli and Ansible installed.
 
-Few notes how to build the Training environment in OpenStack using Terraform
+## Requirements
+
+* Terrafrom
+* [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) (Azure CLI)
+* Ansible
+
+Download Terraform components:
 
 ```
-cd terraform/openstack
+cd ansible/terraform/azure
+terraform init
+cd -
+cd ansible/terraform/openstack
+terraform init
+```
 
-cat > terraform.tfvars << EOF
-openstack_auth_url                     = "https://lab.mirantis.com:5000/v2.0"
-openstack_compute_instance_image_name  = "oscore-ubuntu-16-04-amd64-mcp2018.4.0"
-openstack_compute_instance_flavor_name = "m1.small"
-openstack_password                     = "xxxxxxxx"
-openstack_tenant_name                  = "xxxxxx"
-openstack_user_name                    = "xxxxxx"
-prefix                                 = "ruzickap"
-EOF
+## Openstack
 
-terraform apply
+Few notes how to build the Training environment in OpenStack
+
+```
+cd ansible
+./create_openstack.sh
+
+# Delete whole structure
+./delete_openstack.sh
 ```
 
 ## Azure
 
-Few notes how to build the Training environment in Azure using [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) and sing Terraform.
+Few notes how to build the Training environment in Azure using [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest), Terraform + Ansible.
 
 Create Service Principal and authenticate to Azure - this should be done only once for the new Azure accounts:
 * https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html
@@ -53,12 +63,9 @@ az vm list-sizes --location westus
 * Provision VMs
 
 ```
-cd terraform/azure
+cd ansible
+./create_azure.sh
 
-cat > terraform.tfvars << EOF
-azure_tags = { Environment = "Training", Consumer = "pruzicka@mirantis.com" }
-prefix   = "ruzickap"
-EOF
-
-terraform apply
+# Delete whole structure
+./delete_azure.sh
 ```
