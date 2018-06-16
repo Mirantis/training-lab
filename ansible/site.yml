@@ -19,6 +19,9 @@
   tasks:
     - include_tasks: tasks/configure_vm.yml
 
+    - include_tasks: tasks/kvm01.yml
+      delegate_to: 1.1.1.1
+
   handlers:
     - name: restart libvirt
       service:

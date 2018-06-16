@@ -7,6 +7,7 @@ addons:
     - jq
 
 install:
+  - sudo pip install ansible ansible-lint
   - gem install awesome_bot
   - TERRAFORM_LATEST_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')
   - curl --silent --location https://releases.hashicorp.com/terraform/${TERRAFORM_LATEST_VERSION}/terraform_${TERRAFORM_LATEST_VERSION}_linux_amd64.zip --output /tmp/terraform_linux_amd64.zip
@@ -19,3 +20,6 @@ script:
   - terraform init ansible/terraform/azure
   - terraform validate -check-variables=false ansible/terraform/azure
   - awesome_bot --allow-dupe --allow-redirect --skip-save-results `find . -name *.md`
+  - touch ansible/vars/secrets.yml
+  - ansible-playbook --syntax-check ansible/site.yml
+  - ansible-lint ansible/site.yml
