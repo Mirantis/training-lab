@@ -8,6 +8,13 @@ cfg01_vm_cpus           : 2
 cfg01_image_url         : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-proposed.qcow2
 cfg01_define_script_url : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/predefine-vm/define-vm.sh
 
+
+# Management (mgm) Deploy / PXE
+deploy_network: 192.168.200.0/255.255.255.0
+control_network:
+tenant_network:
+public_network:
+
 default_username: ubuntu
 
 domain: 1.edu.mirantis.net

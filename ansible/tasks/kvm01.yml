@@ -14,16 +14,16 @@
     dest: /root/define-vm.sh
     mode: 0755
 
-- name: Define the cfg01 VM
-  command: /root/define-vm.sh
-  environment:
-    VM_NAME: "{{ cfg01_vm_name }}"
-    VM_SOURCE_DISK: "{{ cfg01_vm_source_disk }}"
-    VM_CONFIG_DISK: "{{ cfg01_vm_config_disk }}"
-    VM_MGM_BRIDGE_NAME: "{{ cfg01_vm_mgm_bridge_name }}"
-    VM_CTL_BRIDGE_NAME: "{{ cfg01_vm_ctl_bridge_name }}"
-    VM_MEM_KB: "{{ cfg01_vm_mem_kb }}"
-    VM_CPUS: "{{ cfg01_vm_cpus }}"
-  creates: "{{ cfg01_vm_name }}-vm.xml"
-  register: define_vm_output
-  changed_when: define_vm_output | search('rendered VM config')
+# - name: Define the cfg01 VM
+#   command: /root/define-vm.sh
+#   environment:
+#     VM_NAME: "{{ cfg01_vm_name }}"
+#     VM_SOURCE_DISK: "{{ cfg01_vm_source_disk }}"
+#     VM_CONFIG_DISK: "{{ cfg01_vm_config_disk }}"
+#     VM_MGM_BRIDGE_NAME: "{{ cfg01_vm_mgm_bridge_name }}"
+#     VM_CTL_BRIDGE_NAME: "{{ cfg01_vm_ctl_bridge_name }}"
+#     VM_MEM_KB: "{{ cfg01_vm_mem_kb }}"
+#     VM_CPUS: "{{ cfg01_vm_cpus }}"
+#   creates: "{{ cfg01_vm_name }}-vm.xml"
+#   register: define_vm_output
+#   changed_when: define_vm_output | search('rendered VM config')

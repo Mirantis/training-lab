@@ -20,7 +20,7 @@
     - include_tasks: tasks/configure_vm.yml
 
     - include_tasks: tasks/kvm01.yml
-      delegate_to: 1.1.1.1
+      when: ansible_hostname is search('kvm01')
 
   handlers:
     - name: restart libvirt
@@ -29,3 +29,7 @@
         enabled: yes
         state: restarted
 
+    - name: reload networking
+      service:
+        name: networking
+        state: restarted
