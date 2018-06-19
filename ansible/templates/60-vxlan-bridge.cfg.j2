@@ -1,21 +1,21 @@
-{% for network in networks %}
-# {{ network.name }}
-auto vxlan{{ network.subnet.split('.')[2] }}
-iface vxlan{{ network.subnet.split('.')[2] }} inet manual
-    pre-up ip link add vxlan{{ network.subnet.split('.')[2] }} type vxlan id {{ network.subnet.split('.')[2] }} dev {{ ansible_default_ipv4.interface }} dstport 0 || true
+{% for network in networks.keys() %}
+# {{ network }}
+auto vxlan{{ networks[network].subnet.split('.')[2] }}
+iface vxlan{{ networks[network].subnet.split('.')[2] }} inet manual
+    pre-up ip link add vxlan{{ networks[network].subnet.split('.')[2] }} type vxlan id {{ networks[network].subnet.split('.')[2] }} dev {{ ansible_default_ipv4.interface }} dstport 0 || true
 {% for node in ansible_play_batch if not hostvars[node].ansible_default_ipv4.address == ansible_default_ipv4.address %}
-    pre-up bridge fdb append to 00:00:00:00:00:00 dst {{ hostvars[node].ansible_default_ipv4.address }} dev vxlan{{ network.subnet.split('.')[2] }}
+    pre-up bridge fdb append to 00:00:00:00:00:00 dst {{ hostvars[node].ansible_default_ipv4.address }} dev vxlan{{ networks[network].subnet.split('.')[2] }}
 {% endfor %}
-    up ip link set vxlan{{ network.subnet.split('.')[2] }} up || true
-    down ip link set vxlan{{ network.subnet.split('.')[2] }} down
-    post-down ip link del vxlan{{ network.subnet.split('.')[2] }}
+    up ip link set vxlan{{ networks[network].subnet.split('.')[2] }} up || true
+    down ip link set vxlan{{ networks[network].subnet.split('.')[2] }} down
+    post-down ip link del vxlan{{ networks[network].subnet.split('.')[2] }}
 
-auto {{ network.device }}
-iface {{ network.device }} inet static
-{% set net = network.subnet + '/' + network.netmask %}
+auto {{ networks[network].device }}
+iface {{ networks[network].device }} inet static
+{% set net = networks[network].subnet + '/' + networks[network].netmask %}
   address {{ net | ipaddr('net') | ipaddr(ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }}
-  netmask {{ network.netmask }}
-  bridge_ports vxlan{{ network.subnet.split('.')[2] }}
+  netmask {{ networks[network].netmask }}
+  bridge_ports vxlan{{ networks[network].subnet.split('.')[2] }}
   bridge_stp off
   bridge_fd 0
   bridge_maxwait 0
