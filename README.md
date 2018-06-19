@@ -20,6 +20,15 @@ cd ansible/terraform/openstack
 terraform init
 ```
 
+## Common
+
+Store the cfg01 config disk on the publicly visible web page. You can store it in Azure:
+
+```
+echo "*** Login to the Azure CLI"
+az login
+```
+
 ## Openstack
 
 Few notes how to build the Training environment in OpenStack

@@ -12,6 +12,7 @@ networks:
 cfg01_vm_name           : cfg01.{{ domain }}
 cfg01_vm_source_disk    : /var/lib/libvirt/images/cfg01/system.qcow2
 cfg01_vm_config_disk    : /var/lib/libvirt/images/cfg01/cfg01-config.iso
+cfg01_vm_config_disk_url: ""
 cfg01_vm_mgm_bridge_name: "{{ networks.deploy_network.device }}"
 cfg01_vm_ctl_bridge_name: "{{ networks.control_network.device }}"
 cfg01_vm_mem_kb         : 4194304
@@ -33,4 +34,5 @@ vm_count: 3
 
 packages:
   - libvirt-bin
+  - python-libvirt
   - qemu-kvm
