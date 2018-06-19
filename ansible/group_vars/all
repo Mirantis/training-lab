@@ -1,3 +1,14 @@
+networks:
+# Management (mgm) Deploy / PXE
+  - name: deploy_network
+    subnet: 10.0.0.0
+    netmask: 255.255.255.0
+    device: br-mgm
+  - name: control_network
+    subnet: 10.0.1.0
+    netmask: 255.255.255.0
+    device: br-ctl
+
 cfg01_vm_name           : cfg01.{{ domain }}
 cfg01_vm_source_disk    : /var/lib/libvirt/images/cfg01/system.qcow2
 cfg01_vm_config_disk    : /var/lib/libvirt/images/cfg01/cfg01-config.iso
@@ -7,13 +18,6 @@ cfg01_vm_mem_kb         : 4194304
 cfg01_vm_cpus           : 2
 cfg01_image_url         : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-proposed.qcow2
 cfg01_define_script_url : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/predefine-vm/define-vm.sh
-
-
-# Management (mgm) Deploy / PXE
-deploy_network: 192.168.200.0/255.255.255.0
-control_network:
-tenant_network:
-public_network:
 
 default_username: ubuntu
 

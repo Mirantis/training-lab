@@ -25,7 +25,7 @@ variable "openstack_networking_subnet_cidr" {
 }
 
 variable "openstack_networking_subnet_dns_nameservers" {
-  default = ["1.1.1.1", "8.8.8.8"]
+  default = ["8.8.8.8", "8.8.4.4"]
 }
 
 variable "openstack_networking_floatingip" {
