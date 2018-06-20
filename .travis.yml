@@ -22,4 +22,4 @@ script:
   - awesome_bot --allow-dupe --allow-redirect --skip-save-results `find . -name *.md`
   - touch ansible/vars/secrets.yml
   - ansible-playbook --syntax-check ansible/site.yml
-  - ansible-lint ansible/site.yml
+  - ansible-lint -x ANSIBLE0004 ansible/site.yml

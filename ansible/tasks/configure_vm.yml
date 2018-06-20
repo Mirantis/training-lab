@@ -73,7 +73,7 @@
   template:
     dest: /etc/network/interfaces.d/60-vxlan-bridge.cfg
     src: templates/60-vxlan-bridge.cfg.j2
-  notify: reload networking
+  notify: restart networking
 
 - name: Run all notify sections
   meta: flush_handlers

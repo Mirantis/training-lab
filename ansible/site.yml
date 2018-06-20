@@ -22,6 +22,12 @@
     - include_tasks: tasks/kvm01.yml
       when: ansible_hostname is search('kvm01')
 
+    - name: Wait for user imput to continue
+      pause:
+        prompt: "Configure MAAS (http://{{ inventory_hostname }}/MAAS), then press ENTER"
+
+    - include_tasks: tasks/run_vm.yml
+
   handlers:
     - name: restart libvirt
       service:
@@ -29,12 +35,12 @@
         enabled: yes
         state: restarted
 
-    - name: reload networking
+    - name: restart networking
       service:
         name: networking
         state: restarted
 
-    - name: reload ufw
+    - name: restart ufw
       service:
         name: ufw
         state: restarted

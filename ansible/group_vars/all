@@ -52,3 +52,5 @@ packages:
   - libvirt-bin
   - python-libvirt
   - qemu-kvm
+  - qemu-utils
+  - virtinst

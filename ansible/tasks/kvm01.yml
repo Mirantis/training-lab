@@ -8,7 +8,7 @@
   loop:
     - { regexp: '^DEFAULT_FORWARD_POLICY', line: 'DEFAULT_FORWARD_POLICY="ACCEPT"' }
     - { regexp: '^DEFAULT_INPUT_POLICY', line: 'DEFAULT_INPUT_POLICY="ACCEPT"' }
-  notify: reload ufw
+  notify: restart ufw
 
 - name: Add port forwarding for Jenkins and MAAS to be accessible form Public IP
   blockinfile:
@@ -31,7 +31,7 @@
 
       COMMIT
   notify:
-    - restart libvirt
+    - restart ufw
 
 - name: Enable UFW
   ufw:
@@ -59,7 +59,7 @@
     repo: "{{ salt_model_git_repository }}"
     dest: /root/model
 
-- name:  Clone repository with mk-pipelines
+- name: Clone repository with mk-pipelines
   git:
     repo: "{{ mk_pipelines_git_repository }}"
     dest: /root/mk-pipelines
