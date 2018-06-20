@@ -23,3 +23,6 @@ script:
   - touch ansible/vars/secrets.yml
   - ansible-playbook --syntax-check ansible/site.yml
   - ansible-lint -x ANSIBLE0004 ansible/site.yml
+
+notifications:
+  slack: miracloud:qPdiQJMHmCsxhpR6QTT4yr98
