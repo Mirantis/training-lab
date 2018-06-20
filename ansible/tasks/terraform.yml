@@ -9,7 +9,8 @@
     project_path: terraform/{{ cloud_platform }}/
   register: terraform_apply_output
 
-- block:
+- name: Add hosts created by terraform and wait for boot to complete
+  block:
   - name: Add hosts created by terraform
     add_host:
       name: "{{ item.0 }}"

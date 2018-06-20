@@ -21,8 +21,9 @@
   changed_when: false
   register: latest_kernel_check
 
-- block:
-  - name: Reboot machine to boot to latest kernel
+- name: Reboot machine to boot to latest kernel and wait for booting up
+  block:
+  - name: Reboot machine
     shell: sleep 2 && shutdown -r now "Ansible triggered reboot"
     async: 1
     poll: 0
