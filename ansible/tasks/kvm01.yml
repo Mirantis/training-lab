@@ -1,3 +1,42 @@
+# https://docs.mirantis.com/mcp/master/mcp-deployment-guide/deploy-mcp-drivetrain/automated-deployment-of-mcp-drivetrain.html
+
+- name: Change ufw settings /etc/default/ufw
+  lineinfile:
+    dest: /etc/default/ufw
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^DEFAULT_FORWARD_POLICY', line: 'DEFAULT_FORWARD_POLICY="ACCEPT"' }
+    - { regexp: '^DEFAULT_INPUT_POLICY', line: 'DEFAULT_INPUT_POLICY="ACCEPT"' }
+  notify: reload ufw
+
+- name: Add port forwarding for Jenkins and MAAS to be accessible form Public IP
+  blockinfile:
+    path: /etc/ufw/before.rules
+    insertbefore: Don't delete these required lines, otherwise there will be errors
+    block: |
+      # nat Table rules
+      *nat
+      :POSTROUTING ACCEPT [0:0]
+      :PREROUTING ACCEPT [0:0]
+
+      # Masquarade traffic for {{ networks.deploy_network.subnet_netmask }} going out of {{ ansible_default_ipv4.interface }}
+      -A POSTROUTING -s {{ networks.deploy_network.subnet_netmask }} -o {{ ansible_default_ipv4.interface }} -j MASQUERADE
+
+      # Add port forwarding
+      # Jenkins: http://{{ inventory_hostname }}:8081 -> http://{{ salt_master_ip }}:8081
+      -A PREROUTING -i {{ ansible_default_ipv4.interface }} -d {{ ansible_default_ipv4.address }} -p tcp --dport 8081 -j DNAT --to-destination {{ salt_master_ip }}:8081
+      # MAAS: http://{{ inventory_hostname }}/MAAS -> http://{{ salt_master_ip }}/MAAS
+      -A PREROUTING -i {{ ansible_default_ipv4.interface }} -d {{ ansible_default_ipv4.address }} -p tcp --dport 80 -j DNAT --to-destination {{ salt_master_ip }}:80
+
+      COMMIT
+  notify:
+    - restart libvirt
+
+- name: Enable UFW
+  ufw:
+    state: enabled
+
 - name: Create directory /var/lib/libvirt/images/cfg01/
   file:
     path: /var/lib/libvirt/images/cfg01
@@ -15,9 +54,55 @@
     force: no
     remote_src: yes
 
-- name: Download define script
+- name: Clone repository with salt-model ({{ salt_model_git_repository }})
+  git:
+    repo: "{{ salt_model_git_repository }}"
+    dest: /root/model
+
+- name:  Clone repository with mk-pipelines
+  git:
+    repo: "{{ mk_pipelines_git_repository }}"
+    dest: /root/mk-pipelines
+
+- name:  Clone repository with pipeline-library
+  git:
+    repo: "{{ pipeline_library_git_repository }}"
+    dest: /root/pipeline-library
+
+- name: Download create-config-drive script ({{ create_config_drive_script_url }})
   get_url:
-    url: "{{ cfg01_define_script_url }}"
+    url: "{{ create_config_drive_script_url }}"
+    dest: /root/create-config-drive
+    mode: 0755
+
+- name: Download master_config script ({{ master_config_script_url }})
+  get_url:
+    url: "{{ master_config_script_url }}"
+    dest: /root/user_data.sh
+    mode: 0755
+  creates: /root/user_data.sh
+
+- name: Change the params in /root/user_data.sh "{{ master_config_script_url }}"
+  lineinfile:
+    path: /root/user_data.sh
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - { regexp: '^export SALT_MASTER_DEPLOY_IP', line: 'export SALT_MASTER_DEPLOY_IP={{ salt_master_ip }}' }
+    - { regexp: '^export SALT_MASTER_MINION_ID', line: 'export SALT_MASTER_MINION_ID=cfg01.{{ domain }}' }
+    - { regexp: '^export DEPLOY_NETWORK_GW', line: 'export DEPLOY_NETWORK_GW={{ networks.deploy_network.gateway }}' }
+    - { regexp: '^export DEPLOY_NETWORK_NETMASK', line: 'export DEPLOY_NETWORK_NETMASK={{ networks.deploy_network.netmask }}' }
+    - { regexp: '^export PIPELINES_FROM_ISO', line: 'export PIPELINES_FROM_ISO=false' }
+
+- name: Create the iso from salt model
+  command: /root/create-config-drive -u /root/user_data.sh -h cfg01 --model /root/model --mk-pipelines /root/mk-pipelines --pipeline-library /root/pipeline-library {{ cfg01_vm_config_disk }}
+  args:
+    chdir: /root
+    creates: "{{ cfg01_vm_config_disk }}"
+
+- name: Download define-vm script ({{ define_vm_script_url }})
+  get_url:
+    url: "{{ define_vm_script_url }}"
     dest: /root/define-vm.sh
     mode: 0755
 
@@ -41,4 +126,3 @@
   virt:
     name: cfg01.{{ domain }}
     state: running
-

@@ -33,3 +33,9 @@
       service:
         name: networking
         state: restarted
+
+    - name: reload ufw
+      service:
+        name: ufw
+        state: restarted
+

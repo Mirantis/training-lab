@@ -12,8 +12,7 @@ iface vxlan{{ networks[network].subnet.split('.')[2] }} inet manual
 
 auto {{ networks[network].device }}
 iface {{ networks[network].device }} inet static
-{% set net = networks[network].subnet + '/' + networks[network].netmask %}
-  address {{ net | ipaddr('net') | ipaddr(ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }}
+  address {{ networks[network].subnet_netmask | ipaddr(ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }}
   netmask {{ networks[network].netmask }}
   bridge_ports vxlan{{ networks[network].subnet.split('.')[2] }}
   bridge_stp off
