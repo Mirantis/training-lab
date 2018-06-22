@@ -20,9 +20,9 @@ script:
   - terraform init ansible/terraform/azure
   - terraform validate -check-variables=false ansible/terraform/azure
   - awesome_bot --allow-dupe --allow-redirect --skip-save-results `find . -name *.md`
-  - touch ansible/vars/secrets.yml
+  - ansible-lint ansible/site.yml
+  - sed -i 's/.*secrets.yml.*/#&/' ansible/site.yml
   - ansible-playbook --syntax-check ansible/site.yml
-  - ansible-lint -x ANSIBLE0004 ansible/site.yml
 
 notifications:
   slack: miracloud:qPdiQJMHmCsxhpR6QTT4yr98

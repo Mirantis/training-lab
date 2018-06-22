@@ -8,5 +8,5 @@
 *.tfvars
 # Terraform crash log
 crash.log
-secrets.yml
+#*secrets.yml
 

@@ -10,14 +10,36 @@ You will need to have Terrafrom, az-cli and Ansible installed.
 * [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) (Azure CLI)
 * Ansible
 
-Download Terraform components:
+### Ubuntu
+
+Follow these commands to install necessary requirements on latest Ubuntu
 
 ```
-cd ansible/terraform/azure
+sudo apt install apt-transport-https ansible curl git gnupg jq lsb-release unzip
+
+# https://docs.microsoft.com/cs-cz/cli/azure/install-azure-cli-apt?view=azure-cli-latest
+curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+AZ_REPO=$(lsb_release -cs)
+echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+sudo apt-get update && sudo apt-get install azure-cli
+
+LATEST_TERRAFORM_VERISON=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')
+curl "https://releases.hashicorp.com/terraform/${LATEST_TERRAFORM_VERISON}/terraform_${LATEST_TERRAFORM_VERISON}_linux_amd64.zip" --output /tmp/terraform_linux_amd64.zip
+sudo unzip /tmp/terraform_linux_amd64.zip -d /usr/local/bin/
+
+git clone https://github.com/Mirantis/training-lab.git
+
+cd training-lab/ansible/terraform/azure
 terraform init
 cd -
-cd ansible/terraform/openstack
+cd training-lab/ansible/terraform/openstack
 terraform init
+cd -
+
+test -d ~/.ansible || mkdir ~/.ansible
+echo "<my_secret_password>" > ~/.ansible/vault_training-lab.txt
+
+cd training-lab/ansible
 ```
 
 ## Common

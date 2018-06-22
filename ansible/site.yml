@@ -6,6 +6,7 @@
 
   vars_files:
     - vars/secrets.yml
+    - vars/{{ cloud_platform }}_secrets.yml
 
   tasks:
     - include_tasks: tasks/terraform.yml
@@ -19,12 +20,18 @@
   tasks:
     - include_tasks: tasks/configure_vm.yml
 
+    - debug: var=ansible_hostname
+
+    - debug: var=ansible_hostname
+      when: ansible_hostname is search('kvm01')
+
     - include_tasks: tasks/kvm01.yml
       when: ansible_hostname is search('kvm01')
 
     - name: Wait for user imput to continue
       pause:
         prompt: "Configure MAAS (http://{{ inventory_hostname }}/MAAS), then press ENTER"
+      when: ansible_hostname is search('kvm01')
 
     - include_tasks: tasks/run_vm.yml
 
