@@ -86,7 +86,8 @@ resource "azurerm_virtual_machine" "vm" {
   os_profile {
     computer_name  = "${format("%s-%02d-kvm%02d", var.prefix, count.index % var.environment_count + 1, count.index / var.environment_count + 1)}"
     admin_username = "${var.username}"
-    admin_password = "${element(random_string.password.*.result, count.index)}"
+
+    # admin_password = "${element(random_string.password.*.result, count.index)}"
   }
 
   os_profile_linux_config {
@@ -99,9 +100,8 @@ resource "azurerm_virtual_machine" "vm" {
   }
 }
 
-
 output "vm_name" {
-  value       = "${azurerm_virtual_machine.vm.*.name}"
+  value = "${azurerm_virtual_machine.vm.*.name}"
 }
 
 output "vm_private_ip" {

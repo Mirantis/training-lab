@@ -77,3 +77,30 @@
 
 - name: Run all notify sections
   meta: flush_handlers
+
+- name: Generate password for student user
+  set_fact:
+    student_password: "{{ lookup('password', file_with_generated_student_password + ' chars=ascii_letters,digits,length=6') }}"
+  delegate_to: localhost
+  changed_when: false
+
+- name: Add user student
+  user:
+    name: "{{ default_student_account_name }}"
+    comment: Student account
+    groups: admin,libvirtd,kvm
+    password: "{{ student_password | password_hash('sha512') }}"
+    shell: /bin/bash
+    update_password: on_create
+
+- name: Set authorized key for {{ default_student_account_name }} account
+  authorized_key:
+    user: "{{ default_student_account_name }}"
+    key: "{{ lookup('file', ssh_public_key) }}"
+
+- name: Add {{ default_student_account_name }} account to sudoers to skip password questions
+  blockinfile:
+    path: /etc/sudoers.d/80-student-account
+    create:  yes
+    block: |
+      {{ default_student_account_name }} ALL=(ALL) NOPASSWD:ALL

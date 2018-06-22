@@ -1,5 +1,62 @@
 # https://docs.mirantis.com/mcp/master/mcp-deployment-guide/deploy-mcp-drivetrain/automated-deployment-of-mcp-drivetrain.html
 
+- name: Install packages related to kvm01
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  loop: "{{ kvm01_packages }}"
+
+- name: Add vncserver to the systemd
+  template:
+    src: templates/vncserver-service.j2
+    dest: /etc/systemd/system/vncserver@.service
+  notify: reload systemd
+
+- name: Create /home/{{ default_student_account_name }}/.vnc directory
+  file:
+    path: /home/{{ default_student_account_name }}/.vnc
+    state: directory
+    mode: 0700
+
+- name: Set VNC password in /home/{{ default_student_account_name }}/.vnc/passwd
+  shell: umask 077; echo "{{ student_password }}" | vncpasswd -f > /home/{{ default_student_account_name }}/.vnc/passwd
+  args:
+    creates: /home/{{ default_student_account_name }}/.vnc/passwd
+  changed_when: false
+
+- name: Add xstartup to student account /home/{{ default_student_account_name }}/.vnc/xstartup
+  template:
+    src: templates/vnc-xstartup.j2
+    dest: /home/{{ default_student_account_name }}/.vnc/xstartup
+    mode: 0755
+
+- name: Change owner of /home/{{ default_student_account_name }}/.vnc to {{ default_student_account_name }}:{{ default_student_account_name }}
+  file:
+    path: /home/{{ default_student_account_name }}/.vnc
+    owner: "{{ default_student_account_name }}"
+    group: "{{ default_student_account_name }}"
+    recurse: yes
+
+- name: Create certificate for novnc
+  command: openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/novnc.pem -out /etc/ssl/novnc.pem -days 365 -subj "/C=CZ/ST=Czech/L=Prague/O=Mirantis/CN={{ domain }}"
+  args:
+    creates: /etc/ssl/novnc.pem
+
+- name: Add systemd service for novnc
+  template:
+    src: templates/novnc.service.j2
+    dest: /etc/systemd/system/novnc.service
+  notify: reload systemd
+
+- name: Enable vncserver + https acces on ufw
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - 5901
+    - 443
+
 - name: Change ufw settings /etc/default/ufw
   lineinfile:
     dest: /etc/default/ufw
@@ -33,9 +90,24 @@
   notify:
     - restart ufw
 
+- name: Run all notify sections
+  meta: flush_handlers
+
 - name: Enable UFW
   ufw:
     state: enabled
+
+- name: Start vncserver when booting
+  service:
+    name: vncserver@1.service
+    enabled: yes
+    state: started
+
+- name: Start novnc when booting
+  service:
+    name: novnc
+    enabled: yes
+    state: started
 
 - name: Create directory /var/lib/libvirt/images/cfg01/
   file:
@@ -80,7 +152,6 @@
     url: "{{ master_config_script_url }}"
     dest: /root/user_data.sh
     mode: 0755
-  creates: /root/user_data.sh
 
 - name: Change the params in /root/user_data.sh "{{ master_config_script_url }}"
   lineinfile:
@@ -93,6 +164,7 @@
     - { regexp: '^export DEPLOY_NETWORK_GW', line: 'export DEPLOY_NETWORK_GW={{ networks.deploy_network.gateway }}' }
     - { regexp: '^export DEPLOY_NETWORK_NETMASK', line: 'export DEPLOY_NETWORK_NETMASK={{ networks.deploy_network.netmask }}' }
     - { regexp: '^export PIPELINES_FROM_ISO', line: 'export PIPELINES_FROM_ISO=false' }
+    - { regexp: '^export MCP_VERSION', line: 'export MCP_VERSION="{{ mcp_release }}"' }
 
 - name: Create the iso from salt model
   command: /root/create-config-drive -u /root/user_data.sh -h cfg01 --model /root/model --mk-pipelines /root/mk-pipelines --pipeline-library /root/pipeline-library {{ cfg01_vm_config_disk }}

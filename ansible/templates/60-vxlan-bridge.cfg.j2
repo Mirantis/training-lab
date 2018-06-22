@@ -1,3 +1,5 @@
+# {{ ansible_managed }}
+
 {% for network in networks.keys() %}
 # {{ network }}
 auto vxlan{{ networks[network].subnet.split('.')[2] }}

@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=NoVNC
+After=network.target syslog.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/usr/share/novnc
+ExecStart=/usr/bin/websockify --web=/usr/share/novnc --cert=/etc/ssl/novnc.pem 443 127.0.0.1:5901
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
