@@ -130,19 +130,16 @@
   git:
     repo: "{{ salt_model_git_repository }}"
     dest: /root/model
-    version: latest
 
 - name: Clone repository with mk-pipelines
   git:
     repo: "{{ mk_pipelines_git_repository }}"
     dest: /root/mk-pipelines
-    version: latest
 
 - name:  Clone repository with pipeline-library
   git:
     repo: "{{ pipeline_library_git_repository }}"
     dest: /root/pipeline-library
-    version: latest
 
 - name: Download create-config-drive script ({{ create_config_drive_script_url }})
   get_url:

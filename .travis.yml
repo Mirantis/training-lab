@@ -19,8 +19,8 @@ script:
   - terraform validate -check-variables=false ansible/terraform/openstack
   - terraform init ansible/terraform/azure
   - terraform validate -check-variables=false ansible/terraform/azure
-  - awesome_bot --allow-dupe --allow-redirect --skip-save-results `find . -name *.md`
-  - ansible-lint ansible/site.yml
+  - awesome_bot --white-list "$" --allow-dupe --allow-redirect --skip-save-results `find . -name *.md`
+  - ansible-lint -x ANSIBLE0004 ansible/site.yml
   - sed -i 's/.*secrets.yml.*/#&/' ansible/site.yml
   - ansible-playbook --syntax-check ansible/site.yml
 

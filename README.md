@@ -4,18 +4,54 @@
 
 You will need to have Terrafrom, az-cli and Ansible installed.
 
+
 ## Requirements
 
 * Terrafrom
 * [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) (Azure CLI)
 * Ansible
+* few minor packages curl, git, jq, ...
+
+
+### Azure related tasks
+
+Few notes how to build the Training environment in Azure using [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest), Terraform + Ansible.
+
+Create Service Principal and authenticate to Azure - this should be done only once for the new Azure accounts:
+
+* [https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html](https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html)
+
+* [https://docs.microsoft.com/en-us/azure/virtual-machines/linux/terraform-install-configure](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/terraform-install-configure)
+
+```bash
+echo "*** Login to the Azure CLI"
+az login
+
+echo "*** Get Subscription ID for Default Subscription"
+SUBSCRIPTION_ID=$(az account list | jq -r '.[] | select (.isDefault == true).id')
+
+echo "*** Create the Service Principal which will have permissions to manage resources in the specified Subscription"
+az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/$SUBSCRIPTION_ID"
+
+echo "*** Increase Token Lifetime (AccessTokenLifetime)"
+```
+
+* Login to Azure using Service Principal and check if it is working
+
+```bash
+az login --service-principal -u 0xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -p fxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --tenant 0xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+az vm list-sizes --location westus
+```
+
 
 ### Ubuntu
 
-Follow these commands to install necessary requirements on latest Ubuntu
+Follow these commands to install necessary requirements on latest Ubuntu:
 
-```
+```bash
 sudo apt install apt-transport-https ansible curl git gnupg jq lsb-release unzip
+
+test -f $HOME/.ssh/id_rsa || ( install -m 0700 -d $HOME/.ssh && ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N "" )
 
 # https://docs.microsoft.com/cs-cz/cli/azure/install-azure-cli-apt?view=azure-cli-latest
 curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
@@ -40,63 +76,16 @@ test -d ~/.ansible || mkdir ~/.ansible
 echo "<my_secret_password>" > ~/.ansible/vault_training-lab.txt
 
 cd training-lab/ansible
-```
 
-## Common
-
-Store the cfg01 config disk on the publicly visible web page. You can store it in Azure:
-
-```
-echo "*** Login to the Azure CLI"
-az login
-```
-
-## Openstack
-
-Few notes how to build the Training environment in OpenStack
-
-```
-cd ansible
+# Create OpenStack training environment
 ./create_openstack.sh
-
-# Delete whole structure
+# Delete whole OpenStack structure
 ./delete_openstack.sh
-```
 
-## Azure
+or
 
-Few notes how to build the Training environment in Azure using [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest), Terraform + Ansible.
-
-Create Service Principal and authenticate to Azure - this should be done only once for the new Azure accounts:
-* https://www.terraform.io/docs/providers/azurerm/authenticating_via_service_principal.html
-* https://docs.microsoft.com/en-us/azure/virtual-machines/linux/terraform-install-configure
-
-```
-echo "*** Login to the Azure CLI"
-az login
-
-echo "*** Get Subscription ID for Default Subscription"
-SUBSCRIPTION_ID=$(az account list | jq -r '.[] | select (.isDefault == true).id')
-
-echo "*** Create the Service Principal which will have permissions to manage resources in the specified Subscription"
-az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/$SUBSCRIPTION_ID"
-
-echo "*** Increase Token Lifetime (AccessTokenLifetime)"
-```
-
-* Login to Azure using Service Principal and check if it is working
-
-```
-az login --service-principal -u 0xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -p fxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --tenant 0xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-az vm list-sizes --location westus
-```
-
-* Provision VMs
-
-```
-cd ansible
+# Create Azure training environment
 ./create_azure.sh
-
-# Delete whole structure
+# Delete whole Azure structure
 ./delete_azure.sh
 ```
