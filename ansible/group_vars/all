@@ -34,7 +34,7 @@ file_with_generated_student_password: /tmp/student_password
 
 
 # stable/proposed/testing
-mcp_release: proposed
+mcp_release: testing
 
 # Number of Training Environment
 environment_count: 1

@@ -104,3 +104,11 @@
     create:  yes
     block: |
       {{ default_student_account_name }} ALL=(ALL) NOPASSWD:ALL
+
+- name: Allow user student to log in using password via ssh
+  blockinfile:
+    path: /etc/ssh/sshd_config
+    block: |
+      Match User {{ default_student_account_name }}
+        PasswordAuthentication yes
+  notify: restart sshd

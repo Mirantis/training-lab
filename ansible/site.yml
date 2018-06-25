@@ -21,8 +21,6 @@
     - include_tasks: tasks/configure_vm.yml
 
     - debug: var=ansible_hostname
-
-    - debug: var=ansible_hostname
       when: ansible_hostname is search('kvm01')
 
     - include_tasks: tasks/kvm01.yml
@@ -35,7 +33,20 @@
 
     - include_tasks: tasks/run_vm.yml
 
+    - name: Display all "external" URLs
+      debug:
+        msg:
+          - "MAAS   : http://{{ inventory_hostname }}/MAAS"
+          - "Jenkins: http://{{ inventory_hostname }}:8081"
+          - "noVNC  : https://{{ inventory_hostname }}/vnc.html?port=443&true_color=1&password={{ student_password }}"
+          - "VNC    : vnc://{{ inventory_hostname }}:5901"
+      when: ansible_hostname is search('kvm01')
+
   handlers:
+    - name: reload systemd
+      systemd:
+        daemon_reload: yes
+
     - name: restart libvirt
       service:
         name: libvirtd
@@ -47,11 +58,18 @@
         name: networking
         state: restarted
 
+    - name: restart novnc
+      service:
+        name: novnc
+        state: restarted
+
+    - name: restart sshd
+      service:
+        name: sshd
+        state: restarted
+
     - name: restart ufw
       service:
         name: ufw
         state: restarted
 
-    - name: reload systemd
-      systemd:
-        daemon_reload: yes

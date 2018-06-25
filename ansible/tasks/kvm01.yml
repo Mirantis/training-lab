@@ -42,11 +42,24 @@
   args:
     creates: /etc/ssl/novnc.pem
 
+- name: Improve VNC output (no jpg compression)
+  replace:
+    path: /usr/share/novnc/include/rfb.js
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  loop:
+    - regexp: "//(\\['compress_lo',      -255 \\],)"
+      replace: '\1'
+    - regexp: "(\\['compress_hi',        -247 \\],)"
+      replace: '//\1'
+
 - name: Add systemd service for novnc
   template:
     src: templates/novnc.service.j2
     dest: /etc/systemd/system/novnc.service
-  notify: reload systemd
+  notify:
+    - reload systemd
+    - restart novnc
 
 - name: Enable vncserver + https acces on ufw
   ufw:
