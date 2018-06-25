@@ -2,6 +2,8 @@
 
 {% if cloud_platform == 'azure' %}
 azure_tags                             = {{ azure_tags }}
+azure_admin_username                   = "{{ default_username }}"
+azure_admin_password                   = "{{ default_username_password }}"
 {% endif %}
 {% if cloud_platform == 'openstack' %}
 openstack_auth_url                     = "{{ openstack_auth_url }}"

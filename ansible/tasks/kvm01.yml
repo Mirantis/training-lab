@@ -19,7 +19,7 @@
     mode: 0700
 
 - name: Set VNC password in /home/{{ default_student_account_name }}/.vnc/passwd
-  shell: umask 077; echo "{{ student_password }}" | vncpasswd -f > /home/{{ default_student_account_name }}/.vnc/passwd
+  shell: umask 077; echo "{{ default_student_account_password }}" | vncpasswd -f > /home/{{ default_student_account_name }}/.vnc/passwd
   args:
     creates: /home/{{ default_student_account_name }}/.vnc/passwd
   changed_when: false
@@ -50,8 +50,8 @@
   loop:
     - regexp: "//(\\['compress_lo',      -255 \\],)"
       replace: '\1'
-    - regexp: "(\\['compress_hi',        -247 \\],)"
-      replace: '//\1'
+    - regexp: "^(\\s+)(\\['compress_hi',        -247 \\],)"
+      replace: '\1//\2'
 
 - name: Add systemd service for novnc
   template:
@@ -149,7 +149,7 @@
     repo: "{{ mk_pipelines_git_repository }}"
     dest: /root/mk-pipelines
 
-- name:  Clone repository with pipeline-library
+- name: Clone repository with pipeline-library
   git:
     repo: "{{ pipeline_library_git_repository }}"
     dest: /root/pipeline-library

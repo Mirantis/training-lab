@@ -2,6 +2,11 @@ variable "environment_count" {
   default = 1
 }
 
+variable "azure_admin_username" {
+  description = "Username which will be created on the VM"
+  default     = "ubuntu"
+}
+
 variable "azurerm_resource_group_location" {
   default = "East US"
 }
@@ -32,12 +37,7 @@ variable "ssh_public_key" {
   default = "~/.ssh/id_rsa.pub"
 }
 
-variable "username" {
-  description = "Username which will be created on the VM"
-  default     = "ubuntu"
-}
-
 variable "vm_count" {
   description = "Number of VMs which should be created"
-  default     = 1
+  default     = 3
 }

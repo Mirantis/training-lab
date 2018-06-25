@@ -85,9 +85,8 @@ resource "azurerm_virtual_machine" "vm" {
 
   os_profile {
     computer_name  = "${format("%s-%02d-kvm%02d", var.prefix, count.index % var.environment_count + 1, count.index / var.environment_count + 1)}"
-    admin_username = "${var.username}"
-
-    # admin_password = "${element(random_string.password.*.result, count.index)}"
+    admin_username = "${var.azure_admin_username}"
+    admin_password = "${var.azure_admin_password}"
   }
 
   os_profile_linux_config {

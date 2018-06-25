@@ -1,8 +1,3 @@
-- name: Add ssh key to authorized key for root
-  authorized_key:
-    user: root
-    key: "{{ lookup('file', ssh_public_key) }}"
-
 - name: "Build hosts file"
   lineinfile:
     dest: /etc/hosts
@@ -44,6 +39,10 @@
     name: "{{ item }}"
   loop: "{{ packages }}"
 
+
+######################################################
+# Configure networking and libvirt
+######################################################
 - name: Set IP forward
   sysctl:
     name: net.ipv4.ip_forward
@@ -75,21 +74,16 @@
     src: templates/60-vxlan-bridge.cfg.j2
   notify: restart networking
 
-- name: Run all notify sections
-  meta: flush_handlers
 
-- name: Generate password for student user
-  set_fact:
-    student_password: "{{ lookup('password', file_with_generated_student_password + ' chars=ascii_letters,digits,length=6') }}"
-  delegate_to: localhost
-  changed_when: false
-
+######################################################
+# Add student account
+######################################################
 - name: Add user student
   user:
     name: "{{ default_student_account_name }}"
     comment: Student account
     groups: admin,libvirtd,kvm
-    password: "{{ student_password | password_hash('sha512') }}"
+    password: "{{ default_student_account_password | password_hash('sha512') }}"
     shell: /bin/bash
     update_password: on_create
 
@@ -112,3 +106,31 @@
       Match User {{ default_student_account_name }}
         PasswordAuthentication yes
   notify: restart sshd
+
+
+######################################################
+# Set all passwords and ssh keys
+######################################################
+- name: Set passwords for all users (root, student, ubuntu)
+  user:
+    name: "{{ item.name }}"
+    password: "{{ item.password | password_hash('sha512') }}"
+  loop:
+    - name: "{{ default_username }}"
+      password: "{{ default_username_password }}"
+    - name: root
+      password: "{{ root_passwrod }}"
+    - name: "{{ default_student_account_name }}"
+      password: "{{ default_student_account_password }}"
+
+- name: Add ssh key to authorized key for all users
+  authorized_key:
+    user: "{{ item }}"
+    key: "{{ lookup('file', ssh_public_key) }}"
+  loop:
+    - "{{ default_username }}"
+    - root
+    - "{{ default_student_account_name }}"
+
+- name: Run all notify sections
+  meta: flush_handlers
