@@ -93,7 +93,7 @@ resource "azurerm_virtual_machine" "vm" {
     disable_password_authentication = false
 
     ssh_keys {
-      path     = "/home/${var.username}/.ssh/authorized_keys"
+      path     = "/home/${var.azure_admin_username}/.ssh/authorized_keys"
       key_data = "${file(var.ssh_public_key)}"
     }
   }

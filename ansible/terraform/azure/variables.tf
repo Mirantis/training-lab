@@ -7,6 +7,10 @@ variable "azure_admin_username" {
   default     = "ubuntu"
 }
 
+variable "azure_admin_password" {
+  description = "Password for \"admin\" username"
+}
+
 variable "azurerm_resource_group_location" {
   default = "East US"
 }

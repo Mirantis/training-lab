@@ -1,6 +1,6 @@
 # https://docs.mirantis.com/mcp/master/mcp-deployment-guide/deploy-mcp-drivetrain/automated-deployment-of-mcp-drivetrain.html
 
-- name: Install packages related to kvm01
+- name: Install packages for kvm01
   apt:
     name: "{{ item }}"
     update_cache: yes
