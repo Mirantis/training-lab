@@ -127,6 +127,7 @@
       password: "{{ root_passwrod }}"
     - name: "{{ default_student_account_name }}"
       password: "{{ default_student_account_password }}"
+  changed_when: false
 
 - name: Add ssh key to authorized key for all users
   authorized_key:

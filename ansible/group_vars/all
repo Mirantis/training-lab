@@ -20,21 +20,28 @@ salt_master_ip: 10.0.0.15
 
 salt_model_git_repository: https://github.com/ruzickap/training-lab-salt-model.git
 
-mk_pipelines_git_repository:     https://github.com/Mirantis/mk-pipelines.git
-pipeline_library_git_repository: https://github.com/Mirantis/pipeline-library.git
-
-define_vm_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/predefine-vm/define-vm.sh
-create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/create_config_drive.sh
-master_config_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/master_config.sh
-
-default_username: ubuntu
-default_student_account_name: student
-# The file where the generated "student" password will be stored
-file_with_generated_student_password: /tmp/student_password
-
+mcp_release_tag: 2018.4.0
 
 # stable/proposed/testing
-mcp_release: testing
+mcp_salt_formulas_version: stable
+
+mk_pipelines_git_repository    : https://github.com/Mirantis/mk-pipelines.git
+pipeline_library_git_repository: https://github.com/Mirantis/pipeline-library.git
+
+define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/predefine-vm/define-vm.sh
+create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/create_config_drive.sh
+master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
+
+#define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/predefine-vm/define-vm.sh
+#create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/create_config_drive.sh
+#master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/master_config.sh
+#master_config_script_url      : https://gerrit.mcp.mirantis.net/gitweb?p=mcp/mcp-common-scripts.git;a=blob_plain;f=config-drive/master_config.sh;hb=refs/changes/61/21061/8
+
+default_username            : ubuntu
+default_student_account_name: student
+
+# The file where the generated "student" password will be stored
+file_with_generated_student_password: /tmp/student_password
 
 # Number of Training Environment
 environment_count: 1
@@ -51,7 +58,7 @@ cfg01_vm_mgm_bridge_name: "{{ networks.deploy_network.device }}"
 cfg01_vm_ctl_bridge_name: "{{ networks.control_network.device }}"
 cfg01_vm_mem_kb         : 5242880
 cfg01_vm_cpus           : 2
-cfg01_image_url         : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release }}.qcow2
+cfg01_image_url         : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
 
 packages:
   - ca-cacert

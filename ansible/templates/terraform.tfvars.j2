@@ -8,6 +8,9 @@ azure_admin_password                   = "{{ default_username_password }}"
 {% if cloud_platform == 'openstack' %}
 openstack_auth_url                     = "{{ openstack_auth_url }}"
 openstack_compute_instance_flavor_name = "{{ openstack_compute_instance_flavor_name }}"
+{% if openstack_networking_subnet_dns_nameservers is defined %}
+openstack_networking_subnet_dns_nameservers = {{ openstack_networking_subnet_dns_nameservers }}
+{% endif %}
 openstack_compute_keypair_public_key   = "{{ ssh_public_key }}"
 openstack_password                     = "{{ openstack_password }}"
 openstack_tenant_name                  = "{{ openstack_tenant_name }}"

@@ -97,7 +97,7 @@
       # Jenkins: http://{{ inventory_hostname }}:8081 -> http://{{ salt_master_ip }}:8081
       -A PREROUTING -i {{ ansible_default_ipv4.interface }} -d {{ ansible_default_ipv4.address }} -p tcp --dport 8081 -j DNAT --to-destination {{ salt_master_ip }}:8081
       # MAAS: http://{{ inventory_hostname }}/MAAS -> http://{{ salt_master_ip }}/MAAS
-      -A PREROUTING -i {{ ansible_default_ipv4.interface }} -d {{ ansible_default_ipv4.address }} -p tcp --dport 80 -j DNAT --to-destination {{ salt_master_ip }}:80
+      -A PREROUTING -i {{ ansible_default_ipv4.interface }} -d {{ ansible_default_ipv4.address }} -p tcp --dport 8080 -j DNAT --to-destination {{ salt_master_ip }}:8080
 
       COMMIT
   notify:
@@ -131,6 +131,7 @@
   get_url:
     url: "{{ cfg01_image_url }}"
     dest: /var/lib/libvirt/images/cfg01/cfg01-day01.qcow2
+    tmp_dest: /var/tmp/
 
 - name: Copy the original cfg01-day01 to {{ cfg01_vm_source_disk }}
   copy:
@@ -148,11 +149,13 @@
   git:
     repo: "{{ mk_pipelines_git_repository }}"
     dest: /root/mk-pipelines
+    version: "{{ mcp_release_tag }}"
 
 - name: Clone repository with pipeline-library
   git:
     repo: "{{ pipeline_library_git_repository }}"
     dest: /root/pipeline-library
+    version: "{{ mcp_release_tag }}"
 
 - name: Download create-config-drive script ({{ create_config_drive_script_url }})
   get_url:
@@ -176,8 +179,7 @@
     - { regexp: '^export SALT_MASTER_MINION_ID', line: 'export SALT_MASTER_MINION_ID=cfg01.{{ domain }}' }
     - { regexp: '^export DEPLOY_NETWORK_GW', line: 'export DEPLOY_NETWORK_GW={{ networks.deploy_network.gateway }}' }
     - { regexp: '^export DEPLOY_NETWORK_NETMASK', line: 'export DEPLOY_NETWORK_NETMASK={{ networks.deploy_network.netmask }}' }
-    - { regexp: '^export PIPELINES_FROM_ISO', line: 'export PIPELINES_FROM_ISO=false' }
-    - { regexp: '^export MCP_VERSION', line: 'export MCP_VERSION="{{ mcp_release }}"' }
+    - { regexp: '^export MCP_VERSION', line: 'export MCP_VERSION="{{ mcp_salt_formulas_version }}"' }
 
 - name: Create the iso from salt model
   command: /root/create-config-drive -u /root/user_data.sh -h cfg01 --model /root/model --mk-pipelines /root/mk-pipelines --pipeline-library /root/pipeline-library {{ cfg01_vm_config_disk }}
