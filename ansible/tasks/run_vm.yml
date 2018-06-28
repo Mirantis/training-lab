@@ -1,8 +1,0 @@
-- name: Define empty virtual machine to boot from network
-  command: virt-install --name=vm-pxe --ram=1024 --vcpus=2 --disk path=/var/lib/libvirt/images/vm-pxe.qcow2,bus=virtio,size=5 --pxe --noautoconsole --graphics vnc --hvm --network bridge=br-mgm,model=virtio --console pty,target_type=serial
-  args:
-    creates: /var/lib/libvirt/images/vm-pxe.qcow2
-  register: virt_install_output
-  changed_when: virt_install_output.stdout is search('console to complete the installation process.')
-
-

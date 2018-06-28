@@ -1,0 +1,34 @@
+# - name: Define empty virtual machine to boot from network
+#   command: virt-install --name=vm-pxe{{ item }}-{{ ansible_hostname }} --ram=1024 --vcpus=2 --disk path=/var/lib/libvirt/images/vm-pxe{{ item }}-{{ ansible_hostname }}.qcow2,bus=virtio,size=5 --boot network,hd --noautoconsole --graphics vnc --hvm --network mac=52:54:00:00:{{ ansible_hostname | regex_replace('.*(\d+)$', '\\1') }}:0{{ item }},bridge=br-mgm,model=virtio --console pty,target_type=serial
+#   args:
+#     creates: /var/lib/libvirt/images/vm-pxe{{ item }}-{{ ansible_hostname }}.qcow2
+#   with_sequence: start=1 end={{ sub_vms_count }}
+#   register: virt_install_output
+#   changed_when: virt_install_output.stdout is search('Domain creation completed.')
+
+- name: Create disk file
+  command: qemu-img create -f qcow2 -o size=5G /var/lib/libvirt/images/{{ item }}.qcow2
+  args:
+    creates: /var/lib/libvirt/images/{{ item }}.qcow2
+  with_sequence: start=1 end={{ sub_vms_count }} format=vm-pxe%01x-{{ ansible_hostname }}
+
+- name: Set correct owner/group for the qcow2 disk image
+  file:
+    path: /var/lib/libvirt/images/{{ item }}.qcow2
+    owner: libvirt-qemu
+    group: kvm
+  with_sequence: start=1 end={{ sub_vms_count }} format=vm-pxe%01x-{{ ansible_hostname }}
+
+- name: Get list of vms
+  virt:
+    command: list_vms
+  register: virt_vms
+
+- name: Define empty virtual machine to boot from network
+  virt:
+    name: "{{ item }}"
+    command: define
+    xml: "{{ lookup('template', 'templates/vm-template.xml.j2') }}"
+  when: item not in virt_vms.list_vms
+  with_sequence: start=1 end={{ sub_vms_count }} format=vm-pxe%01x-{{ ansible_hostname }}
+

@@ -16,26 +16,21 @@ networks:
     gateway: 10.0.1.11
     device: br-ctl
 
-salt_master_ip: 10.0.0.15
+mcp_salt_master_ip: 10.0.0.15
 
-salt_model_git_repository: https://github.com/ruzickap/training-lab-salt-model.git
+mcp_salt_model_git_repository: https://github.com/ruzickap/training-lab-salt-model.git
 
 mcp_release_tag: 2018.4.0
 
 # stable/proposed/testing
 mcp_salt_formulas_version: stable
 
-mk_pipelines_git_repository    : https://github.com/Mirantis/mk-pipelines.git
-pipeline_library_git_repository: https://github.com/Mirantis/pipeline-library.git
+mcp_mk_pipelines_git_repository    : https://github.com/Mirantis/mk-pipelines.git
+mcp_pipeline_library_git_repository: https://github.com/Mirantis/pipeline-library.git
 
-define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/predefine-vm/define-vm.sh
-create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/create_config_drive.sh
-master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
-
-#define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/predefine-vm/define-vm.sh
-#create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/create_config_drive.sh
-#master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/master_config.sh
-#master_config_script_url      : https://gerrit.mcp.mirantis.net/gitweb?p=mcp/mcp-common-scripts.git;a=blob_plain;f=config-drive/master_config.sh;hb=refs/changes/61/21061/8
+mcp_define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/predefine-vm/define-vm.sh
+mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/create_config_drive.sh
+mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
 
 default_username            : ubuntu
 default_student_account_name: student
@@ -51,14 +46,17 @@ ssh_public_key: ~/.ssh/id_rsa.pub
 # Number of Virtual Machines
 vm_count: 3
 
-cfg01_vm_name           : cfg01.{{ domain }}
-cfg01_vm_source_disk    : /var/lib/libvirt/images/cfg01/system.qcow2
-cfg01_vm_config_disk    : /var/lib/libvirt/images/cfg01/cfg01-config.iso
-cfg01_vm_mgm_bridge_name: "{{ networks.deploy_network.device }}"
-cfg01_vm_ctl_bridge_name: "{{ networks.control_network.device }}"
-cfg01_vm_mem_kb         : 5242880
-cfg01_vm_cpus           : 2
-cfg01_image_url         : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
+# Number of tesing PXE sub-vms
+sub_vms_count: 2
+
+mcp_cfg01_vm_name           : cfg01.{{ domain }}
+mcp_cfg01_vm_source_disk    : /var/lib/libvirt/images/cfg01/system.qcow2
+mcp_cfg01_vm_config_disk    : /var/lib/libvirt/images/cfg01/cfg01-config.iso
+mcp_cfg01_vm_mgm_bridge_name: "{{ networks.deploy_network.device }}"
+mcp_cfg01_vm_ctl_bridge_name: "{{ networks.control_network.device }}"
+mcp_cfg01_vm_mem_kb         : 5242880
+mcp_cfg01_vm_cpus           : 2
+mcp_cfg01_image_url         : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
 
 packages:
   - ca-cacert

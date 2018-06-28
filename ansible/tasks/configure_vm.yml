@@ -16,33 +16,11 @@
     name: "{{ item }}"
   loop: "{{ packages }}"
 
-- name: Check if reboot is necessery to boot to the latest kernel
-  shell: if [ "$(ls -t -1 /boot/vmlinuz-* | head -1 | sed 's@.*/vmlinuz-\(.*\)@\1@')" != "$(uname -r)" ]; then echo reboot; fi
-  changed_when: false
-  register: latest_kernel_check
-
-- name: Check if reboot is required by checking the file /var/run/reboot-required
-  stat:
-    path: /var/run/reboot-required
-  register: reboot_required_file
-
-- name: Reboot machine to boot to latest kernel and wait for booting up
-  block:
-  - name: Reboot machine
-    shell: sleep 2 && shutdown -r now "Ansible triggered reboot"
-    async: 1
-    poll: 0
-    ignore_errors: true
-
-  - name: Wait for system to boot up
-    wait_for:
-      host: "{{ ansible_host }}"
-      port: "{{ ansible_port | default('22') }}"
-      search_regex: OpenSSH
-      delay: 10
-    connection: local
-    become: False
-  when: latest_kernel_check.stdout is search("reboot") or reboot_required_file.stat.exists
+- name: Install packages for kvm01
+  apt:
+    name: "{{ item }}"
+  loop: "{{ kvm01_packages }}"
+  when: ansible_hostname is search('kvm01')
 
 
 ######################################################
@@ -140,3 +118,26 @@
 
 - name: Run all notify sections
   meta: flush_handlers
+
+- name: Check if reboot is necessary by locatimng the /var/run/reboot-required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required
+
+- name: Reboot check
+  block:
+  - name: Reboot machine
+    shell: sleep 2 && shutdown -r now "Ansible triggered reboot"
+    async: 1
+    poll: 0
+    ignore_errors: true
+
+  - name: Wait for system to boot up
+    wait_for:
+      host: "{{ ansible_host }}"
+      port: "{{ ansible_port | default('22') }}"
+      search_regex: OpenSSH
+      delay: 10
+    connection: local
+    become: False
+  when: reboot_required.stat.exists

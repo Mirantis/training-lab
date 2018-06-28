@@ -41,12 +41,20 @@
     - include_tasks: tasks/kvm01.yml
       when: ansible_hostname is search('kvm01')
 
+    - include_tasks: tasks/define_vms.yml
+
     - name: Wait for user imput to continue
       pause:
-        prompt: "Configure MAAS (http://{{ inventory_hostname }}/MAAS), then press ENTER"
-      when: ansible_hostname is search('kvm01')
+        prompt: |
 
-    - include_tasks: tasks/run_vm.yml
+          Install libvirt-clients and add VMs to MAAS in cfg01 by running - ssh {{ inventory_hostname }}; virsh console cfg01.{{ domain }}; apt install -y libvirt-bin
+
+          Enable DHCP in MAAS by going to http://{{ inventory_hostname }}:8080/MAAS (mirantis/r00tme) then 'DHCP Subnets -> untagged -> Provide DHCP'
+
+          for A in {1..3}; do for B in {1..3}; do maas mirantis machines create power_parameters_power_address=qemu+tcp://10.0.0.1$A/system hostname=vm-pxe$B-ruzickap-01-kvm0$A power_type=virsh power_parameters_power_id=vm-pxe$B-ruzickap-01-kvm0$A architecture=amd64/generic mac_addresses=52:54:00:00:0$A:0$B; done; done
+
+          ... and then press ENTER
+      when: ansible_hostname is search('kvm01')
 
     - name: Display all "external" URLs
       debug:
@@ -57,6 +65,7 @@
           - "VNC    : vnc://{{ inventory_hostname }}:5901, Password: {{ default_student_account_password }}"
           - "ssh {{ default_student_account_name }}@{{ inventory_hostname }} | {{ ansible_hostname }}, Password: {{ default_student_account_password }}"
       when: ansible_hostname is search('kvm01')
+
 
   handlers:
     - name: reload systemd
