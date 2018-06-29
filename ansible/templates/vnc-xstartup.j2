@@ -3,3 +3,7 @@
 # {{ ansible_managed }}
 
 startxfce4 &
+
+{% for node in ansible_play_batch %}
+virt-manager -c qemu+ssh://root@{{ hostvars[node].ansible_hostname }}/system
+{% endfor %}

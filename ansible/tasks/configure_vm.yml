@@ -94,6 +94,44 @@
 ######################################################
 # Set all passwords and ssh keys
 ######################################################
+- block:
+  - name: Generate private/public ssh keys for access inside all VMs
+    command: ssh-keygen -t rsa -b 2048 -f /root/.ssh/id_rsa -N "" -q
+    args:
+      creates: /root/.ssh/id_rsa
+
+  - name: Get generated private ssh key for access inside all VMs
+    command: cat /root/.ssh/id_rsa
+    register: generated_ssh_private_key
+    changed_when: false
+
+  - name: Get generated public ssh key for access inside all VMs
+    command: cat /root/.ssh/id_rsa.pub
+    register: generated_ssh_public_key
+    changed_when: false
+  run_once: true
+
+- name: Add generated ssh public key to authorized key for all users
+  authorized_key:
+    user: "{{ item }}"
+    key: "{{ generated_ssh_public_key.stdout }}"
+  loop:
+    - "{{ default_username }}"
+    - root
+    - "{{ default_student_account_name }}"
+
+- name: Add generated ssh private key to all users $HOME/.ssh/id_rsa
+  copy:
+    content: "{{ generated_ssh_private_key.stdout }}"
+    dest: "{{ item }}/.ssh/id_rsa"
+    mode: 0600
+    owner: "{{ item | basename }}"
+    group: "{{ item | basename }}"
+  loop:
+    - "/home/{{ default_username }}"
+    - /root
+    - "/home/{{ default_student_account_name }}"
+
 - name: Set passwords for all users (root, student, ubuntu)
   user:
     name: "{{ item.name }}"
@@ -107,7 +145,7 @@
       password: "{{ default_student_account_password }}"
   changed_when: false
 
-- name: Add ssh key to authorized key for all users
+- name: Add ssh key ({{ ssh_public_key }}) to authorized key for all users
   authorized_key:
     user: "{{ item }}"
     key: "{{ lookup('file', ssh_public_key) }}"

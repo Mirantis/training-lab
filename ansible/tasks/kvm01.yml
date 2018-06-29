@@ -191,19 +191,19 @@
   command: /root/define-vm.sh
   args:
     chdir: /root
-    creates: "/root/{{ mcp_cfg01_vm_name }}-vm.xml"
+    creates: "/root/cfg01.{{ domain }}-vm.xml"
   environment:
-    VM_NAME: "{{ mcp_cfg01_vm_name }}"
+    VM_NAME: "cfg01.{{ domain }}"
     VM_SOURCE_DISK: "{{ mcp_cfg01_vm_source_disk }}"
     VM_CONFIG_DISK: "{{ mcp_cfg01_vm_config_disk }}"
-    VM_MGM_BRIDGE_NAME: "{{ mcp_cfg01_vm_mgm_bridge_name }}"
-    VM_CTL_BRIDGE_NAME: "{{ mcp_cfg01_vm_ctl_bridge_name }}"
+    VM_MGM_BRIDGE_NAME: "{{ networks.deploy_network.device }}"
+    VM_CTL_BRIDGE_NAME: "{{ networks.control_network.device }}"
     VM_MEM_KB: "{{ mcp_cfg01_vm_mem_kb }}"
     VM_CPUS: "{{ mcp_cfg01_vm_cpus }}"
   register: define_vm_output
   changed_when: define_vm_output.stdout is search('defined from')
 
-- name: Start {{ mcp_cfg01_vm_name }}
+- name: Start cfg01.{{ domain }}
   virt:
     name: cfg01.{{ domain }}
     state: running

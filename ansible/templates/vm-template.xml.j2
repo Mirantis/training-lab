@@ -1,7 +1,10 @@
+<!--
+{{ ansible_managed }}
+-->
 <domain type='kvm'>
   <name>{{ item }}</name>
   <uuid>{{ item | to_uuid }}</uuid>
-  <memory unit='KiB'>2097152</memory>
+  <memory unit='KiB'>{{ sub_vms_memory * 1024 * 1024 }}</memory>
   <currentMemory unit='KiB'>1048576</currentMemory>
   <vcpu placement='static'>2</vcpu>
   <os>

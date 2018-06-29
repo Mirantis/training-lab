@@ -26,7 +26,7 @@ variable "azure_tags" {
 }
 
 variable "azurerm_virtual_machine_vm_size" {
-  default = "Standard_D2_v3"
+  default = "Standard_D16_v3"
 }
 
 variable "azurerm_virtual_network_address_space" {
