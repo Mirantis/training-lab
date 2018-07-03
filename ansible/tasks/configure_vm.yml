@@ -24,6 +24,15 @@
 
 
 ######################################################
+# Optimize Virtualization
+######################################################
+- name: Add module parameters for kvm_intel into /etc/modprobe.d/kvm_intel.conf
+  template:
+    dest: /etc/modprobe.d/kvm_intel.conf
+    src: templates/kvm_intel.conf.j2
+
+
+######################################################
 # Configure networking and libvirt
 ######################################################
 - name: Set IP forward
@@ -166,22 +175,60 @@
     - /root
     - "/home/{{ default_student_account_name }}"
 
-- name: Change gights for /mnt
-  file:
-    path: /mnt
-    mode: 0755
+# - name: Change rights for /mnt
+#   file:
+#     path: /mnt
+#     mode: 0755
 
-- name: Remove the /var/lib/libvirt/images directory
-  file:
+- name: Check if symling /var/lib/libvirt/images -> /mnt already exists
+  stat:
     path: /var/lib/libvirt/images
-    state: absent
+  register: images_stat
 
-- name: Create symlink for /mnt to /var/lib/libvirt/images
-  file:
-    src: /mnt
-    dest: /var/lib/libvirt/images
-    mode: 0775
-    state: link
+- block:
+  - name: Remove the /var/lib/libvirt/images directory
+    file:
+      path: /var/lib/libvirt/images
+      state: absent
+
+  - name: Create symlink for /mnt to /var/lib/libvirt/images
+    file:
+      src: /mnt
+      dest: /var/lib/libvirt/images
+      mode: 0775
+      state: link
+  when: not images_stat.stat.islnk
+
+
+######################################################
+# Configure firewall
+######################################################
+- name: Enable ssh acces on ufw
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - 22
+
+- name: Change ufw settings /etc/default/ufw
+  lineinfile:
+    dest: /etc/default/ufw
+    regexp: '^DEFAULT_FORWARD_POLICY'
+    line: 'DEFAULT_FORWARD_POLICY="ACCEPT"'
+  notify: restart ufw
+
+- name: Allow all access from 10.0.0.0/8, 192.168.0.0/16 networks
+  ufw:
+    rule: allow
+    src: '{{ item }}'
+  with_items:
+    - 10.0.0.0/8
+    - 192.168.0.0/16
+
+- name: Enable UFW
+  ufw:
+    state: enabled
 
 - name: Run all notify sections
   meta: flush_handlers

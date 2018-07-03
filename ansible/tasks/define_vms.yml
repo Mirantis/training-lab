@@ -19,6 +19,7 @@
 - name: Define empty virtual machine to boot from network
   virt:
     name: "{{ item }}"
+    autostart: yes
     command: define
     xml: "{{ lookup('template', 'templates/vm-template.xml.j2') }}"
   when: item not in virt_vms.list_vms
