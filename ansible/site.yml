@@ -53,17 +53,13 @@
       loop: "{{ ansible_play_batch }}"
       run_once: true
 
-    - name: Wait for user imput to continue
+    - name: Notes...
       debug:
         msg:
-          - Install libvirt-clients and add VMs to MAAS in cfg01 by running - ssh {{ inventory_hostname }}; virsh console cfg01.{{ domain }}; apt install -y libvirt-bin
+          - Install libvirt-clients and add VMs to MAAS in cfg01 by running - ssh {{ default_student_account_name }}@{{ inventory_hostname }}; virsh console cfg01.{{ domain }}; apt install -y libvirt-bin
           - Enable DHCP in MAAS by going to http://{{ inventory_hostname }}:8080/MAAS (mirantis/r00tme) then 'DHCP Subnets -> untagged -> Provide DHCP'
+          - Add your ssh public key into the default account
           - for A in {1..{{ vm_count }}}; do for B in {1..{{ sub_vms_count }}}; do maas mirantis machines create power_parameters_power_address=qemu+tcp://10.0.0.1$A/system hostname=vm-pxe$B-ruzickap-01-kvm0$A power_type=virsh power_parameters_power_id=vm-pxe$B-ruzickap-01-kvm0$A architecture=amd64/generic mac_addresses=52:54:00:00:0$A:0$B; done; done
-      run_once: true
-
-    - name: Display all "external" URLs
-      debug:
-        msg:
           - "MAAS   : http://{{ inventory_hostname }}:8080/MAAS (mirantis/r00tme)"
           - "Jenkins: http://{{ inventory_hostname }}:8081 (admin/r00tme)"
           - "noVNC  : https://{{ inventory_hostname }}/vnc.html?port=443&true_color=1&password={{ default_student_account_password }}"

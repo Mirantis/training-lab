@@ -154,6 +154,35 @@
     - root
     - "{{ default_student_account_name }}"
 
+- name: Configure ssh ~/.ssh/config for all users
+  template:
+    src: templates/config.j2
+    dest: "{{ item }}/.ssh/config"
+    mode: 0600
+    owner: "{{ item | basename }}"
+    group: "{{ item | basename }}"
+  loop:
+    - "/home/{{ default_username }}"
+    - /root
+    - "/home/{{ default_student_account_name }}"
+
+- name: Change gights for /mnt
+  file:
+    path: /mnt
+    mode: 0755
+
+- name: Remove the /var/lib/libvirt/images directory
+  file:
+    path: /var/lib/libvirt/images
+    state: absent
+
+- name: Create symlink for /mnt to /var/lib/libvirt/images
+  file:
+    src: /mnt
+    dest: /var/lib/libvirt/images
+    mode: 0775
+    state: link
+
 - name: Run all notify sections
   meta: flush_handlers
 

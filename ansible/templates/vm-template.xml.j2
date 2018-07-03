@@ -5,8 +5,8 @@
   <name>{{ item }}</name>
   <uuid>{{ item | to_uuid }}</uuid>
   <memory unit='KiB'>{{ sub_vms_memory * 1024 * 1024 }}</memory>
-  <currentMemory unit='KiB'>1048576</currentMemory>
-  <vcpu placement='static'>2</vcpu>
+  <currentMemory unit='KiB'>{{ sub_vms_memory * 1024 * 1024 }}</currentMemory>
+  <vcpu placement='static'>{{ sub_vms_cpu }}</vcpu>
   <os>
     <type arch='x86_64' machine='pc-i440fx-xenial'>hvm</type>
     <boot dev='network'/>

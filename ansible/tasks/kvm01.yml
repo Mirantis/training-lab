@@ -61,8 +61,17 @@
     port: "{{ item }}"
     proto: tcp
   loop:
-    - 5901
+    - 22
     - 443
+    - 5901
+
+- name: Allow all access from 10.0.0.0/8, 192.168.0.0/16 networks
+  ufw:
+    rule: allow
+    src: '{{ item }}'
+  with_items:
+    - 10.0.0.0/8
+    - 192.168.0.0/16
 
 - name: Change ufw settings /etc/default/ufw
   lineinfile:
@@ -71,7 +80,6 @@
     line: "{{ item.line }}"
   loop:
     - { regexp: '^DEFAULT_FORWARD_POLICY', line: 'DEFAULT_FORWARD_POLICY="ACCEPT"' }
-    - { regexp: '^DEFAULT_INPUT_POLICY', line: 'DEFAULT_INPUT_POLICY="ACCEPT"' }
   notify: restart ufw
 
 - name: Add port forwarding for Jenkins and MAAS to be accessible form Public IP
@@ -97,12 +105,12 @@
   notify:
     - restart ufw
 
-- name: Run all notify sections
-  meta: flush_handlers
-
 - name: Enable UFW
   ufw:
     state: enabled
+
+- name: Run all notify sections
+  meta: flush_handlers
 
 - name: Start vncserver when booting
   service:

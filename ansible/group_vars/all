@@ -1,61 +1,97 @@
+# Terraform variables
+
+# Default user for all VMs created by cloud provider
+default_username            : ubuntu
+
+# Default user for all VMs created by config management
+default_student_account_name: student
+
+# Number of Training Environment
+environment_count: 1
+
+# Number of Virtual Machines
+vm_count: 3
+
+# Prefix for all names used in Cloud (vms, networks, ...)
+prefix: training
+
+# Local SSH public key which will be saved to all VMs to all users
+ssh_public_key: ~/.ssh/id_rsa.pub
+
+# Azure
+azurerm_resource_group_location      : East US
+azurerm_subnet_address_prefix        : 192.168.250.0/24
+azure_tags                           : '{ Environment = "Training", Consumer = "training@mirantis.com" }'
+azurerm_virtual_machine_vm_size      : Standard_D16_v3
+azurerm_virtual_network_address_space: '["192.168.250.0/24"]'
+
+# OpenStack
+openstack_auth_url                                : https://cloud.example.com:5000/v2.0
+openstack_compute_instance_flavor_name            : m1.xxlarge80
+openstack_compute_instance_image_name             : ubuntu-16-04-x64-201804032121
+openstack_networking_network_external_network_name: public
+openstack_networking_subnet_cidr                  : 192.168.250.0/24
+openstack_networking_subnet_dns_nameservers       : '["1.1.1.1"]'
+openstack_networking_floatingip                   : public
+openstack_password                                : my_secret_password
+openstack_tenant_name                             : my_tenant_name
+openstack_user_name                               : my_username
+
+# Domain name
 domain: 1.edu.mirantis.net
 
+# Network list
 networks:
   # Management (mgm) Deploy / PXE
   deploy_network:
-    subnet: 10.0.0.0
-    netmask: 255.255.255.0
+    subnet        : 10.0.0.0
+    netmask       : 255.255.255.0
     subnet_netmask: 10.0.0.0/24
-    gateway: 10.0.0.11
-    device: br-mgm
+    gateway       : 10.0.0.11
+    device        : br-mgm
   # Control network
   control_network:
-    subnet: 10.0.1.0
-    netmask: 255.255.255.0
+    subnet        : 10.0.1.0
+    netmask       : 255.255.255.0
     subnet_netmask: 10.0.1.0/24
-    gateway: 10.0.1.11
-    device: br-ctl
+    gateway       : 10.0.1.11
+    device        : br-ctl
 
+# Salt Master IP (cfg01)
 mcp_salt_master_ip: 10.0.0.15
 
+# Salt model
 mcp_salt_model_git_repository: https://github.com/ruzickap/training-lab-salt-model.git
 
+# MCP release tags: https://github.com/Mirantis/mcp-common-scripts/tags, http://images.mirantis.com/
 mcp_release_tag: 2018.4.0
 
 # stable/proposed/testing
 mcp_salt_formulas_version: stable
 
+# MCP pipelines
 mcp_mk_pipelines_git_repository    : https://github.com/Mirantis/mk-pipelines.git
 mcp_pipeline_library_git_repository: https://github.com/Mirantis/pipeline-library.git
 
+# MCP build scripts (https://github.com/Mirantis/mcp-common-scripts)
 mcp_define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/predefine-vm/define-vm.sh
 mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/create_config_drive.sh
 mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
 
-default_username            : ubuntu
-default_student_account_name: student
-
 # The file where the generated "student" password will be stored
 file_with_generated_student_password: /tmp/student_password
 
-# Number of Training Environment
-environment_count: 1
-
-ssh_public_key: ~/.ssh/id_rsa.pub
-
-# Number of Virtual Machines
-vm_count: 3
-
 # Number of tesing PXE sub-vms
-sub_vms_count: 5
+sub_vms_count : 5
 sub_vms_memory: 8
+sub_vms_cpu   : 2
 
-# cfg01 parameters
-mcp_cfg01_vm_source_disk    : /var/lib/libvirt/images/cfg01/system.qcow2
-mcp_cfg01_vm_config_disk    : /var/lib/libvirt/images/cfg01/cfg01-config.iso
-mcp_cfg01_vm_mem_kb         : 8388608
-mcp_cfg01_vm_cpus           : 4
-mcp_cfg01_image_url         : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
+# cfg01 VM parameters
+mcp_cfg01_vm_source_disk: /var/lib/libvirt/images/cfg01/system.qcow2
+mcp_cfg01_vm_config_disk: /var/lib/libvirt/images/cfg01/cfg01-config.iso
+mcp_cfg01_vm_mem_kb     : 8388608
+mcp_cfg01_vm_cpus       : 4
+mcp_cfg01_image_url     : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
 
 packages:
   - ca-cacert
