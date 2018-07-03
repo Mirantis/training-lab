@@ -19,8 +19,14 @@
 - name: Define empty virtual machine to boot from network
   virt:
     name: "{{ item }}"
-    autostart: yes
     command: define
     xml: "{{ lookup('template', 'templates/vm-template.xml.j2') }}"
   when: item not in virt_vms.list_vms
+  with_sequence: start=1 end={{ sub_vms_count }} format=vm-pxe%01x-{{ ansible_hostname }}
+
+- name: Autostart the VMs
+  virt:
+    name: "{{ item }}"
+    autostart: yes
+    command: info
   with_sequence: start=1 end={{ sub_vms_count }} format=vm-pxe%01x-{{ ansible_hostname }}
