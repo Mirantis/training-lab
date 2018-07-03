@@ -175,11 +175,6 @@
     - /root
     - "/home/{{ default_student_account_name }}"
 
-# - name: Change rights for /mnt
-#   file:
-#     path: /mnt
-#     mode: 0755
-
 - name: Check if symling /var/lib/libvirt/images -> /mnt already exists
   stat:
     path: /var/lib/libvirt/images
