@@ -13,6 +13,17 @@ You will need to have Terrafrom, az-cli and Ansible installed.
 * few minor packages curl, git, jq, ...
 
 
+## Network diagram
+
+* Training lab - Architecture diagram
+
+![Training lab - Architecture diagram](images/training-lab.png)
+
+* Ansible + Terraform + Cloud Architecture
+
+![Ansible + Terraform + Cloud Architecture](images/ansible_terraform.png)
+
+
 ### Azure related tasks
 
 Few notes how to build the Training environment in Azure using [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest), [Terrafrom](https://www.terraform.io/) + [Ansible](https://www.ansible.com/).
@@ -74,6 +85,9 @@ cd -
 
 test -d ~/.ansible || mkdir ~/.ansible
 echo "<my_secret_password>" > ~/.ansible/vault_training-lab.txt
+
+# For editing the secrets you can use:
+# ansible-vault edit --vault-password-file=~/.ansible/vault_training-lab.txt vars/openstack_secrets.yml
 
 cd training-lab/ansible
 

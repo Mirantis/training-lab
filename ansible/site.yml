@@ -48,6 +48,7 @@
       delegate_to: localhost
       become: true
       become_user: pruzicka
+      when: ansible_system == "Linux"
       loop: "{{ ansible_play_batch }}"
       run_once: true
 

@@ -159,6 +159,7 @@
     - { regexp: '^export SALT_MASTER_MINION_ID', line: 'export SALT_MASTER_MINION_ID=cfg01.{{ domain }}' }
     - { regexp: '^export DEPLOY_NETWORK_GW', line: 'export DEPLOY_NETWORK_GW={{ networks.deploy_network.gateway }}' }
     - { regexp: '^export DEPLOY_NETWORK_NETMASK', line: 'export DEPLOY_NETWORK_NETMASK={{ networks.deploy_network.netmask }}' }
+    - { regexp: '^export DEPLOY_NETWORK_MTU', line: 'export DEPLOY_NETWORK_MTU=1450' }
     - { regexp: '^export MCP_VERSION', line: 'export MCP_VERSION="{{ mcp_salt_formulas_version }}"' }
 
 - name: Create the iso from salt model
