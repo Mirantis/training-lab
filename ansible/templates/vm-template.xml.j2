@@ -4,9 +4,9 @@
 <domain type='kvm'>
   <name>{{ item }}</name>
   <uuid>{{ item | to_uuid }}</uuid>
-  <memory unit='KiB'>{{ sub_vms_memory * 1024 * 1024 }}</memory>
-  <currentMemory unit='KiB'>{{ sub_vms_memory * 1024 * 1024 }}</currentMemory>
-  <vcpu placement='static'>{{ sub_vms_cpu }}</vcpu>
+  <memory unit='KiB'>{{ nested_vms_memory * 1024 * 1024 }}</memory>
+  <currentMemory unit='KiB'>{{ nested_vms_memory * 1024 * 1024 }}</currentMemory>
+  <vcpu placement='static'>{{ nested_vms_cpu }}</vcpu>
   <os>
     <type arch='x86_64' machine='pc-i440fx-xenial'>hvm</type>
     <boot dev='network'/>
@@ -53,7 +53,7 @@
     </controller>
     <controller type='pci' index='0' model='pci-root'/>
     <interface type='bridge'>
-      <mac address='52:54:00:00:0{{ ansible_hostname | regex_replace('.*(\d+)$', '\\1') }}:0{{ item | regex_replace('^vm-pxe(\d+)-.*$', '\\1') }}'/>
+      <mac address='52:54:00:00:{{ ansible_hostname | regex_replace('.*kvm(\d+).*', '\\1') }}:{{ item | regex_replace('.*pxe(\d+).*', '\\1') }}'/>
       <source bridge='{{ networks.deploy_network.device }}'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>

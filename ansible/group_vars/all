@@ -19,10 +19,14 @@ prefix: training
 ssh_public_key: ~/.ssh/id_rsa.pub
 
 # Azure
+# Permanent Azure Resource Group which is serving the {{ domain }} should be already exist...
+azure_dns_resource_group             : training-lab-dns
+azure_tags                           : '{ Environment = "Training", Consumer = "training@mirantis.com" }'
+#azurerm_resource_group_location      : East US 2
 azurerm_resource_group_location      : East US
 azurerm_subnet_address_prefix        : 192.168.250.0/24
-azure_tags                           : '{ Environment = "Training", Consumer = "training@mirantis.com" }'
-azurerm_virtual_machine_vm_size      : Standard_D16_v3
+#azurerm_virtual_machine_vm_size      : Standard_D16_v3
+azurerm_virtual_machine_vm_size      : Standard_B1s
 azurerm_virtual_network_address_space: '["192.168.250.0/24"]'
 
 # OpenStack
@@ -38,7 +42,7 @@ openstack_tenant_name                             : my_tenant_name
 openstack_user_name                               : my_username
 
 # Domain name
-domain: 1.edu.mirantis.net
+domain: edu.mirantis.net
 
 # Network list
 networks:
@@ -82,9 +86,10 @@ mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/m
 file_with_generated_student_password: /tmp/student_password
 
 # Number of tesing PXE sub-vms
-sub_vms_count : 5
-sub_vms_memory: 8
-sub_vms_cpu   : 2
+nested_vms_count : 1
+# Minimum RAM for sub_vm is 2GB
+nested_vms_memory: 2
+nested_vms_cpu   : 2
 
 # cfg01 VM parameters
 mcp_cfg01_vm_source_disk: /var/lib/libvirt/images/cfg01/system.qcow2

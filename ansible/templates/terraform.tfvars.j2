@@ -4,9 +4,10 @@
 # Azure
 azure_admin_username                  = "{{ default_username }}"
 azure_admin_password                  = "{{ default_username_password }}"
+azure_dns_resource_group              = "{{ azure_dns_resource_group }}"
+azure_tags                            = {{ azure_tags }}
 azurerm_resource_group_location       = "{{ azurerm_resource_group_location }}"
 azurerm_subnet_address_prefix         = "{{ azurerm_subnet_address_prefix }}"
-azure_tags                            = {{ azure_tags }}
 azurerm_virtual_machine_vm_size       = "{{ azurerm_virtual_machine_vm_size }}"
 azurerm_virtual_network_address_space = {{ azurerm_virtual_network_address_space }}
 {% endif %}
@@ -27,8 +28,9 @@ openstack_user_name                                = "{{ openstack_user_name }}"
 {% endif %}
 
 # Common
-environment_count                      = {{ environment_count }}
-prefix                                 = "{{ prefix }}"
-ssh_public_key                         = "{{ ssh_public_key }}"
-username                               = "{{ default_username }}"
-vm_count                               = {{ vm_count }}
+domain            = "{{ domain }}"
+environment_count = {{ environment_count }}
+prefix            = "{{ prefix }}"
+ssh_public_key    = "{{ ssh_public_key }}"
+username          = "{{ default_username }}"
+vm_count          = {{ vm_count }}

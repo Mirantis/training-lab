@@ -2,14 +2,14 @@
   command: qemu-img create -f qcow2 -o size=5G /var/lib/libvirt/images/{{ item }}.qcow2
   args:
     creates: /var/lib/libvirt/images/{{ item }}.qcow2
-  with_sequence: start=1 end={{ sub_vms_count }} format=vm-pxe%01x-{{ ansible_hostname }}
+  with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname }}-pxe%02x
 
 - name: Set correct owner/group for the qcow2 disk image
   file:
     path: /var/lib/libvirt/images/{{ item }}.qcow2
     owner: libvirt-qemu
     group: kvm
-  with_sequence: start=1 end={{ sub_vms_count }} format=vm-pxe%01x-{{ ansible_hostname }}
+  with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname }}-pxe%02x
 
 - name: Get list of vms
   virt:
@@ -22,11 +22,11 @@
     command: define
     xml: "{{ lookup('template', 'templates/vm-template.xml.j2') }}"
   when: item not in virt_vms.list_vms
-  with_sequence: start=1 end={{ sub_vms_count }} format=vm-pxe%01x-{{ ansible_hostname }}
+  with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname }}-pxe%02x
 
 - name: Autostart the VMs
   virt:
     name: "{{ item }}"
     autostart: yes
     command: info
-  with_sequence: start=1 end={{ sub_vms_count }} format=vm-pxe%01x-{{ ansible_hostname }}
+  with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname }}-pxe%02x

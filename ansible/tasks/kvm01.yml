@@ -32,7 +32,7 @@
     recurse: yes
 
 - name: Create certificate for novnc
-  command: openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/novnc.pem -out /etc/ssl/novnc.pem -days 365 -subj "/C=CZ/ST=Czech/L=Prague/O=Mirantis/CN={{ domain }}"
+  command: openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/novnc.pem -out /etc/ssl/novnc.pem -days 365 -subj "/C=CZ/ST=Czech/L=Prague/O=Mirantis/CN={{ ansible_domain }}"
   args:
     creates: /etc/ssl/novnc.pem
 

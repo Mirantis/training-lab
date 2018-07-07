@@ -44,6 +44,10 @@ variable "openstack_user_name" {
   description = "The username for the Tenant"
 }
 
+variable "domain" {
+  default = "edu.example.com"
+}
+
 variable "prefix" {
   default = "terraform"
 }

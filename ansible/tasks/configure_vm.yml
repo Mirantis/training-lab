@@ -1,10 +1,19 @@
-- name: "Build hosts file"
-  lineinfile:
-    dest: /etc/hosts
-    regexp: '{{ hostvars[item].ansible_hostname }}'
-    line: "{{ hostvars[item].ansible_default_ipv4.address }} {{ hostvars[item].ansible_hostname }}"
-  when: hostvars[item].ansible_default_ipv4.address is defined and hostvars[item].ansible_hostname is defined
+- name: Set proper hostname / domain
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Build hosts file
+  blockinfile:
+    path: /etc/hosts
+    backup: yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ index }}"
+    block: |
+      {{ hostvars[item].ansible_default_ipv4.address }} {{ hostvars[item].ansible_hostname }}
+      {{ hostvars[item].ansible_host }} {{ hostvars[item].ansible_fqdn }}
   loop: "{{ ansible_play_batch }}"
+  loop_control:
+    index_var: index
+    label: "{{ ansible_host }} {{ hostvars[item].ansible_default_ipv4.address }} {{ hostvars[item].ansible_hostname }} {{ hostvars[item].ansible_fqdn }}"
 
 - name: Update all packages
   apt:

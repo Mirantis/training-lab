@@ -11,6 +11,10 @@ variable "azure_admin_password" {
   description = "Password for \"admin\" username"
 }
 
+variable "azure_dns_resource_group" {
+  default = "training-lab-dns"
+}
+
 variable "azurerm_resource_group_location" {
   default = "East US"
 }
@@ -31,6 +35,10 @@ variable "azurerm_virtual_machine_vm_size" {
 
 variable "azurerm_virtual_network_address_space" {
   default = ["192.168.250.0/24"]
+}
+
+variable "domain" {
+  default = "edu.example.com"
 }
 
 variable "prefix" {
