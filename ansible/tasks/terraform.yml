@@ -15,7 +15,9 @@
     add_host:
       name: "{{ item.1 }}"
       ansible_host: "{{ item.0 }}"
-      groups: terraform
+      groups:
+        - training-lab-{{ item.1.split('.')[1] }}
+        - training-lab
     loop: "{{ terraform_apply_output.outputs.vm_public_ip.value|zip(terraform_apply_output.outputs.vm_name.value)|list }}"
     changed_when: false
 

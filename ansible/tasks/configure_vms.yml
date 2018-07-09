@@ -3,17 +3,18 @@
     name: "{{ inventory_hostname }}"
 
 - name: Build hosts file
-  blockinfile:
-    path: /etc/hosts
+  template:
+    src: templates/hosts.j2
+    dest: /etc/hosts
     backup: yes
-    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ index }}"
-    block: |
-      {{ hostvars[item].ansible_default_ipv4.address }} {{ hostvars[item].ansible_hostname }}
-      {{ hostvars[item].ansible_host }} {{ hostvars[item].ansible_fqdn }}
-  loop: "{{ ansible_play_batch }}"
-  loop_control:
-    index_var: index
-    label: "{{ ansible_host }} {{ hostvars[item].ansible_default_ipv4.address }} {{ hostvars[item].ansible_hostname }} {{ hostvars[item].ansible_fqdn }}"
+
+- name: Add Salt Stack GPG key
+  apt_key:
+    url: https://repo.saltstack.com/apt/ubuntu/{{ ansible_distribution_version }}/amd64/latest/SALTSTACK-GPG-KEY.pub
+
+- name: Add salt repository
+  apt_repository:
+    repo: deb http://mirror.mirantis.com/{{ mcp_release_tag }}/saltstack-2016.3/{{ ansible_distribution_release }}/ {{ ansible_distribution_release }} main
 
 - name: Update all packages
   apt:
@@ -84,9 +85,7 @@
     name: "{{ default_student_account_name }}"
     comment: Student account
     groups: admin,libvirtd,kvm
-    password: "{{ default_student_account_password | password_hash('sha512') }}"
     shell: /bin/bash
-    update_password: on_create
 
 - name: Set authorized key for {{ default_student_account_name }} account
   authorized_key:
@@ -150,17 +149,20 @@
     - /root
     - "/home/{{ default_student_account_name }}"
 
+- name: Generate access password for all users
+  set_fact:
+    default_access_password: "{{ lookup('password', file_with_generated_access_password_prefix + ' chars=ascii_letters,digits,length=6') }}"
+  delegate_to: localhost
+  changed_when: false
+
 - name: Set passwords for all users (root, student, ubuntu)
   user:
-    name: "{{ item.name }}"
-    password: "{{ item.password | password_hash('sha512') }}"
+    name: "{{ item }}"
+    password: "{{ default_access_password | password_hash('sha512') }}"
   loop:
-    - name: "{{ default_username }}"
-      password: "{{ default_username_password }}"
-    - name: root
-      password: "{{ root_passwrod }}"
-    - name: "{{ default_student_account_name }}"
-      password: "{{ default_student_account_password }}"
+    - "{{ default_username }}"
+    - root
+    - "{{ default_student_account_name }}"
   changed_when: false
 
 - name: Add ssh key ({{ ssh_public_key }}) to authorized key for all users
@@ -234,6 +236,19 @@
   ufw:
     state: enabled
 
+
+######################################################
+# Salt configuration
+######################################################
+- name: Configure salt-minion
+  blockinfile:
+    path: /etc/salt/minion
+    backup: yes
+    block: |
+      id: {{ ansible_fqdn }}
+      master: {{ mcp_salt_master_ip }}
+  notify: restart salt-minion
+
 - name: Run all notify sections
   meta: flush_handlers
 
@@ -259,3 +274,15 @@
     connection: local
     become: False
   when: reboot_required.stat.exists
+
+
+- name: Add all VMs conections to the virt-manager
+  shell: virt-manager -c qemu+ssh://root@{{ hostvars[item].ansible_host }}/system && touch /tmp/virt-manager-{{ hostvars[item].ansible_host }}
+  args:
+    creates: /tmp/virt-manager-{{ hostvars[item].ansible_host }}
+  delegate_to: localhost
+  become: true
+  become_user: pruzicka
+  when: ansible_system == "Linux"
+  loop: "{{ ansible_play_batch }}"
+  run_once: true

@@ -42,7 +42,7 @@ openstack_tenant_name                             : my_tenant_name
 openstack_user_name                               : my_username
 
 # Domain name
-domain: edu.mirantis.net
+domain: tng.mirantis.com
 
 # Network list
 networks:
@@ -82,12 +82,12 @@ mcp_define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/m
 mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/create_config_drive.sh
 mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
 
-# The file where the generated "student" password will be stored
-file_with_generated_student_password: /tmp/student_password
+# The file where the generated password (ssh, vnc, ...) will be stored
+file_with_generated_access_password_prefix: /tmp/{{ prefix }}-password
 
-# Number of tesing PXE sub-vms
+# Number of testing PXE sub-vms
 nested_vms_count : 1
-# Minimum RAM for sub_vm is 2GB
+# Minimum RAM for nested_vm is 2GB
 nested_vms_memory: 2
 nested_vms_cpu   : 2
 
@@ -105,6 +105,7 @@ packages:
   - python-libvirt
   - qemu-kvm
   - qemu-utils
+  - salt-minion
   - screen
   - virtinst
 

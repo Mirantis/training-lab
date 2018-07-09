@@ -59,14 +59,14 @@ az vm list-sizes --location westus
 ```bash
 # Create resource group
 az group create --name training-lab-dns --location "East US 2"
-az network dns zone create -g training-lab-dns -n edu.mirantis.net
+az network dns zone create -g training-lab-dns -n tng.mirantis.com
 
-# List DNS nameservers for zone edu.mirantis.net in Azure
-# You need to ask the domain owner to delegate the zone "edu.mirantis.net" to the Azure nameservers
-az network dns zone show -g training-lab-dns -n edu.mirantis.net -o json
+# List DNS nameservers for zone tng.mirantis.com in Azure
+# You need to ask the domain owner to delegate the zone "tng.mirantis.com" to the Azure nameservers
+az network dns zone show -g training-lab-dns -n tng.mirantis.com -o json
 
 # Add default "www" CNAME to training.mirantis.com
-az network dns record-set cname set-record -g training-lab-dns -z edu.mirantis.net -n www -c training.mirantis.com
+az network dns record-set cname set-record -g training-lab-dns -z tng.mirantis.com -n www -c training.mirantis.com
 ```
 
 ### Ubuntu

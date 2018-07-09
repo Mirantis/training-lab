@@ -13,7 +13,7 @@
     mode: 0700
 
 - name: Set VNC password in /home/{{ default_student_account_name }}/.vnc/passwd
-  shell: umask 077; echo "{{ default_student_account_password }}" | vncpasswd -f > /home/{{ default_student_account_name }}/.vnc/passwd
+  shell: umask 077; echo "{{ default_access_password }}" | vncpasswd -f > /home/{{ default_student_account_name }}/.vnc/passwd
   args:
     creates: /home/{{ default_student_account_name }}/.vnc/passwd
   changed_when: false

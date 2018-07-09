@@ -1,6 +1,6 @@
 ---
 - name: Use terraform to chnage the infrastructure
-  hosts: localhost
+  hosts: 127.0.0.1
   connection: local
   gather_facts: no
 
@@ -9,17 +9,10 @@
     - vars/{{ cloud_platform }}_secrets.yml
 
   tasks:
-    - name: Generate password for student user
-      set_fact:
-        default_username_password: "{{ all_users_password | default(lookup('password', file_with_generated_student_password + ' chars=ascii_letters,digits,length=6')) }}"
-      delegate_to: localhost
-      changed_when: false
-
     - include_tasks: tasks/terraform.yml
 
-
 - name: Configure VMs created by terraform
-  hosts: terraform
+  hosts: training-lab
   user: "{{ default_username }}"
   become: true
 
@@ -28,29 +21,10 @@
     - vars/{{ cloud_platform }}_secrets.yml
 
   tasks:
-    - name: Generate password for student user
-      set_fact:
-        default_student_account_password: "{{ all_users_password | default(lookup('password', file_with_generated_student_password + ' chars=ascii_letters,digits,length=6')) }}"
-        root_passwrod: "{{ all_users_password | default(lookup('password', file_with_generated_student_password + ' chars=ascii_letters,digits,length=6')) }}"
-        default_username_password: "{{ all_users_password | default(lookup('password', file_with_generated_student_password + ' chars=ascii_letters,digits,length=6')) }}"
-      delegate_to: localhost
-      changed_when: false
-
-    - include_tasks: tasks/configure_vm.yml
+    - include_tasks: tasks/configure_vms.yml
 
     - include_tasks: tasks/kvm01.yml
       when: ansible_hostname is search('kvm01')
-
-    - name: Add all VMs conections to the virt-manager
-      shell: virt-manager -c qemu+ssh://root@{{ hostvars[item].ansible_host }}/system && touch /tmp/virt-manager-{{ hostvars[item].ansible_host }}
-      args:
-        creates: /tmp/virt-manager-{{ hostvars[item].ansible_host }}
-      delegate_to: localhost
-      become: true
-      become_user: pruzicka
-      when: ansible_system == "Linux"
-      loop: "{{ ansible_play_batch }}"
-      run_once: true
 
     - include_tasks: tasks/define_vms.yml
 
@@ -63,10 +37,10 @@
           - for A in {1..{{ vm_count }}}; do for B in {1..{{ nested_vms_count }}}; do maas mirantis machines create power_parameters_power_address=qemu+tcp://10.0.0.1$A/system hostname={{ prefix }}-kvm0$A-pxe0$B power_type=virsh power_parameters_power_id={{ prefix }}-kvm0$A-pxe0$B architecture=amd64/generic mac_addresses=52:54:00:00:0$A:0$B; done; done
           - "MAAS   : http://{{ ansible_host }}:8080/MAAS (mirantis/r00tme)"
           - "Jenkins: http://{{ ansible_host }}:8081 (admin/r00tme)"
-          - "noVNC  : https://{{ ansible_host }}/vnc.html?port=443&true_color=1&password={{ default_student_account_password }}"
-          - "VNC    : vnc://{{ ansible_host }}:5901, Password: {{ default_student_account_password }}"
-          - "ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no {{ default_student_account_name }}@{{ ansible_host }} | {{ ansible_hostname }}, Password: {{ default_student_account_password }}"
-      run_once: true
+          - "noVNC  : https://{{ ansible_host }}/vnc.html?port=443&true_color=1&password={{ default_access_password }}"
+          - "VNC    : vnc://{{ ansible_host }}:5901, Password: {{ default_access_password }}"
+          - "ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no {{ default_student_account_name }}@{{ ansible_host }} | {{ ansible_hostname }}, Password: {{ default_access_password }}"
+      when: ansible_hostname is search('kvm01')
 
   handlers:
     - name: reload systemd
@@ -87,6 +61,11 @@
     - name: restart novnc
       service:
         name: novnc
+        state: restarted
+
+    - name: restart salt-minion
+      service:
+        name: salt-minion
         state: restarted
 
     - name: restart sshd
