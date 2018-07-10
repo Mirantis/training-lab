@@ -7,7 +7,7 @@ You will need to have Terrafrom, az-cli and Ansible installed.
 
 ## Requirements
 
-* [Terrafrom](https://www.terraform.io/)
+* [Terraform](https://www.terraform.io/)
 * [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) (Azure CLI)
 * [Ansible](https://www.ansible.com/)
 * few minor packages curl, git, jq, ...
@@ -26,7 +26,7 @@ You will need to have Terrafrom, az-cli and Ansible installed.
 
 ### Azure related tasks
 
-Few notes how to build the Training environment in Azure using [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest), [Terrafrom](https://www.terraform.io/) + [Ansible](https://www.ansible.com/).
+Few notes how to build the Training environment in Azure using [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest), [Terraform](https://www.terraform.io/) + [Ansible](https://www.ansible.com/).
 
 Create Service Principal and authenticate to Azure - this should be done only once for the new Azure accounts:
 

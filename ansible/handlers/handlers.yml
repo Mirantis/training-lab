@@ -1,0 +1,34 @@
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: restart networking
+  service:
+    name: networking
+    state: restarted
+
+- name: restart ufw
+  service:
+    name: ufw
+    state: restarted
+
+- name: restart libvirt
+  service:
+    name: libvirtd
+    enabled: yes
+    state: restarted
+
+- name: restart novnc
+  service:
+    name: novnc
+    state: restarted
+
+- name: restart salt-minion
+  service:
+    name: salt-minion
+    state: restarted
+
+- name: restart sshd
+  service:
+    name: sshd
+    state: restarted

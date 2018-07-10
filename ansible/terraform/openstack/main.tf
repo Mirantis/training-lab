@@ -56,16 +56,17 @@ resource "openstack_networking_floatingip_v2" "floatingip" {
 
 # Create nodes
 resource "openstack_compute_instance_v2" "vms" {
-  count       = "${var.vm_count * var.environment_count}"
-  name        = "${format("%s-kvm%02d.%02d.%s", var.prefix, count.index / var.environment_count + 1, count.index % var.environment_count + 1, var.domain)}"
-  image_name  = "${var.openstack_compute_instance_image_name}"
-  flavor_name = "${var.openstack_compute_instance_flavor_name}"
-  key_pair    = "${openstack_compute_keypair_v2.keypair.name}"
-  user_data   = "#cloud-config\nusers:\n  - name: ubuntu\n    ssh_authorized_keys:\n      - ${file(var.openstack_compute_keypair_public_key)}"
+  count             = "${var.vm_count * var.environment_count}"
+  name              = "${format("%s-kvm%02d.%02d.%s", var.prefix, count.index % var.vm_count + 1, count.index / var.vm_count + 1, var.domain)}"
+  image_name        = "${count.index % var.vm_count == 0 ? var.openstack_compute_instance_kvm01_image_name : var.openstack_compute_instance_image_name}"
+  flavor_name       = "${var.openstack_compute_instance_flavor_name}"
+  availability_zone = "${var.openstack_availability_zone}"
+  key_pair          = "${openstack_compute_keypair_v2.keypair.name}"
+  user_data         = "#cloud-config\nusers:\n  - name: ubuntu\n    ssh_authorized_keys:\n      - ${file(var.openstack_compute_keypair_public_key)}"
 
   network {
     uuid           = "${element(openstack_networking_network_v2.private-network.*.id, count.index)}"
-    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 10 + (count.index / var.environment_count + 1 ))}"
+    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 10 + count.index % var.vm_count + 1)}"
     access_network = true
   }
 }

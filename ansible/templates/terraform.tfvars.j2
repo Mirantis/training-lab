@@ -3,7 +3,6 @@
 {% if cloud_platform == 'azure' %}
 # Azure
 azure_admin_username                  = "{{ default_username }}"
-azure_admin_password                  = "{{ default_username_password }}"
 azure_dns_resource_group              = "{{ azure_dns_resource_group }}"
 azure_tags                            = {{ azure_tags }}
 azurerm_resource_group_location       = "{{ azurerm_resource_group_location }}"
@@ -15,8 +14,10 @@ azurerm_virtual_network_address_space = {{ azurerm_virtual_network_address_space
 {% if cloud_platform == 'openstack' %}
 # OpenStack
 openstack_auth_url                                 = "{{ openstack_auth_url }}"
+openstack_availability_zone                        = "{{ openstack_availability_zone }}"
 openstack_compute_instance_flavor_name             = "{{ openstack_compute_instance_flavor_name }}"
 openstack_compute_instance_image_name              = "{{ openstack_compute_instance_image_name }}"
+openstack_compute_instance_kvm01_image_name        = "{{ openstack_compute_instance_kvm01_image_name }}"
 openstack_networking_floatingip                    = "{{ openstack_networking_floatingip }}"
 openstack_networking_network_external_network_name = "{{ openstack_networking_network_external_network_name }}"
 openstack_networking_subnet_cidr                   = "{{ openstack_networking_subnet_cidr }}"

@@ -6,10 +6,20 @@ variable "openstack_auth_url" {
   description = "The endpoint url to connect to OpenStack"
 }
 
-variable "openstack_compute_instance_flavor_name" {}
+variable "openstack_availability_zone" {
+  description = "The availability zone in which to create the server"
+}
+
+variable "openstack_compute_instance_flavor_name" {
+  description = "Name of Flavor in OpenStack"
+}
 
 variable "openstack_compute_instance_image_name" {
-  default = "ubuntu-16-04-x64-201804032121"
+  description = "Image Name in OpenStack"
+}
+
+variable "openstack_compute_instance_kvm01_image_name" {
+  description = "Image Name for kvm01 nodes in OpenStack"
 }
 
 variable "openstack_compute_keypair_public_key" {
@@ -49,7 +59,8 @@ variable "domain" {
 }
 
 variable "prefix" {
-  default = "terraform"
+  description = "Prefix used for all names"
+  default     = "terraform"
 }
 
 variable "username" {
@@ -59,5 +70,5 @@ variable "username" {
 
 variable "vm_count" {
   description = "Number of VMs which should be created"
-  default     = 1
+  default     = 3
 }

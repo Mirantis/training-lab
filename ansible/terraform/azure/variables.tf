@@ -7,12 +7,8 @@ variable "azure_admin_username" {
   default     = "ubuntu"
 }
 
-variable "azure_admin_password" {
-  description = "Password for \"admin\" username"
-}
-
 variable "azure_dns_resource_group" {
-  default = "training-lab-dns"
+  description = "Resource Group name handling the DNS (domain)"
 }
 
 variable "azurerm_resource_group_location" {
