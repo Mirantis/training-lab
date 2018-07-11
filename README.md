@@ -56,6 +56,8 @@ az vm list-sizes --location westus
 
 * Create DNS zone
 
+See the details: https://docs.microsoft.com/en-us/azure/dns/dns-delegate-domain-azure-dns
+
 ```bash
 # Create resource group
 az group create --name training-lab-dns --location "East US 2"
@@ -117,3 +119,35 @@ or
 # Delete whole Azure structure
 ./delete_azure.sh
 ```
+
+## Deployment steps on kvm01
+
+https://docs.mirantis.com/mcp/master/mcp-deployment-guide/single/index.html (Start from: To create control plane VMs:)
+
+```bash
+# Log in to the Salt Master node console
+$ virsh console cfg01.tng.mirantis.com
+
+# Verify that all your Salt Minion nodes are registered on the Salt Master node
+$ salt-key
+Accepted Keys:
+cfg01.tng.mirantis.com
+ruzickap-os-kvm01.01.tng.mirantis.com
+ruzickap-os-kvm02.01.tng.mirantis.com
+ruzickap-os-kvm03.01.tng.mirantis.com
+Denied Keys:
+Unaccepted Keys:
+Rejected Keys:
+
+# Verify that the Salt Minion nodes are synchronized by running the following command on the Salt Master node
+$ salt '*' saltutil.sync_all
+
+# Perform the initial Salt configuration
+$ salt '*kvm*' state.sls salt.minion
+
+# Set up the network interfaces and the SSH access
+$ salt -C 'I@salt:control' cmd.run 'salt-call state.sls linux.system.user,openssh,linux.network;reboot'
+
+$ salt 'kvm*' state.sls libvirt
+```
+

@@ -1,0 +1,17 @@
+- name: Ansible playbook for Packer
+  hosts: all
+  become: true
+
+  vars_files:
+    - group_vars/all
+
+  tasks:
+    - debug: var=packer_build_name
+
+    - import_tasks: tasks/configure_vms.yml
+
+    - import_tasks: tasks/kvm01.yml
+      when: packer_build_name is defined and packer_build_name is search("kvm01-ubuntu")
+
+  handlers:
+    - import_tasks: handlers/handlers.yml

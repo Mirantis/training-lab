@@ -23,6 +23,20 @@ script:
   - ansible-lint -x ANSIBLE0004 ansible/site.yml
   - sed -i 's/.*secrets.yml.*/#&/' ansible/site.yml
   - ansible-playbook --syntax-check ansible/site.yml
+  - ansible-playbook --syntax-check ansible/packer_ansible.yml
+
+  # Validate Packer templates
+  - |
+    PACKER_LATEST_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/packer | jq -r -M '.current_version')
+    curl https://releases.hashicorp.com/packer/${PACKER_LATEST_VERSION}/packer_${PACKER_LATEST_VERSION}_linux_amd64.zip --output /tmp/packer_linux_amd64.zip
+    sudo unzip -o /tmp/packer_linux_amd64.zip -d /usr/local/bin/
+    cd packer
+    for FILE in *.json; do
+      echo "*** $FILE"
+      RUN=$(cat $FILE | jq -r '."_comment" | join("; ")' | sed 's/packer build/packer validate/g;')
+      echo "* $RUN"
+      eval "$RUN"
+    done
 
 notifications:
   slack: miracloud:qPdiQJMHmCsxhpR6QTT4yr98

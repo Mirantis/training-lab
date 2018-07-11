@@ -8,5 +8,10 @@
 *.tfvars
 # Terraform crash log
 crash.log
-#*secrets.yml
-
+# Packer cache
+packer_cache
+# Packer boxes
+*.box
+# Packer build directories
+*-qemu
+*-virtualbox-iso

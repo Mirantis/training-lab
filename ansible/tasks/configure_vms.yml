@@ -1,20 +1,10 @@
-- name: Set proper hostname / domain
-  hostname:
-    name: "{{ inventory_hostname }}"
-
-- name: Build hosts file
-  template:
-    src: templates/hosts.j2
-    dest: /etc/hosts
-    backup: yes
-
 - name: Add Salt Stack GPG key
   apt_key:
     url: https://repo.saltstack.com/apt/ubuntu/{{ ansible_distribution_version }}/amd64/latest/SALTSTACK-GPG-KEY.pub
 
 - name: Add salt repository
   apt_repository:
-    repo: deb http://mirror.mirantis.com/{{ mcp_release_tag }}/saltstack-2016.3/{{ ansible_distribution_release }}/ {{ ansible_distribution_release }} main
+    repo: deb [arch=amd64] http://mirror.mirantis.com/{{ mcp_release_tag }}/saltstack-2016.3/{{ ansible_distribution_release }}/ {{ ansible_distribution_release }} main
 
 - name: Update all packages
   apt:
@@ -25,6 +15,26 @@
   apt:
     name: "{{ item }}"
   loop: "{{ packages }}"
+
+- name: Set proper hostname / domain
+  hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Build hosts file
+  template:
+    src: templates/hosts.j2
+    dest: /etc/hosts
+    backup: yes
+
+- name: Start services
+  service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - acpid
+    - haveged
+    - salt-minion
 
 
 ######################################################
@@ -68,23 +78,33 @@
   template:
     dest: /etc/network/interfaces.d/60-vxlan-bridge.cfg
     src: templates/60-vxlan-bridge.cfg.j2
-  notify: restart networking
+  notify:
+    - restart networking
+    - restart salt-minion
 
 
 ######################################################
-# Add student account
+# Add student + ubuntu account
 ######################################################
-- name: Add user student
+- name: Add user {{ default_student_account_name }}
   user:
     name: "{{ default_student_account_name }}"
     comment: Student account
-    groups: admin,libvirtd,kvm
+    groups: libvirtd,kvm
+    shell: /bin/bash
+
+- name: Add user {{ default_username }}
+  user:
+    name: "{{ default_username }}"
+    comment: Ubuntu account
+    groups: libvirtd,kvm
     shell: /bin/bash
 
 - name: Set authorized key for {{ default_student_account_name }} account
   authorized_key:
     user: "{{ default_student_account_name }}"
     key: "{{ lookup('file', ssh_public_key) }}"
+  when: packer_build_name is not defined
 
 - name: Add {{ default_student_account_name }} account to sudoers to skip password questions
   blockinfile:
@@ -98,7 +118,7 @@
     path: /etc/ssh/sshd_config
     block: |
       Match User {{ default_student_account_name }}
-        PasswordAuthentication yes
+      PasswordAuthentication yes
   notify: restart sshd
 
 
@@ -120,28 +140,40 @@
     command: cat /root/.ssh/id_rsa.pub
     register: generated_ssh_public_key
     changed_when: false
+  when: packer_build_name is not defined
   run_once: true
 
-- name: Add generated ssh public key to authorized key for all users
+- block:
+  - name: Add generated ssh public key to authorized key for all users
+    authorized_key:
+      user: "{{ item }}"
+      key: "{{ generated_ssh_public_key.stdout }}"
+    loop:
+      - "{{ default_username }}"
+      - root
+      - "{{ default_student_account_name }}"
+
+  - name: Add generated ssh private key to all users $HOME/.ssh/id_rsa
+    copy:
+      content: "{{ generated_ssh_private_key.stdout }}"
+      dest: "{{ item }}/.ssh/id_rsa"
+      mode: 0600
+      owner: "{{ item | basename }}"
+      group: "{{ item | basename }}"
+    loop:
+      - "/home/{{ default_username }}"
+      - /root
+      - "/home/{{ default_student_account_name }}"
+  when: packer_build_name is not defined
+
+- name: Add ssh key ({{ ssh_public_key }}) to authorized key for all users
   authorized_key:
     user: "{{ item }}"
-    key: "{{ generated_ssh_public_key.stdout }}"
+    key: "{{ lookup('file', ssh_public_key) }}"
   loop:
     - "{{ default_username }}"
     - root
     - "{{ default_student_account_name }}"
-
-- name: Add generated ssh private key to all users $HOME/.ssh/id_rsa
-  copy:
-    content: "{{ generated_ssh_private_key.stdout }}"
-    dest: "{{ item }}/.ssh/id_rsa"
-    mode: 0600
-    owner: "{{ item | basename }}"
-    group: "{{ item | basename }}"
-  loop:
-    - "/home/{{ default_username }}"
-    - /root
-    - "/home/{{ default_student_account_name }}"
 
 - name: Generate access password for all users
   set_fact:
@@ -158,15 +190,6 @@
     - root
     - "{{ default_student_account_name }}"
   changed_when: false
-
-- name: Add ssh key ({{ ssh_public_key }}) to authorized key for all users
-  authorized_key:
-    user: "{{ item }}"
-    key: "{{ lookup('file', ssh_public_key) }}"
-  loop:
-    - "{{ default_username }}"
-    - root
-    - "{{ default_student_account_name }}"
 
 - name: Configure ssh ~/.ssh/config for all users
   template:
@@ -242,8 +265,32 @@
     block: |
       id: {{ ansible_fqdn }}
       master: {{ mcp_salt_master_ip }}
+      log_level_logfile: debug
+      log_level: debug
   notify: restart salt-minion
 
+- name: Check if reboot is necessary by locatimng the /var/run/reboot-required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required
+
+- name: Reboot check
+  block:
+  - name: Reboot machine
+    shell: sleep 2 && shutdown -r now "Ansible triggered reboot"
+    async: 1
+    poll: 0
+    ignore_errors: true
+
+  - name: Wait for system to boot up
+    wait_for:
+      host: "{{ ansible_host }}"
+      port: "{{ ansible_port | default('22') }}"
+      search_regex: OpenSSH
+      delay: 10
+    connection: local
+    become: False
+  when: reboot_required.stat.exists
 
 - name: Add all VMs conections to the virt-manager
   shell: virt-manager -c qemu+ssh://root@{{ hostvars[item].ansible_host }}/system && touch /tmp/virt-manager-{{ hostvars[item].ansible_host }}
@@ -252,6 +299,6 @@
   delegate_to: localhost
   become: true
   become_user: pruzicka
-  when: ansible_system == "Linux"
+  when: ansible_system == "Linux" and packer_build_name is not defined
   loop: "{{ ansible_play_batch }}"
   run_once: true

@@ -1,7 +1,7 @@
 # Terraform variables
 
 # Default user for all VMs created by cloud provider
-default_username            : ubuntu
+default_username: ubuntu
 
 # Default user for all VMs created by config management
 default_student_account_name: student
@@ -22,12 +22,12 @@ ssh_public_key: ~/.ssh/id_rsa.pub
 # Permanent Azure Resource Group which is serving the {{ domain }} should be already exist...
 azure_dns_resource_group             : training-lab-dns
 azure_tags                           : '{ Environment = "Training", Consumer = "training@mirantis.com" }'
-#azurerm_resource_group_location      : East US 2
+#azurerm_resource_group_location     : East US 2
 azurerm_resource_group_location      : East US
 azurerm_subnet_address_prefix        : 192.168.250.0/24
-#azurerm_virtual_machine_vm_size      : Standard_D16_v3
+#azurerm_virtual_machine_vm_size     : Standard_D16_v3
 azurerm_virtual_machine_vm_size      : Standard_B1s
-#azurerm_virtual_machine_vm_size      : Standard_DS11_v2_Promo
+#azurerm_virtual_machine_vm_size     : Standard_DS11_v2_Promo
 azurerm_virtual_network_address_space: '["192.168.250.0/24"]'
 
 # OpenStack
@@ -101,15 +101,46 @@ mcp_cfg01_vm_cpus       : 4
 mcp_cfg01_image_url     : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
 
 packages:
+  - acpid
+  - bash-completion
   - ca-cacert
+  - cloud-init
+  - cloud-initramfs-growroot
+  - curl
+  - dnsutils
+  - ethtool
+  - haveged
+  - htop
+  - iftop
+  - iotop
+  - ifenslave
   - libvirt-bin
+  - linux-virtual
+  - logrotate
+  - lshw
+  - lsof
+  - man
   - mc
+  - mlocate
+  - nmap
+  - ntp
+  - ntpdate
+  - openssh-server
+  - postfix
   - python-libvirt
   - qemu-kvm
   - qemu-utils
+  - rsync
   - salt-minion
   - screen
+  - sysstat
+  - tcpdump
+  - telnet
+  - ufw
+  - vim
   - virtinst
+  - virt-what
+  - wget
 
 kvm01_packages:
   - chromium-browser
