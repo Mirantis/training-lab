@@ -24,7 +24,7 @@ You will need to have Terrafrom, az-cli and Ansible installed.
 ![Ansible + Terraform + Cloud Architecture](images/ansible_terraform.png)
 
 
-### Azure related tasks
+## Azure related tasks
 
 Few notes how to build the Training environment in Azure using [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest), [Terraform](https://www.terraform.io/) + [Ansible](https://www.ansible.com/).
 
@@ -44,17 +44,12 @@ SUBSCRIPTION_ID=$(az account list | jq -r '.[] | select (.isDefault == true).id'
 echo "*** Create the Service Principal which will have permissions to manage resources in the specified Subscription"
 az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/$SUBSCRIPTION_ID"
 
-echo "*** Increase Token Lifetime (AccessTokenLifetime)"
-```
-
-* Login to Azure using Service Principal and check if it is working
-
-```bash
+echo "*** Login to Azure using Service Principal and check if it is working"
 az login --service-principal -u 0xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx -p fxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --tenant 0xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 az vm list-sizes --location westus
 ```
 
-* Create DNS zone
+### Create DNS zone
 
 See the details: https://docs.microsoft.com/en-us/azure/dns/dns-delegate-domain-azure-dns
 
@@ -71,7 +66,46 @@ az network dns zone show -g training-lab-dns -n tng.mirantis.com -o json
 az network dns record-set cname set-record -g training-lab-dns -z tng.mirantis.com -n www -c training.mirantis.com
 ```
 
-### Ubuntu
+### Create Resource Group holding the images created by packer (optional)
+
+Building own images will speed up the deployment process.
+Details can be found here: https://www.packer.io/docs/builders/azure-setup.html and https://github.com/hashicorp/packer/blob/master/contrib/azure-setup.sh
+
+```bash
+# Create resource group
+az group create --name training-lab-images --location "East US 2"
+
+echo "*** Create application"
+az ad app create --display-name "packerbuild" --identifier-uris http://packerbuild --homepage http://packerbuild --password my_packer_password
+
+# Change password: az ad app update --id $(az ad app list | jq -r '.[] | select (.displayName == "packerbuild").appId') --password fxxxxxxxxxxxxxxf
+
+echo "*** Get application id"
+CLIENT_ID=$(az ad app list | jq -r '.[] | select (.displayName == "packerbuild").appId')
+
+echo "*** Create service principal"
+az ad sp create --id $CLIENT_ID
+
+echo "*** Get service principal id"
+OBJECT_ID=$(az ad sp list | jq -r '.[] | select (.displayName == "packerbuild").objectId')
+
+echo "*** Get Subscription ID for Default Subscription"
+SUBSCRIPTION_ID=$(az account list | jq -r '.[] | select (.isDefault == true).id')
+
+echo "*** Create permissions"
+az role assignment create --assignee $OBJECT_ID --role "Owner" --scope /subscriptions/$SUBSCRIPTION_ID
+```
+
+
+## Build your own images
+
+The standard deployment process download many packages / huge images / repositories form Internet which takes a lot of time.
+It's handy to build your own images for OpenStack / Azure / local testing to speed up the deployment.
+
+Please check the [packer](packer) directory for more details.
+
+
+## Ubuntu
 
 Follow these commands to install necessary requirements on latest Ubuntu:
 
@@ -150,4 +184,3 @@ $ salt -C 'I@salt:control' cmd.run 'salt-call state.sls linux.system.user,openss
 
 $ salt 'kvm*' state.sls libvirt
 ```
-

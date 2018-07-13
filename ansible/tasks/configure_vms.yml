@@ -100,12 +100,6 @@
     groups: libvirtd,kvm
     shell: /bin/bash
 
-- name: Set authorized key for {{ default_student_account_name }} account
-  authorized_key:
-    user: "{{ default_student_account_name }}"
-    key: "{{ lookup('file', ssh_public_key) }}"
-  when: packer_build_name is not defined
-
 - name: Add {{ default_student_account_name }} account to sudoers to skip password questions
   blockinfile:
     path: /etc/sudoers.d/80-student-account
@@ -144,7 +138,22 @@
   run_once: true
 
 - block:
-  - name: Add generated ssh public key to authorized key for all users
+  - name: Remove vagrant public key
+    authorized_key:
+      user: ubuntu
+      key: https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub
+      state: absent
+
+  - name: Add own public keys "{{ ssh_public_key }}" to all accounts
+    authorized_key:
+      user: "{{ item }}"
+      key: "{{ lookup('file', ssh_public_key) }}"
+    loop:
+      - "{{ default_username }}"
+      - root
+      - "{{ default_student_account_name }}"
+
+  - name: Add generated public keys to all accounts
     authorized_key:
       user: "{{ item }}"
       key: "{{ generated_ssh_public_key.stdout }}"
@@ -164,44 +173,35 @@
       - "/home/{{ default_username }}"
       - /root
       - "/home/{{ default_student_account_name }}"
+
+  - name: Generate access password for all users
+    set_fact:
+      default_access_password: "{{ lookup('password', file_with_generated_access_password_prefix + ' chars=ascii_letters,digits,length=6') }}"
+    delegate_to: localhost
+    changed_when: false
+
+  - name: Set passwords for all users (root, student, ubuntu)
+    user:
+      name: "{{ item }}"
+      password: "{{ default_access_password | password_hash('sha512') }}"
+    loop:
+      - "{{ default_username }}"
+      - root
+      - "{{ default_student_account_name }}"
+    changed_when: false
+
+  - name: Configure ssh ~/.ssh/config for all users
+    template:
+      src: templates/config.j2
+      dest: "{{ item }}/.ssh/config"
+      mode: 0600
+      owner: "{{ item | basename }}"
+      group: "{{ item | basename }}"
+    loop:
+      - "/home/{{ default_username }}"
+      - /root
+      - "/home/{{ default_student_account_name }}"
   when: packer_build_name is not defined
-
-- name: Add ssh key ({{ ssh_public_key }}) to authorized key for all users
-  authorized_key:
-    user: "{{ item }}"
-    key: "{{ lookup('file', ssh_public_key) }}"
-  loop:
-    - "{{ default_username }}"
-    - root
-    - "{{ default_student_account_name }}"
-
-- name: Generate access password for all users
-  set_fact:
-    default_access_password: "{{ lookup('password', file_with_generated_access_password_prefix + ' chars=ascii_letters,digits,length=6') }}"
-  delegate_to: localhost
-  changed_when: false
-
-- name: Set passwords for all users (root, student, ubuntu)
-  user:
-    name: "{{ item }}"
-    password: "{{ default_access_password | password_hash('sha512') }}"
-  loop:
-    - "{{ default_username }}"
-    - root
-    - "{{ default_student_account_name }}"
-  changed_when: false
-
-- name: Configure ssh ~/.ssh/config for all users
-  template:
-    src: templates/config.j2
-    dest: "{{ item }}/.ssh/config"
-    mode: 0600
-    owner: "{{ item | basename }}"
-    group: "{{ item | basename }}"
-  loop:
-    - "/home/{{ default_username }}"
-    - /root
-    - "/home/{{ default_student_account_name }}"
 
 - name: Check if symling /var/lib/libvirt/images -> /mnt already exists
   stat:
@@ -265,8 +265,6 @@
     block: |
       id: {{ ansible_fqdn }}
       master: {{ mcp_salt_master_ip }}
-      log_level_logfile: debug
-      log_level: debug
   notify: restart salt-minion
 
 - name: Check if reboot is necessary by locatimng the /var/run/reboot-required
@@ -290,7 +288,7 @@
       delay: 10
     connection: local
     become: False
-  when: reboot_required.stat.exists
+  when: reboot_required.stat.exists and packer_build_name is not defined
 
 - name: Add all VMs conections to the virt-manager
   shell: virt-manager -c qemu+ssh://root@{{ hostvars[item].ansible_host }}/system && touch /tmp/virt-manager-{{ hostvars[item].ansible_host }}

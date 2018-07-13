@@ -70,10 +70,7 @@ mcp_salt_master_ip: 10.0.0.15
 mcp_salt_model_git_repository: https://github.com/ruzickap/training-lab-salt-model.git
 
 # MCP release tags: https://github.com/Mirantis/mcp-common-scripts/tags, http://images.mirantis.com/
-mcp_release_tag: 2018.4.0
-
-# stable/proposed/testing
-mcp_salt_formulas_version: stable
+mcp_release_tag: 2018.7.0-milestone1
 
 # MCP pipelines
 mcp_mk_pipelines_git_repository    : https://github.com/Mirantis/mk-pipelines.git

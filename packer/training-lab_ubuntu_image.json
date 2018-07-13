@@ -14,12 +14,48 @@
     "ssh_username": "ubuntu",
     "ssh_password": "ubuntu",
     "preseed_file_name": "training-lab_ubuntu_image-preseed.cfg",
-    "disk_size": "30720",
-    "headless": "false"
+    "disk_size": "51200",
+    "headless": "false",
+
+    "azure_client_id": "{{ env `AZURE_CLIENT_ID` }}",
+    "azure_client_secret": "{{ env `AZURE_CLIENT_SECRET` }}",
+    "azure_resource_group_name": "{{ env `AZURE_RESOURCE_GROUP_NAME` }}",
+    "azure_subscription_id": "{{ env `AZURE_SUBSCRIPTION_ID` }}",
+    "azure_os_type": "Linux",
+    "azure_image_publisher": "Canonical",
+    "azure_image_offer": "UbuntuServer",
+    "azure_image_sku": "16.04-LTS",
+    "azure_location": "East US",
+    "azure_vm_size": "Standard_A1_v2"
   },
 
   "builders":
   [
+    {
+      "type": "azure-arm",
+
+      "client_id": "{{ user `azure_client_id` }}",
+      "client_secret": "{{ user `azure_client_secret` }}",
+      "subscription_id": "{{ user `azure_subscription_id` }}",
+
+      "os_type": "{{ user `azure_os_type` }}",
+      "image_publisher": "{{ user `azure_image_publisher` }}",
+      "image_offer": "{{ user `azure_image_offer` }}",
+      "image_sku": "{{ user `azure_image_sku` }}",
+
+      "managed_image_resource_group_name": "{{ user `azure_resource_group_name` }}",
+      "managed_image_name": "{{ user `name` }}-{{ isotime \"20060102\" }}",
+
+      "azure_tags": {
+        "Environment": "Training",
+        "Consumer": "training@mirantis.com",
+        "Task": "training-lab image build"
+      },
+
+      "location": "{{ user `azure_location` }}",
+      "vm_size": "{{ user `azure_vm_size` }}",
+      "ssh_username": "{{ user `ssh_username` }}"
+    },
     {
       "vm_name": "{{ user `name` }}",
       "type": "qemu",
@@ -121,10 +157,20 @@
     },
     {
       "type": "shell",
+      "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+      "inline": [
+        "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
+      ],
+      "inline_shebang": "/bin/sh -x",
+      "only": ["azure-arm"]
+    },
+    {
+      "type": "shell",
       "execute_command": "echo 'ubuntu' | {{ .Vars }} sudo -S -E bash -x '{{ .Path }}'",
       "scripts": [
         "scripts/linux-common/cleanup.sh"
-      ]
+      ],
+      "only": ["qemu","virtualbox-iso"]
     }
   ],
   "post-processors": [
@@ -133,7 +179,8 @@
         "type": "vagrant",
         "compression_level": 9,
         "vagrantfile_template": "Vagrantfile-linux.template",
-        "output": "{{ user `name` }}-{{ .Provider }}-{{ isotime \"20060102\" }}.box"
+        "output": "{{ user `name` }}-{{ .Provider }}-{{ isotime \"20060102\" }}.box",
+        "only": ["qemu","virtualbox-iso"]
       }
     ]
   ]
