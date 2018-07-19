@@ -158,6 +158,29 @@
     dest: /root/user_data.sh
     mode: 0755
 
+# Fix bug (https://gerrit.mcp.mirantis.net/#/c/22492) !!!!! xxxx TODO
+- name: Enable setting MTU on cfg01
+  blockinfile:
+    path: /root/user_data.sh
+    backup: yes
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Enable setting MTU"
+    insertafter: "pidof /sbin/dhclient"
+    block: |
+      sed -i.orig '/gateway/i \ \ mtu $DEPLOY_NETWORK_MTU' /root/interfaces
+
+- name: Install nightly packages for specific salt-formula
+  blockinfile:
+    path: /root/user_data.sh
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - Install nightly packages for specific salt-formula"
+    insertafter: "MCP_SALT_REPO > /etc/apt/sources.list.d/mcp_salt.list"
+    block: |
+      echo "deb [arch=amd64] http://apt.mirantis.com/xenial nightly salt" > /etc/apt/sources.list.d/mcp_salt_nightly.list
+      cat > /etc/apt/preferences.d/mcp_nightly_salt_formulas_packages << EOF
+      Package: {{ mcp_nightly_salt_formulas_packages }}
+      Pin: release a=nightly
+      Pin-Priority: 1100
+      EOF
+
 # This is by default done by Jenkins which is building the .iso
 - name: Change the params in /root/user_data.sh "{{ mcp_master_config_script_url }}"
   lineinfile:
@@ -174,15 +197,6 @@
     - { regexp: '^export MCP_VERSION', line: 'export MCP_VERSION="{{ mcp_release_tag }}"' }
     # Fix bug (https://gerrit.mcp.mirantis.net/#/c/22842/) !!!!! xxxx TODO
     - { regexp: '^for i in', line: 'for i in $(salt-key -l accepted | grep -v Accepted | grep -v {{ domain }} | grep -v "$SALT_MASTER_MINION_ID"); do' }
-
-# Fix bug (https://gerrit.mcp.mirantis.net/#/c/22492) !!!!! xxxx TODO
-- name: Enable setting MTU on cfg01
-  blockinfile:
-    path: /root/user_data.sh
-    backup: yes
-    insertafter: ".*pidof /sbin/dhclient.*"
-    block: |
-      sed -i.orig '/gateway/i \ \ mtu $DEPLOY_NETWORK_MTU' /root/interfaces
 
 - name: Download define-vm script ({{ mcp_define_vm_script_url }})
   get_url:
@@ -222,7 +236,7 @@
     debug:
       msg:
         - Check the installation output - ssh {{ default_student_account_name }}@{{ ansible_host }}; virsh console cfg01.{{ domain }}
-        - Enable DHCP and change MTU in MAAS by going to http://{{ ansible_host }}:5240/MAAS (mirantis/r00tme) then 'DHCP Subnets -> untagged -> Provide DHCP'
+        - Change MTU in MAAS by going to http://{{ ansible_host }}:5240/MAAS (mirantis/r00tme) then 'DHCP Subnets -> untagged -> (edit MTU)'
         - Add your ssh public key into the default account
         - for A in {1..{{ vm_count }}}; do for B in {1..{{ nested_vms_count }}}; do maas mirantis machines create power_parameters_power_address=qemu+tcp://10.0.0.1$A/system hostname={{ prefix }}-kvm0$A-pxe0$B power_type=virsh power_parameters_power_id={{ prefix }}-kvm0$A-pxe0$B architecture=amd64/generic mac_addresses=52:54:00:00:0$A:0$B; done; done
         - "MAAS   : http://{{ ansible_host }}:5240/MAAS (mirantis/r00tme)"

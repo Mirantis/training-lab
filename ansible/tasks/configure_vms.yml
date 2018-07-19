@@ -299,4 +299,3 @@
   become_user: pruzicka
   when: ansible_system == "Linux" and packer_build_name is not defined
   loop: "{{ ansible_play_batch }}"
-  run_once: true
