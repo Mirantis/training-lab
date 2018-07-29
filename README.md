@@ -4,14 +4,12 @@
 
 You will need to have Terrafrom, az-cli and Ansible installed.
 
-
 ## Requirements
 
 * [Terraform](https://www.terraform.io/)
 * [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) (Azure CLI)
 * [Ansible](https://www.ansible.com/)
 * few minor packages curl, git, jq, ...
-
 
 ## Network diagram
 
@@ -22,7 +20,6 @@ You will need to have Terrafrom, az-cli and Ansible installed.
 * Ansible + Terraform + Cloud Architecture
 
 ![Ansible + Terraform + Cloud Architecture](images/ansible_terraform.png)
-
 
 ## Azure related tasks
 
@@ -51,7 +48,7 @@ az vm list-sizes --location westus
 
 ### Create DNS zone
 
-See the details: https://docs.microsoft.com/en-us/azure/dns/dns-delegate-domain-azure-dns
+See the details: [https://docs.microsoft.com/en-us/azure/dns/dns-delegate-domain-azure-dns](https://docs.microsoft.com/en-us/azure/dns/dns-delegate-domain-azure-dns)
 
 ```bash
 # Create resource group
@@ -69,7 +66,7 @@ az network dns record-set cname set-record -g training-lab-dns -z tng.mirantis.c
 ### Create Resource Group holding the images created by packer (optional)
 
 Building own images will speed up the deployment process.
-Details can be found here: https://www.packer.io/docs/builders/azure-setup.html and https://github.com/hashicorp/packer/blob/master/contrib/azure-setup.sh
+Details can be found here: [https://www.packer.io/docs/builders/azure-setup.html](https://www.packer.io/docs/builders/azure-setup.html) and [https://github.com/hashicorp/packer/blob/master/contrib/azure-setup.sh](https://github.com/hashicorp/packer/blob/master/contrib/azure-setup.sh)
 
 ```bash
 # Create resource group
@@ -96,7 +93,6 @@ echo "*** Create permissions"
 az role assignment create --assignee $OBJECT_ID --role "Owner" --scope /subscriptions/$SUBSCRIPTION_ID
 ```
 
-
 ## Build your own images
 
 The standard deployment process download many packages / huge images / repositories form Internet which takes a lot of time.
@@ -104,12 +100,14 @@ It's handy to build your own images for OpenStack / Azure / local testing to spe
 
 Please check the [packer](packer) directory for more details.
 
-
-## Ubuntu
+## Build environment on Ubuntu
 
 Follow these commands to install necessary requirements on latest Ubuntu:
 
 ```bash
+# You can use docker image:
+# docker run --rm -it ubuntu:latest
+
 sudo apt install apt-transport-https ansible curl git gnupg jq lsb-release unzip
 
 test -f $HOME/.ssh/id_rsa || ( install -m 0700 -d $HOME/.ssh && ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N "" )
@@ -136,10 +134,10 @@ cd -
 test -d ~/.ansible || mkdir ~/.ansible
 echo "<my_secret_password>" > ~/.ansible/vault_training-lab.txt
 
+cd training-lab/ansible
+
 # For editing the secrets you can use:
 # ansible-vault edit --vault-password-file=~/.ansible/vault_training-lab.txt vars/openstack_secrets.yml
-
-cd training-lab/ansible
 
 # Create OpenStack training environment
 ./create_openstack.sh
@@ -156,7 +154,7 @@ or
 
 ## Deployment steps on kvm01
 
-https://docs.mirantis.com/mcp/master/mcp-deployment-guide/single/index.html (Start from: To create control plane VMs:)
+[https://docs.mirantis.com/mcp/master/mcp-deployment-guide/single/index.html](https://docs.mirantis.com/mcp/master/mcp-deployment-guide/single/index.html) (Start from: To create control plane VMs:)
 
 ```bash
 # Log in to the Salt Master node console
