@@ -124,20 +124,11 @@ sudo unzip /tmp/terraform_linux_amd64.zip -d /usr/local/bin/
 
 git clone https://github.com/Mirantis/training-lab.git
 
-cd training-lab/ansible/terraform/azure
-terraform init
-cd -
-cd training-lab/ansible/terraform/openstack
-terraform init
-cd -
-
 test -d ~/.ansible || mkdir ~/.ansible
-echo "<my_secret_password>" > ~/.ansible/vault_training-lab.txt
+read -s -p "Ansible Vault Password for Training Lab: " MY_ANSIBLE_VAULT_TRAINIG_LAB_PASSWORD
+echo "$MY_ANSIBLE_VAULT_TRAINIG_LAB_PASSWORD" > ~/.ansible/vault_training-lab.txt
 
 cd training-lab/ansible
-
-# For editing the secrets you can use:
-# ansible-vault edit --vault-password-file=~/.ansible/vault_training-lab.txt vars/openstack_secrets.yml
 
 # Create OpenStack training environment
 ./create_openstack.sh
