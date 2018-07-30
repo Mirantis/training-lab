@@ -12,6 +12,33 @@ resource "openstack_compute_keypair_v2" "keypair" {
   public_key = "${file(var.openstack_compute_keypair_public_key)}"
 }
 
+# Create Security Group
+resource "openstack_compute_secgroup_v2" "secgroup" {
+  name        = "${var.prefix}-secgroup"
+  description = "Security Group got training-lab for ${var.prefix}"
+
+  rule {
+    from_port   = 1
+    to_port     = 65535
+    ip_protocol = "udp"
+    cidr        = "0.0.0.0/0"
+  }
+
+  rule {
+    from_port   = 1
+    to_port     = 65535
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+
+  rule {
+    from_port   = -1
+    to_port     = -1
+    ip_protocol = "icmp"
+    cidr        = "0.0.0.0/0"
+  }
+}
+
 data "openstack_networking_network_v2" "external_network" {
   name = "${var.openstack_networking_network_external_network_name}"
 }
@@ -62,6 +89,7 @@ resource "openstack_compute_instance_v2" "vms" {
   flavor_name       = "${var.openstack_compute_instance_flavor_name}"
   availability_zone = "${var.openstack_availability_zone}"
   key_pair          = "${openstack_compute_keypair_v2.keypair.name}"
+  security_groups   = ["default", "${openstack_compute_secgroup_v2.secgroup.id}"]
   user_data         = "#cloud-config\nusers:\n  - name: ubuntu\n    ssh_authorized_keys:\n      - ${file(var.openstack_compute_keypair_public_key)}"
 
   network {

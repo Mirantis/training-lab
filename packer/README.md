@@ -44,6 +44,6 @@ NAME=training-lab_kvm01-ubuntu-16.04-server-amd64 UBUNTU_CODENAME=xenial packer 
 
 ```bash
 export TMPDIR="$PWD/packer_cache"
-NAME=kvm-ubuntu-16.04-server-amd64   UBUNTU_CODENAME=xenial packer build -only=virtualbox-iso training-lab_ubuntu_image.json
-NAME=kvm01-ubuntu-16.04-server-amd64 UBUNTU_CODENAME=xenial packer build -only=virtualbox-iso training-lab_ubuntu_image.json
+NAME=training-lab_kvm-ubuntu-16.04-server-amd64   UBUNTU_CODENAME=xenial packer build -only=virtualbox-iso training-lab_ubuntu_image.json
+NAME=training-lab_kvm01-ubuntu-16.04-server-amd64 UBUNTU_CODENAME=xenial packer build -only=virtualbox-iso training-lab_ubuntu_image.json
 ```
