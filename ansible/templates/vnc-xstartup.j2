@@ -4,6 +4,6 @@
 
 startxfce4 &
 
-{% for node in ansible_play_batch %}
-virt-manager -c qemu+ssh://root@{{ hostvars[node].ansible_hostname }}/system
+{% for node in groups['all'] if node | regex_search(ansible_domain) %}
+virt-manager -c qemu+ssh://root@{{ node }}/system
 {% endfor %}

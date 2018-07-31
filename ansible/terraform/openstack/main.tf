@@ -89,7 +89,7 @@ resource "openstack_compute_instance_v2" "vms" {
   flavor_name       = "${var.openstack_compute_instance_flavor_name}"
   availability_zone = "${var.openstack_availability_zone}"
   key_pair          = "${openstack_compute_keypair_v2.keypair.name}"
-  security_groups   = ["default", "${openstack_compute_secgroup_v2.secgroup.id}"]
+  security_groups   = ["${openstack_compute_secgroup_v2.secgroup.id}"]
   user_data         = "#cloud-config\nusers:\n  - name: ubuntu\n    ssh_authorized_keys:\n      - ${file(var.openstack_compute_keypair_public_key)}"
 
   network {

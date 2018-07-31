@@ -26,7 +26,19 @@
     "azure_image_offer": "UbuntuServer",
     "azure_image_sku": "16.04-LTS",
     "azure_location": "East US",
-    "azure_vm_size": "Standard_A1_v2"
+    "azure_vm_size": "Standard_A1_v2",
+
+    "openstack_identity_endpoint": "{{ env `OPENSTACK_IDENTITY_ENDPOINT` }}",
+    "openstack_tenant_name": "{{ env `OPENSTACK_TENANT_NAME` }}",
+    "openstack_domain_name": "{{ env `OPENSTACK_DOMAIN_NAME` }}",
+    "openstack_username": "{{ env `OPENSTACK_USERNAME` }}",
+    "openstack_password": "{{ env `OPENSTACK_PASSWORD` }}",
+    "openstack_availability_zone": "{{ env `OPENSTACK_AVAILABILITY_ZONE` }}",
+    "openstack_source_image_name": "{{ env `OPENSTACK_SOURCE_IMAGE_NAME` }}",
+    "openstack_network": "{{ env `OPENSTACK_NETWORK` }}",
+    "openstack_security_groups": "{{ env `OPENSTACK_SECURITY_GROUP` }}",
+    "openstack_floating_ip_pool": "{{ env `OPENSTACK_FLOATING_IP_POOL` }}",
+    "openstack_flavor": "{{ env `OPENSTACK_FLAVOR` }}"
   },
 
   "builders":
@@ -55,6 +67,25 @@
       "location": "{{ user `azure_location` }}",
       "vm_size": "{{ user `azure_vm_size` }}",
       "ssh_username": "{{ user `ssh_username` }}"
+    },
+    {
+      "type": "openstack",
+
+      "identity_endpoint": "{{ user `openstack_identity_endpoint` }}",
+      "tenant_name": "{{ user `openstack_tenant_name` }}",
+      "domain_name": "{{ user `openstack_domain_name` }}",
+      "username": "{{ user `openstack_username` }}",
+      "password": "{{ user `openstack_password` }}",
+      "availability_zone": "{{ user `openstack_availability_zone` }}",
+      "ssh_username": "{{ user `ssh_username` }}",
+      "image_name": "{{ user `name` }}-{{ isotime \"20060102\" }}",
+      "source_image_name": "{{ user `openstack_source_image_name` }}",
+      "flavor": "{{ user `openstack_flavor` }}",
+      "networks": "{{ user `openstack_network` }}",
+      "image_visibility": "shared",
+      "floating_ip_pool": "{{ user `openstack_floating_ip_pool` }}",
+      "security_groups": "{{ user `openstack_security_groups` }}",
+      "insecure": "true"
     },
     {
       "vm_name": "{{ user `name` }}",

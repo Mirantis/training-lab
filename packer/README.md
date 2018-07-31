@@ -8,15 +8,12 @@ Here is the description how you can build such images using Packer on the follow
 * Qemu
 * VirtualBox
 
-
 ## Requirements
 
 * [Packer](https://www.packer.io/)
 * [Ansible](https://www.ansible.com/)
 
-
 ## Openstack
-
 
 ## Azure
 
@@ -30,6 +27,24 @@ NAME=training-lab_kvm-ubuntu-16.04-server-amd64   packer build -only=azure-arm t
 NAME=training-lab_kvm01-ubuntu-16.04-server-amd64 packer build -only=azure-arm training-lab_ubuntu_image.json
 ```
 
+## Openstack
+
+```bash
+export OPENSTACK_IDENTITY_ENDPOINT="https://cloud-cz.bud.mirantis.net:5000/v2.0"
+export OPENSTACK_TENANT_NAME="mirantis-services"
+export OPENSTACK_USERNAME="mirantis-services"
+read -s -p "Openstack Password for user \"$OPENSTACK_USERNAME\": " OPENSTACK_PASSWORD
+export OPENSTACK_PASSWORD
+export OPENSTACK_AVAILABILITY_ZONE="nova"
+export OPENSTACK_SOURCE_IMAGE_NAME="xenial-server-cloudimg-amd64-disk1-20180731"
+export OPENSTACK_FLAVOR="m1.medium"
+export OPENSTACK_NETWORK="4e34055c-4764-4995-b769-e5f43d3618ba"
+export OPENSTACK_FLOATING_IP_POOL="public"
+export OPENSTACK_SECURITY_GROUP="allow_all"
+
+NAME=$USER-training-lab_kvm-ubuntu-16.04-server-amd64   packer build -only=openstack training-lab_ubuntu_image.json
+NAME=$USER-training-lab_kvm01-ubuntu-16.04-server-amd64 packer build -only=openstack training-lab_ubuntu_image.json
+```
 
 ## Qemu
 
@@ -38,7 +53,6 @@ export TMPDIR="$PWD/packer_cache"
 NAME=training-lab_kvm-ubuntu-16.04-server-amd64   UBUNTU_CODENAME=xenial packer build -only=qemu training-lab_ubuntu_image.json
 NAME=training-lab_kvm01-ubuntu-16.04-server-amd64 UBUNTU_CODENAME=xenial packer build -only=qemu training-lab_ubuntu_image.json
 ```
-
 
 ## VirtualBox
 
