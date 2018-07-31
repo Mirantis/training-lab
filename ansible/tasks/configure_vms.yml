@@ -82,12 +82,7 @@
   template:
     dest: /etc/network/interfaces.d/60-vxlan-bridge.cfg
     src: templates/60-vxlan-bridge.cfg.j2
-  notify:
-    - restart networking
-    - restart salt-minion
-
-- name: Execute all notify sections
-  meta: flush_handlers
+  register: network_interfaces
 
 
 ######################################################
@@ -295,5 +290,5 @@
       delay: 10
     connection: local
     become: False
-  when: reboot_required.stat.exists and packer_build_name is not defined
+  when: reboot_required.stat.exists or network_interfaces.changed and packer_build_name is not defined
 

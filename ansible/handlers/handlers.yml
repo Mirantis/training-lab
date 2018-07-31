@@ -2,11 +2,6 @@
   systemd:
     daemon_reload: yes
 
-- name: restart networking
-  service:
-    name: networking
-    state: restarted
-
 - name: restart ufw
   service:
     name: ufw

@@ -16,7 +16,7 @@ if [ ! -d "terraform/$CLOUD_PLATFORM/.terraform/plugins/" ]; then
 fi
 
 if [ "$ACTION" == "delete" ]; then
-  ansible-playbook --extra-vars "cloud_platform=$CLOUD_PLATFORM terraform_state=absent" -i 127.0.0.1, site.yml
+  ansible-playbook --extra-vars "cloud_platform=$CLOUD_PLATFORM terraform_state=absent prefix=$USER" -i 127.0.0.1, site.yml
 else
-  ansible-playbook --extra-vars "cloud_platform=$CLOUD_PLATFORM terraform_state=present" -i 127.0.0.1, site.yml
+  ansible-playbook --extra-vars "cloud_platform=$CLOUD_PLATFORM terraform_state=present prefix=$USER" -i 127.0.0.1, site.yml
 fi
