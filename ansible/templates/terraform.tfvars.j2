@@ -2,13 +2,16 @@
 
 {% if cloud_platform == 'azure' %}
 # Azure
-azure_admin_username                  = "{{ default_username }}"
-azure_dns_resource_group              = "{{ azure_dns_resource_group }}"
-azure_tags                            = {{ azure_tags }}
-azurerm_resource_group_location       = "{{ azurerm_resource_group_location }}"
-azurerm_subnet_address_prefix         = "{{ azurerm_subnet_address_prefix }}"
-azurerm_virtual_machine_vm_size       = "{{ azurerm_virtual_machine_vm_size }}"
-azurerm_virtual_network_address_space = {{ azurerm_virtual_network_address_space }}
+azure_admin_username                      = "{{ default_username }}"
+azure_dns_resource_group                  = "{{ azure_dns_resource_group }}"
+azure_images_resource_group               = "{{ azure_images_resource_group }}"
+azure_image_kvm_name_regex                = "{{ azure_image_kvm_name_regex }}"
+azure_image_kvm01_name_regex              = "{{ azure_image_kvm01_name_regex }}"
+azure_tags                                = {{ azure_tags }}
+azurerm_resource_group_location           = "{{ azurerm_resource_group_location }}"
+azurerm_subnet_address_prefix             = "{{ azurerm_subnet_address_prefix }}"
+azurerm_virtual_machine_vm_size           = "{{ azurerm_virtual_machine_vm_size }}"
+azurerm_virtual_network_address_space     = {{ azurerm_virtual_network_address_space }}
 {% endif %}
 
 {% if cloud_platform == 'openstack' %}
@@ -16,7 +19,7 @@ azurerm_virtual_network_address_space = {{ azurerm_virtual_network_address_space
 openstack_auth_url                                 = "{{ openstack_auth_url }}"
 openstack_availability_zone                        = "{{ openstack_availability_zone }}"
 openstack_compute_instance_flavor_name             = "{{ openstack_compute_instance_flavor_name }}"
-openstack_compute_instance_image_name              = "{{ openstack_compute_instance_image_name }}"
+openstack_compute_instance_kvm_image_name          = "{{ openstack_compute_instance_kvm_image_name }}"
 openstack_compute_instance_kvm01_image_name        = "{{ openstack_compute_instance_kvm01_image_name }}"
 openstack_networking_floatingip                    = "{{ openstack_networking_floatingip }}"
 openstack_networking_network_external_network_name = "{{ openstack_networking_network_external_network_name }}"

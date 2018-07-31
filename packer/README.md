@@ -19,7 +19,8 @@ Here is the description how you can build such images using Packer on the follow
 
 ```bash
 export AZURE_CLIENT_ID="$(az ad app list | jq -r '.[] | select (.displayName == "packerbuild").appId')"
-export AZURE_CLIENT_SECRET="my_packer_password"
+read -s -p "Azure Password for Client ID \"$AZURE_CLIENT_ID\": " AZURE_CLIENT_SECRET
+export AZURE_CLIENT_SECRET
 export AZURE_RESOURCE_GROUP_NAME="training-lab-images"
 export AZURE_SUBSCRIPTION_ID="$(az account list | jq -r '.[] | select (.isDefault == true).id')"
 

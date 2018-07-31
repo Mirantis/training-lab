@@ -85,7 +85,7 @@ resource "openstack_networking_floatingip_v2" "floatingip" {
 resource "openstack_compute_instance_v2" "vms" {
   count             = "${var.vm_count * var.environment_count}"
   name              = "${format("%s-kvm%02d.%02d.%s", var.prefix, count.index % var.vm_count + 1, count.index / var.vm_count + 1, var.domain)}"
-  image_name        = "${count.index % var.vm_count == 0 ? var.openstack_compute_instance_kvm01_image_name : var.openstack_compute_instance_image_name}"
+  image_name        = "${count.index % var.vm_count == 0 ? var.openstack_compute_instance_kvm01_image_name : var.openstack_compute_instance_kvm_image_name}"
   flavor_name       = "${var.openstack_compute_instance_flavor_name}"
   availability_zone = "${var.openstack_availability_zone}"
   key_pair          = "${openstack_compute_keypair_v2.keypair.name}"

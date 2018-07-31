@@ -7,3 +7,5 @@ startxfce4 &
 {% for node in groups['all'] if node | regex_search(ansible_domain) %}
 virt-manager -c qemu+ssh://root@{{ node }}/system
 {% endfor %}
+
+conky -d

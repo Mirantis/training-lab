@@ -96,7 +96,19 @@ az role assignment create --assignee $OBJECT_ID --role "Owner" --scope /subscrip
 ## Build your own images
 
 The standard deployment process download many packages / huge images / repositories form Internet which takes a lot of time.
-It's handy to build your own images for OpenStack / Azure / local testing to speed up the deployment.
+Build your own images for OpenStack / Azure / local testing to speed up the deployment.
+
+### Build azure images
+
+```bash
+export AZURE_CLIENT_ID="$(az ad app list | jq -r '.[] | select (.displayName == "packerbuild").appId')"
+export AZURE_CLIENT_SECRET="my_packer_password"
+export AZURE_RESOURCE_GROUP_NAME="training-lab-images"
+export AZURE_SUBSCRIPTION_ID="$(az account list | jq -r '.[] | select (.isDefault == true).id')"
+
+NAME=training-lab_kvm-ubuntu-16.04-server-amd64   packer build -only=azure-arm training-lab_ubuntu_image.json
+NAME=training-lab_kvm01-ubuntu-16.04-server-amd64 packer build -only=azure-arm training-lab_ubuntu_image.json
+```
 
 Please check the [packer](packer) directory for more details.
 

@@ -25,7 +25,7 @@
     "azure_image_publisher": "Canonical",
     "azure_image_offer": "UbuntuServer",
     "azure_image_sku": "16.04-LTS",
-    "azure_location": "East US",
+    "azure_location": "East US 2",
     "azure_vm_size": "Standard_A1_v2",
 
     "openstack_identity_endpoint": "{{ env `OPENSTACK_IDENTITY_ENDPOINT` }}",

@@ -1,6 +1,17 @@
 # Configure the Azure Provider
 provider "azurerm" {}
 
+# Check if custom (prebuild) Azure image exists
+data "azurerm_image" "image_kvm" {
+  name_regex          = "${var.azure_image_kvm_name_regex}"
+  resource_group_name = "${var.azure_images_resource_group}"
+}
+
+data "azurerm_image" "image_kvm01" {
+  name_regex          = "${var.azure_image_kvm01_name_regex}"
+  resource_group_name = "${var.azure_images_resource_group}"
+}
+
 # Create a resource group
 resource "azurerm_resource_group" "rg" {
   name     = "${var.prefix}-rg"
@@ -75,10 +86,12 @@ resource "azurerm_virtual_machine" "vm" {
   tags                             = "${var.azure_tags}"
 
   storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
-    version   = "latest"
+    id = "${count.index % var.vm_count == 0 ? data.azurerm_image.image_kvm01.id : data.azurerm_image.image_kvm.id}"
+
+    #   publisher = "Canonical"
+    #   offer     = "UbuntuServer"
+    #   sku       = "16.04-LTS"
+    #   version   = "latest"
   }
 
   storage_os_disk {

@@ -14,7 +14,7 @@ variable "openstack_compute_instance_flavor_name" {
   description = "Name of Flavor in OpenStack"
 }
 
-variable "openstack_compute_instance_image_name" {
+variable "openstack_compute_instance_kvm_image_name" {
   description = "Image Name in OpenStack"
 }
 

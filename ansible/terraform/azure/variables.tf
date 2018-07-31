@@ -11,6 +11,21 @@ variable "azure_dns_resource_group" {
   description = "Resource Group name handling the DNS (domain)"
 }
 
+variable "azure_images_resource_group" {
+  description = "Resource Group containing the prebuild images"
+  default     = "training-lab-images"
+}
+
+variable "azure_image_kvm_name_regex" {
+  description = "Regexp for the prebuild kvm image (used for all VM except kvm01)"
+  default     = "training-lab-kvm-ubuntu-16.04-server-amd64*"
+}
+
+variable "azure_image_kvm01_name_regex" {
+  description = "Regexp for the prebuild kvm01 image"
+  default     = "training-lab-kvm01-ubuntu-16.04-server-amd64*"
+}
+
 variable "azurerm_resource_group_location" {
   default = "East US"
 }

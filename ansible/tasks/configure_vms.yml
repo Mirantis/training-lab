@@ -1,3 +1,7 @@
+- name: Set fact public_ip
+  set_fact:
+    public_ip: "{{ ansible_host }}"
+
 - name: Add Salt Stack GPG key
   apt_key:
     url: https://repo.saltstack.com/apt/ubuntu/{{ ansible_distribution_version }}/amd64/latest/SALTSTACK-GPG-KEY.pub
@@ -81,6 +85,9 @@
   notify:
     - restart networking
     - restart salt-minion
+
+- name: Execute all notify sections
+  meta: flush_handlers
 
 
 ######################################################
@@ -290,12 +297,3 @@
     become: False
   when: reboot_required.stat.exists and packer_build_name is not defined
 
-- name: Add all VMs conections to the virt-manager
-  shell: virt-manager -c qemu+ssh://root@{{ hostvars[item].ansible_host }}/system && touch /tmp/virt-manager-{{ hostvars[item].ansible_host }}
-  args:
-    creates: /tmp/virt-manager-{{ hostvars[item].ansible_host }}
-  delegate_to: localhost
-  become: true
-  become_user: pruzicka
-  when: ansible_system == "Linux" and packer_build_name is not defined
-  loop: "{{ ansible_play_batch }}"
