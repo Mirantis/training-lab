@@ -59,6 +59,7 @@
       "managed_image_name": "{{ user `name` }}-{{ isotime \"20060102\" }}",
 
       "azure_tags": {
+        "Image": "{{ user `name` }}",
         "Environment": "Training",
         "Consumer": "training@mirantis.com",
         "Task": "training-lab image build"
