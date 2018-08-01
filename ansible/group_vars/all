@@ -34,8 +34,8 @@ azurerm_virtual_network_address_space     : '["192.168.250.0/24"]'
 # OpenStack
 openstack_auth_url                                : https://cloud.example.com:5000/v2.0
 openstack_compute_instance_flavor_name            : m1.xxlarge80
-openstack_compute_instance_kvm_image_name         : pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180731
-openstack_compute_instance_kvm01_image_name       : pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180731
+openstack_compute_instance_kvm_image_name         : pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180801
+openstack_compute_instance_kvm01_image_name       : pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180801
 openstack_networking_network_external_network_name: public
 openstack_networking_subnet_cidr                  : 192.168.250.0/24
 openstack_networking_subnet_dns_nameservers       : '["1.1.1.1"]'

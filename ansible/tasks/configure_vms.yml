@@ -265,10 +265,15 @@
     path: /etc/salt/minion
     backup: yes
     block: |
-      id: {{ ansible_fqdn }}
+      id: {{ ansible_hostname | regex_replace('.*(kvm[0-9]{2}).*', '\1') }}.{{ domain }}
       master: {{ mcp_salt_master_ip }}
   notify: restart salt-minion
+  when: packer_build_name is not defined
 
+
+######################################################
+# Reboot
+######################################################
 - name: Check if reboot is necessary by locatimng the /var/run/reboot-required
   stat:
     path: /var/run/reboot-required
