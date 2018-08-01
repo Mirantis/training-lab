@@ -118,9 +118,10 @@ Follow these commands to install necessary requirements on latest Ubuntu:
 
 ```bash
 # You can use docker image:
-# docker run --rm -it ubuntu:latest
+# docker run -e "USER=$USER" --rm -it ubuntu:latest
 
-sudo apt install apt-transport-https ansible curl git gnupg jq lsb-release unzip
+sudo apt update -qq
+sudo apt install apt-transport-https ansible curl git gnupg jq lsb-release sudo unzip
 
 test -f $HOME/.ssh/id_rsa || ( install -m 0700 -d $HOME/.ssh && ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N "" )
 
@@ -149,11 +150,14 @@ cd training-lab/ansible
 
 or
 
+az login
 # Create Azure training environment
 ./create_azure.sh
 # Delete whole Azure structure
 ./delete_azure.sh
 ```
+
+[![asciicast](https://asciinema.org/a/194279.png)](https://asciinema.org/a/194279)
 
 ## Deployment steps on kvm01
 

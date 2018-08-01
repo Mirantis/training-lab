@@ -2,10 +2,19 @@
 
 # {{ ansible_managed }}
 
+(
+
 startxfce4 &
 
 {% for node in groups['all'] if node | regex_search(ansible_domain) %}
 virt-manager -c qemu+ssh://root@{{ node }}/system
 {% endfor %}
 
-conky -d
+sleep 1
+
+conky -a bottom -d
+
+xscreensaver-command -exit
+
+) 2>&1 | tee /tmp/vnc-xstartup.log
+
