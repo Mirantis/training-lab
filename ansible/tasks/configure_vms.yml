@@ -8,7 +8,7 @@
 
 - name: Add salt repository
   apt_repository:
-    repo: deb [arch=amd64] http://mirror.mirantis.com/{{ mcp_release_tag }}/saltstack-2016.3/{{ ansible_distribution_release }}/ {{ ansible_distribution_release }} main
+    repo: deb [arch=amd64] http://mirror.mirantis.com/{{ mcp_release_tag }}/saltstack-{{ saltstack_repository_version }}/{{ ansible_distribution_release }}/ {{ ansible_distribution_release }} main
 
 - name: Update all packages
   apt:

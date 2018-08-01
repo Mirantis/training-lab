@@ -178,8 +178,17 @@ Denied Keys:
 Unaccepted Keys:
 Rejected Keys:
 
+# Check salt versions
+$ salt '*' test.version
+
 # Verify that the Salt Minion nodes are synchronized by running the following command on the Salt Master node
 $ salt '*' saltutil.sync_all
+
+# Refresh Salt pillars
+$ salt '*' saltutil.refresh_pillar
+
+# Check out your inventory to be able to resolve any inconsistencies in your model:
+$ reclass-salt --top
 
 # Perform the initial Salt configuration
 $ salt '*kvm*' state.sls salt.minion

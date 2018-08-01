@@ -70,6 +70,9 @@ mcp_salt_master_ip: 10.0.0.15
 # Salt model
 mcp_salt_model_git_repository: https://github.com/ruzickap/training-lab-salt-model.git
 
+# SaltStack repository version (http://mirror.mirantis.com/2018.7.0-milestone1//saltstack-2017.7//xenial xenial main)
+saltstack_repository_version: 2017.7
+
 # MCP release tags: https://github.com/Mirantis/mcp-common-scripts/tags, http://images.mirantis.com/
 mcp_release_tag: 2018.7.0-milestone1
 
