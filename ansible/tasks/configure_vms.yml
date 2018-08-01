@@ -295,5 +295,5 @@
       delay: 10
     connection: local
     become: False
-  when: reboot_required.stat.exists or network_interfaces.changed and packer_build_name is not defined
+  when: ( reboot_required.stat.exists or network_interfaces.changed ) and packer_build_name is not defined
 

@@ -50,6 +50,7 @@ NAME=$USER-training-lab_kvm01-ubuntu-16.04-server-amd64 packer build -only=opens
 ## Qemu
 
 ```bash
+mkdir $PWD/packer_cache
 export TMPDIR="$PWD/packer_cache"
 NAME=training-lab_kvm-ubuntu-16.04-server-amd64   UBUNTU_CODENAME=xenial packer build -only=qemu training-lab_ubuntu_image.json
 NAME=training-lab_kvm01-ubuntu-16.04-server-amd64 UBUNTU_CODENAME=xenial packer build -only=qemu training-lab_ubuntu_image.json
@@ -58,6 +59,7 @@ NAME=training-lab_kvm01-ubuntu-16.04-server-amd64 UBUNTU_CODENAME=xenial packer 
 ## VirtualBox
 
 ```bash
+mkdir $PWD/packer_cache
 export TMPDIR="$PWD/packer_cache"
 NAME=training-lab_kvm-ubuntu-16.04-server-amd64   UBUNTU_CODENAME=xenial packer build -only=virtualbox-iso training-lab_ubuntu_image.json
 NAME=training-lab_kvm01-ubuntu-16.04-server-amd64 UBUNTU_CODENAME=xenial packer build -only=virtualbox-iso training-lab_ubuntu_image.json
