@@ -5,11 +5,13 @@ provider "azurerm" {}
 data "azurerm_image" "image_kvm" {
   name_regex          = "${var.azure_image_kvm_name_regex}"
   resource_group_name = "${var.azure_images_resource_group}"
+  sort_descending     = true
 }
 
 data "azurerm_image" "image_kvm01" {
   name_regex          = "${var.azure_image_kvm01_name_regex}"
   resource_group_name = "${var.azure_images_resource_group}"
+  sort_descending     = true
 }
 
 # Create a resource group
