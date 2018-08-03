@@ -37,7 +37,7 @@ export OPENSTACK_USERNAME="mirantis-services"
 read -s -p "Openstack Password for user \"$OPENSTACK_USERNAME\": " OPENSTACK_PASSWORD
 export OPENSTACK_PASSWORD
 export OPENSTACK_AVAILABILITY_ZONE="nova"
-export OPENSTACK_SOURCE_IMAGE_NAME="xenial-server-cloudimg-amd64-disk1-20180731"
+export OPENSTACK_SOURCE_IMAGE_NAME="xenial-server-cloudimg-amd64-disk1-20180803"
 export OPENSTACK_FLAVOR="m1.medium"
 export OPENSTACK_NETWORK="4e34055c-4764-4995-b769-e5f43d3618ba"
 export OPENSTACK_FLOATING_IP_POOL="public"
