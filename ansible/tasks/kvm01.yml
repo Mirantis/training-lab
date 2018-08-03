@@ -91,6 +91,7 @@
       -A PREROUTING -i {{ ansible_default_ipv4.interface }} -d {{ ansible_default_ipv4.address }} -p tcp --dport 5240 -j DNAT --to-destination {{ mcp_salt_master_ip }}:5240
 
       COMMIT
+  when: packer_build_name is not defined
   notify:
     - restart ufw
 
@@ -237,11 +238,11 @@
       msg:
         - "Check the installation output: ssh {{ default_student_account_name }}@{{ ansible_host }}; virsh console cfg01.{{ domain }}"
         - "Add your ssh public key into the default MAAS account: http://{{ ansible_host }}:5240/MAAS (mirantis/r00tme)"
-        - "Add VMs for comissioning+deploy: for A in {1..{{ vm_count }}}; do for B in {1..{{ nested_vms_count }}}; do maas mirantis machines create power_parameters_power_address=qemu+tcp://10.0.0.1$A/system hostname={{ prefix }}-kvm0$A-pxe0$B power_type=virsh power_parameters_power_id={{ prefix }}-kvm0$A-pxe0$B architecture=amd64/generic mac_addresses=52:54:00:00:0$A:0$B; done; done"
+        - "Add VMs for comissioning+deploy: for A in {1..{{ kvm_vm_nodes }}}; do for B in {1..{{ nested_vms_count }}}; do maas mirantis machines create power_parameters_power_address=qemu+tcp://10.0.0.1$A/system hostname={{ prefix }}-kvm0$A-pxe0$B power_type=virsh power_parameters_power_id={{ prefix }}-kvm0$A-pxe0$B architecture=amd64/generic mac_addresses=52:54:00:00:0$A:0$B; done; done"
         - "MAAS   : http://{{ ansible_host }}:5240/MAAS (mirantis/r00tme)"
         - "Jenkins: http://{{ ansible_host }}:8081 (admin/r00tme)"
         - "noVNC  : https://{{ ansible_host }}/vnc.html?port=443&true_color=1&password={{ default_access_password }}"
         - "VNC    : vnc://{{ ansible_host }}:5901, Password: {{ default_access_password }}"
-        - "SSH    : ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no {{ default_student_account_name }}@{{ ansible_host }} | {{ ansible_hostname }}, Password: {{ default_access_password }}"
+        - "SSH    : ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no -o ControlPath=none {{ default_student_account_name }}@{{ ansible_host }} | {{ ansible_hostname }}, Password: {{ default_access_password }}"
         - "Nodes  : {% for node in groups['all'] if node | regex_search(ansible_domain) %}{{ hostvars[node].public_ip }} / {{ hostvars[node].ansible_fqdn }}{% if not loop.last %}, {% endif %}{% endfor %}"
   when: packer_build_name is not defined

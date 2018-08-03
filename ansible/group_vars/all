@@ -7,13 +7,19 @@ default_username: ubuntu
 default_student_account_name: student
 
 # Number of Training Environment
-environment_count: 1
+environment_count: 2
 
-# Number of Virtual Machines
-vm_count: 3
+# Number of kvm VMs (max 9)
+kvm_vm_nodes: 3
+
+# Number of cmp (compute) VMs (max 9)
+cmp_vm_nodes: 1
+
+# Number of osd (ceph) VMs (max 9)
+osd_vm_nodes: 0
 
 # Prefix for all names used in Cloud (vms, networks, ...)
-prefix: training
+# prefix: training (taken from the main script create_openstack.sh)
 
 # Local SSH public key which will be saved to all VMs to all users
 ssh_public_key: ~/.ssh/id_rsa.pub
@@ -22,27 +28,39 @@ ssh_public_key: ~/.ssh/id_rsa.pub
 # Permanent Azure Resource Group which is serving the {{ domain }} should be already exist...
 azure_dns_resource_group                  : training-lab-dns
 azure_images_resource_group               : training-lab-images
-azure_image_kvm_name_regex                : training-lab_kvm-ubuntu-16.04-server-amd64*
 azure_image_kvm01_name_regex              : training-lab_kvm01-ubuntu-16.04-server-amd64*
+azure_image_kvm_name_regex                : training-lab_kvm-ubuntu-16.04-server-amd64*
+azure_image_cmp_name_regex                : "{{ azure_image_kvm_name_regex }}"
+azure_image_osd_name_regex                : "{{ azure_image_kvm_name_regex }}"
 azure_tags                                : '{ Environment = "Training", Consumer = "training@mirantis.com" }'
 azurerm_resource_group_location           : East US 2
-azurerm_subnet_address_prefix             : 192.168.250.0/24
-#azurerm_virtual_machine_vm_size          : Standard_D16s_v3
-azurerm_virtual_machine_vm_size           : Standard_D4s_v3
-azurerm_virtual_network_address_space     : '["192.168.250.0/24"]'
+azurerm_subnet_address_prefix             : "{{ cloud_network }}"
+# Standard_D16s_v3
+azurerm_virtual_machine_vm_size_kvm       : Standard_D4s_v3
+azurerm_virtual_machine_vm_size_cmp       : Standard_D2s_v3
+azurerm_virtual_machine_vm_size_osd       : Basic_A2
+azurerm_virtual_network_address_space     : '["{{ cloud_network | string }}"]'
 
 # OpenStack
 openstack_auth_url                                : https://cloud.example.com:5000/v2.0
-openstack_compute_instance_flavor_name            : m1.xxlarge80
-openstack_compute_instance_kvm_image_name         : pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180801
-openstack_compute_instance_kvm01_image_name       : pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180801
+#m1.xxlarge80 # m1.xlarge40 # m1.medium
+openstack_compute_instance_flavor_name_kvm        : m1.xlarge40
+openstack_compute_instance_flavor_name_cmp        : m1.medium
+openstack_compute_instance_flavor_name_osd        : t2.nano
+openstack_compute_instance_kvm01_image_name       : pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180803
+openstack_compute_instance_kvm_image_name         : pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180803
+openstack_compute_instance_cmp_image_name         : "{{ openstack_compute_instance_kvm_image_name }}"
+openstack_compute_instance_osd_image_name         : "{{ openstack_compute_instance_kvm_image_name }}"
 openstack_networking_network_external_network_name: public
-openstack_networking_subnet_cidr                  : 192.168.250.0/24
+openstack_networking_subnet_cidr                  : "{{ cloud_network }}"
 openstack_networking_subnet_dns_nameservers       : '["1.1.1.1"]'
 openstack_networking_floatingip                   : public
 openstack_password                                : my_secret_password
 openstack_tenant_name                             : my_tenant_name
 openstack_user_name                               : my_username
+
+# Cloud Network (this network is created inside cloud and all cloud VMs are connected to it)
+cloud_network: 192.168.250.0/24
 
 # Domain name
 domain: tng.mirantis.com
@@ -155,6 +173,12 @@ kvm01_packages:
   - xfce4
   - xfce4-terminal
   - xfonts-base
+
+# Services which should be started during boot
+start_services:
+  - acpid
+  - haveged
+  - salt-minion
 
 # Salt formulas taken from nightly (usually used for features / bug fixes / ...)
 # http://apt.mirantis.com/xenial/pool/salt/s/

@@ -19,7 +19,7 @@
 # Configure all Virtual Machines
 ########################################################################
 - name: Configure VMs created by terraform
-  hosts: training-lab
+  hosts: training_lab
   user: "{{ default_username }}"
   become: true
 
@@ -30,6 +30,7 @@
   tasks:
     - import_tasks: tasks/configure_vms.yml
     - import_tasks: tasks/define_vms.yml
+      when: ansible_fqdn in groups['training_lab_kvm']
 
   handlers:
     - import_tasks: handlers/handlers.yml
@@ -39,7 +40,7 @@
 # Configure kvm01 Virtual Machines
 ########################################################################
 - name: Configure kvm01 VMs
-  hosts: training-lab-kvm01
+  hosts: training_lab_kvm01
   user: "{{ default_username }}"
   become: true
 

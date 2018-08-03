@@ -20,26 +20,24 @@
     name: "{{ item }}"
   loop: "{{ packages }}"
 
-- name: Set proper hostname / domain
-  hostname:
-    name: "{{ inventory_hostname }}"
+- block:
+  - name: Set proper hostname / domain
+    hostname:
+      name: "{{ inventory_hostname }}"
 
-- name: Build hosts file
-  template:
-    src: templates/hosts.j2
-    dest: /etc/hosts
-    backup: yes
+  - name: Build hosts file
+    template:
+      src: templates/hosts.j2
+      dest: /etc/hosts
+      backup: yes
+  when: packer_build_name is not defined
 
 - name: Start services
   service:
     name: "{{ item }}"
     enabled: yes
     state: started
-  loop:
-    - acpid
-    - haveged
-    - salt-minion
-
+  loop: "{{ start_services }}"
 
 ######################################################
 # Optimize Virtualization
@@ -83,6 +81,7 @@
     dest: /etc/network/interfaces.d/60-vxlan-bridge.cfg
     src: templates/60-vxlan-bridge.cfg.j2
   register: network_interfaces
+  when: packer_build_name is not defined
 
 
 ######################################################
@@ -265,7 +264,7 @@
     path: /etc/salt/minion
     backup: yes
     block: |
-      id: {{ ansible_hostname | regex_replace('.*(kvm[0-9]{2}).*', '\1') }}.{{ domain }}
+      id: {{ ansible_fqdn | regex_replace('.*\-(\w{3}\d{2}).*', '\1') }}.{{ domain }}
       master: {{ mcp_salt_master_ip }}
   notify: restart salt-minion
   when: packer_build_name is not defined
@@ -295,5 +294,5 @@
       delay: 10
     connection: local
     become: False
-  when: ( reboot_required.stat.exists or network_interfaces.changed ) and packer_build_name is not defined
+  when: ( reboot_required.stat.exists or ( network_interfaces is defined and network_interfaces.changed )) and packer_build_name is not defined
 

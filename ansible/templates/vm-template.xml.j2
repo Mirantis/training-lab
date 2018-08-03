@@ -53,7 +53,7 @@
     </controller>
     <controller type='pci' index='0' model='pci-root'/>
     <interface type='bridge'>
-      <mac address='52:54:00:00:{{ ansible_hostname | regex_replace('.*kvm(\d+).*', '\\1') }}:{{ item | regex_replace('.*pxe(\d+).*', '\\1') }}'/>
+      <mac address='52:54:00:00:{{ ansible_hostname | regex_replace('.*\-\w{3}(\d{2}).*', '\\1') }}:{{ item | regex_replace('.*pxe(\d{2}).*', '\\1') }}'/>
       <source bridge='{{ networks.deploy_network.device }}'/>
       <model type='virtio'/>
       <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>

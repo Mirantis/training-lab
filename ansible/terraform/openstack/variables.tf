@@ -10,16 +10,32 @@ variable "openstack_availability_zone" {
   description = "The availability zone in which to create the server"
 }
 
-variable "openstack_compute_instance_flavor_name" {
-  description = "Name of Flavor in OpenStack"
+variable "openstack_compute_instance_flavor_name_kvm" {
+  description = "Name of kvm flavor in OpenStack"
 }
 
-variable "openstack_compute_instance_kvm_image_name" {
-  description = "Image Name in OpenStack"
+variable "openstack_compute_instance_flavor_name_cmp" {
+  description = "Name of cmp flavor in OpenStack"
+}
+
+variable "openstack_compute_instance_flavor_name_osd" {
+  description = "Name of osd flavor in OpenStack"
 }
 
 variable "openstack_compute_instance_kvm01_image_name" {
-  description = "Image Name for kvm01 nodes in OpenStack"
+  description = "Image name for kvm01 VMs in OpenStack"
+}
+
+variable "openstack_compute_instance_kvm_image_name" {
+  description = "Image name for kvm VMs in OpenStack"
+}
+
+variable "openstack_compute_instance_cmp_image_name" {
+  description = "Image name for cmp VMs in OpenStack"
+}
+
+variable "openstack_compute_instance_osd_image_name" {
+  description = "Image name for osd VMs in OpenStack"
 }
 
 variable "openstack_compute_keypair_public_key" {
@@ -68,7 +84,17 @@ variable "username" {
   default     = "ubuntu"
 }
 
-variable "vm_count" {
-  description = "Number of VMs which should be created"
+variable "kvm_vm_nodes" {
+  description = "Number of VMs which should be created as kvm hosts"
+  default     = 3
+}
+
+variable "cmp_vm_nodes" {
+  description = "Number of VMs which should be created as cmp hosts"
+  default     = 3
+}
+
+variable "osd_vm_nodes" {
+  description = "Number of VMs which should be created as osd hosts"
   default     = 3
 }

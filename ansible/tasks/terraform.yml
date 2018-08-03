@@ -11,29 +11,55 @@
 
 - name: Add hosts created by terraform and wait for boot to complete
   block:
-    - name: Add hosts created by terraform
+    - name: Add kvm hosts created by terraform
       add_host:
         name: "{{ item.1 }}"
         ansible_host: "{{ item.0 }}"
         groups:
-          - training-lab-{{ item.1.split('.')[1] }}
-          - training-lab
-      loop: "{{ terraform_apply_output.outputs.vm_public_ip.value|zip(terraform_apply_output.outputs.vm_name.value)|list }}"
+          - training_lab_{{ item.1.split('.')[1] }}
+          - training_lab_{{ item.1.split('.')[1] }}_kvm
+          - training_lab_kvm
+          - training_lab
+      loop: "{{ terraform_apply_output.outputs.vms_kvm_public_ip.value|zip(terraform_apply_output.outputs.vms_kvm_name.value)|list }}"
       changed_when: false
 
-    - name: Add kvm01 hosts to training-lab-kvm01 group
+    - name: Add cmp hosts created by terraform
+      add_host:
+        name: "{{ item.1 }}"
+        ansible_host: "{{ item.0 }}"
+        groups:
+          - training_lab_{{ item.1.split('.')[1] }}
+          - training_lab_{{ item.1.split('.')[1] }}_cmp
+          - training_lab_cmp
+          - training_lab
+      loop: "{{ terraform_apply_output.outputs.vms_cmp_public_ip.value|zip(terraform_apply_output.outputs.vms_cmp_name.value)|list }}"
+      changed_when: false
+
+    - name: Add osd hosts created by terraform
+      add_host:
+        name: "{{ item.1 }}"
+        ansible_host: "{{ item.0 }}"
+        groups:
+          - training_lab_{{ item.1.split('.')[1] }}
+          - training_lab_{{ item.1.split('.')[1] }}_osd
+          - training_lab_osd
+          - training_lab
+      loop: "{{ terraform_apply_output.outputs.vms_osd_public_ip.value|zip(terraform_apply_output.outputs.vms_osd_name.value)|list }}"
+      changed_when: false
+
+    - name: Add kvm01 hosts to training_lab_kvm01 group
       add_host:
         name: "{{ item }}"
-        groups: training-lab-kvm01
+        groups: training_lab_kvm01
       loop: "{{ groups['all'] }}"
-      when: item is search("kvm01")
+      when: item is search("-kvm01.")
       changed_when: false
 
     - name: Wait for all VMs to boot
       wait_for:
-        host: "{{ item }}"
+        host: "{{ hostvars[item].ansible_host }}"
         port: "22"
         search_regex: OpenSSH
         delay: 1
-      loop: "{{ terraform_apply_output.outputs.vm_public_ip.value }}"
+      loop: "{{ groups['training_lab'] }}"
   when: terraform_apply_output.state == 'present'

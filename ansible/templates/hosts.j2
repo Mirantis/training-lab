@@ -1,10 +1,20 @@
 127.0.0.1 localhost
 
-############ Training lab
-{% for node in ansible_play_hosts if node | regex_search(ansible_domain) %}
+############ Training lab real Cloud IPs ({{ cloud_network }})
+{% for node in groups['training_lab'] if node | regex_search(ansible_domain) %}
 {{ hostvars[node]['ansible_default_ipv4']['address'] }} {{ hostvars[node]['ansible_hostname'] }} {{ node }}
 {% endfor %}
 ############
+
+{% for network in networks.keys() %}
+############ Training lab - {{ network }} ({{networks[network].subnet_netmask}}, {{networks[network].gateway}}) [{{networks[network].device}}]
+{% for node in groups['training_lab'] if node | regex_search(ansible_domain) %}
+{{ networks[network].subnet_netmask | ipaddr(hostvars[node].ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }} {{ hostvars[node]['ansible_fqdn'] | regex_replace('.*\-(\w{3}\d{2}).*', '\\1') }}-{{ networks[network].device | regex_replace('br-(\w)', '\\1') }}.{{ domain }}{% if networks[network].device | regex_search('mgm') %} {{ hostvars[node]['ansible_fqdn'] | regex_replace('.*\-(\w{3}\d{2}).*', '\\1') }}.{{ domain }}{% endif %}
+
+{% endfor %}
+############
+
+{% endfor %}
 
 # The following lines are desirable for IPv6 capable hosts
 ::1 ip6-localhost ip6-loopback
