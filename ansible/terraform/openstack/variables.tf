@@ -8,34 +8,42 @@ variable "openstack_auth_url" {
 
 variable "openstack_availability_zone" {
   description = "The availability zone in which to create the server"
+  default = "nova"
 }
 
 variable "openstack_compute_instance_flavor_name_kvm" {
   description = "Name of kvm flavor in OpenStack"
+  default = "m1.xlarge"
 }
 
 variable "openstack_compute_instance_flavor_name_cmp" {
   description = "Name of cmp flavor in OpenStack"
+  default = "m1.xlarge"
 }
 
 variable "openstack_compute_instance_flavor_name_osd" {
   description = "Name of osd flavor in OpenStack"
+  default = "m1.xlarge"
 }
 
 variable "openstack_compute_instance_kvm01_image_name" {
   description = "Image name for kvm01 VMs in OpenStack"
+  default = "training-lab_kvm01-ubuntu-16.04-server-amd64-20180803"
 }
 
 variable "openstack_compute_instance_kvm_image_name" {
   description = "Image name for kvm VMs in OpenStack"
+  default = "training-lab_kvm-ubuntu-16.04-server-amd64-20180803"
 }
 
 variable "openstack_compute_instance_cmp_image_name" {
   description = "Image name for cmp VMs in OpenStack"
+  default = "training-lab_kvm-ubuntu-16.04-server-amd64-20180803"
 }
 
 variable "openstack_compute_instance_osd_image_name" {
   description = "Image name for osd VMs in OpenStack"
+  default = "training-lab_kvm-ubuntu-16.04-server-amd64-20180803"
 }
 
 variable "openstack_compute_keypair_public_key" {

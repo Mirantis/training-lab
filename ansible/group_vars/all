@@ -7,7 +7,7 @@ default_username: ubuntu
 default_student_account_name: student
 
 # Number of Training Environment
-environment_count: 2
+environment_count: 1
 
 # Number of kvm VMs (max 9)
 kvm_vm_nodes: 3
