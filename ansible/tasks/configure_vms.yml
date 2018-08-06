@@ -133,23 +133,14 @@
 ######################################################
 - block:
   - name: Generate private/public ssh keys for access inside all VMs
-    command: ssh-keygen -t rsa -b 2048 -f /root/.ssh/id_rsa -N "" -q
+    command: ssh-keygen -t rsa -b 2048 -f /tmp/{{ prefix }}-id_rsa-{{ hostvars[item].ansible_domain }} -N "" -q
     args:
-      creates: /root/.ssh/id_rsa
+      creates: /tmp/{{ prefix }}-id_rsa-{{ hostvars[item].ansible_domain }}
+    loop: "{{ groups['training_lab_kvm01'] }}"
+    become: false
+    delegate_to: localhost
+    run_once: true
 
-  - name: Get generated private ssh key for access inside all VMs
-    command: cat /root/.ssh/id_rsa
-    register: generated_ssh_private_key
-    changed_when: false
-
-  - name: Get generated public ssh key for access inside all VMs
-    command: cat /root/.ssh/id_rsa.pub
-    register: generated_ssh_public_key
-    changed_when: false
-  when: packer_build_name is not defined
-  run_once: true
-
-- block:
   - name: Remove vagrant public key
     authorized_key:
       user: ubuntu
@@ -167,24 +158,20 @@
 
   - name: Add generated public keys to all accounts
     authorized_key:
-      user: "{{ item }}"
-      key: "{{ generated_ssh_public_key.stdout }}"
-    loop:
-      - "{{ default_username }}"
-      - root
-      - "{{ default_student_account_name }}"
+      user: "{{ item[1] }}"
+      key:  "{{ lookup('file', '/tmp/{{ prefix }}-id_rsa-{{ hostvars[item[0]].ansible_domain }}.pub') }}"
+    when: item[0] is search(ansible_fqdn)
+    loop: "{{ groups['training_lab'] | product ([ default_username, 'root', default_student_account_name ]) | list }}"
 
   - name: Add generated ssh private key to all users $HOME/.ssh/id_rsa
     copy:
-      content: "{{ generated_ssh_private_key.stdout }}"
-      dest: "{{ item }}/.ssh/id_rsa"
+      src: "/tmp/{{ prefix }}-id_rsa-{{ hostvars[item[0]].ansible_domain }}"
+      dest: "{{ item[1] }}/.ssh/id_rsa"
       mode: 0600
-      owner: "{{ item | basename }}"
-      group: "{{ item | basename }}"
-    loop:
-      - "/home/{{ default_username }}"
-      - /root
-      - "/home/{{ default_student_account_name }}"
+      owner: "{{ item[1] | basename }}"
+      group: "{{ item[1] | basename }}"
+    when: item[0] is search(ansible_fqdn)
+    loop: "{{ groups['training_lab'] | product ([ '/home/' + default_username, '/root', '/home/' + default_student_account_name ]) | list }}"
 
   - name: Generate access password for all users
     set_fact:
