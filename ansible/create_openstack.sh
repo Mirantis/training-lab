@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -e
 
 # Cloud Platforms: openstack, azure, gce
 CLOUD_PLATFORM=$(basename $0 | sed 's/.*_\(.*\).sh/\1/')
@@ -13,6 +13,20 @@ if [ ! -d "terraform/$CLOUD_PLATFORM/.terraform/plugins/" ]; then
   cd terraform/$CLOUD_PLATFORM/
   terraform init
   cd -
+fi
+
+if [ "$CLOUD_PLATFORM" == "azure" ]; then
+  # Check if your account is working properly
+  if [ "`az account show 2>&1`" == "ERROR: Please run 'az login' to setup account." ]; then
+    echo "*** Running 'az login'"
+    if [ -n "$CLIENT_ID" ] && [ -n "$CLIENT_SECRET" ] && [ -n "$TENANT_ID" ]; then
+      # Use non-interactive login using service principal (https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest)
+      az login --service-principal -u "$CLIENT_ID" -p "$CLIENT_SECRET" --tenant "$TENANT_ID"
+    else
+      # Use interactive login
+      az login
+    fi
+  fi
 fi
 
 if [ "$ACTION" == "delete" ]; then
