@@ -17,8 +17,8 @@
 
 - name: Install packages
   apt:
-    name: "{{ item }}"
-  loop: "{{ packages }}"
+    name: "{{ packages }}"
+    install_recommends: no
 
 - block:
   - name: Set proper hostname / domain
