@@ -10,10 +10,6 @@ startxfce4 &
 virt-manager -c qemu+ssh://root@{{ node }}/system
 {% endfor %}
 
-sleep 5
-
-conky -a bottom -d
-
 xscreensaver-command -exit
 
 ) 2>&1 | tee /tmp/vnc-xstartup.log
