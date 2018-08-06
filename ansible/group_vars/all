@@ -1,5 +1,3 @@
-# Terraform variables
-
 # Default user for all VMs created by cloud provider
 default_username: ubuntu
 
@@ -21,10 +19,10 @@ osd_vm_nodes: 0
 # Prefix for all names used in Cloud (vms, networks, ...)
 # prefix: training (taken from the main script create_openstack.sh)
 
-# Local SSH public key which will be saved to all VMs to all users
+# Local SSH public key which will be provisioned to all VMs to all users
 ssh_public_key: ~/.ssh/id_rsa.pub
 
-# Azure
+# Azure Terraform variables
 # Permanent Azure Resource Group which is serving the {{ domain }} should be already exist...
 azure_dns_resource_group                  : training-lab-dns
 azure_images_resource_group               : training-lab-images
@@ -41,7 +39,7 @@ azurerm_virtual_machine_vm_size_cmp       : Standard_D2s_v3
 azurerm_virtual_machine_vm_size_osd       : Basic_A2
 azurerm_virtual_network_address_space     : '["{{ cloud_network | string }}"]'
 
-# OpenStack
+# OpenStack Terraform variables
 openstack_auth_url                                : https://cloud.example.com:5000/v2.0
 #m1.xxlarge80 # m1.xlarge40 # m1.medium
 openstack_compute_instance_flavor_name_kvm        : m1.xlarge40
@@ -81,6 +79,25 @@ networks:
     subnet_netmask: 10.0.1.0/24
     gateway       : 10.0.1.11
     device        : br-ctl
+  public_network:
+    subnet        : 10.0.1.0
+    netmask       : 255.255.255.0
+    subnet_netmask: 10.0.2.0/24
+    gateway       : 10.0.2.11
+    device        : br-public
+  storage_network:
+    subnet        : 10.0.1.0
+    netmask       : 255.255.255.0
+    subnet_netmask: 10.0.3.0/24
+    gateway       : 10.0.3.11
+    device        : br-storage
+  storage_replication_network:
+    subnet        : 10.0.4.0
+    netmask       : 255.255.255.0
+    subnet_netmask: 10.0.4.0/24
+    gateway       : 10.0.4.11
+    device        : br-stor-repl
+
 
 # Salt Master IP (cfg01)
 mcp_salt_master_ip: 10.0.0.15

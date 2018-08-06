@@ -1,24 +1,26 @@
 # {{ ansible_managed }}
 
-{% for network in networks.keys() %}
-# {{ network }}
-auto vxlan{{ networks[network].subnet.split('.')[2] }}
-iface vxlan{{ networks[network].subnet.split('.')[2] }} inet manual
-    pre-up ip link add vxlan{{ networks[network].subnet.split('.')[2] }} type vxlan id {{ networks[network].subnet.split('.')[2] }} dev {{ ansible_default_ipv4.interface }} dstport 0 || true
+{% for network in networks.items() | sort(attribute='1.subnet_netmask') %}
+# {{ network.0 }}
+auto vxlan{{ network.1.subnet.split('.')[2] }}
+iface vxlan{{ network.1.subnet.split('.')[2] }} inet manual
+    pre-up ip link add vxlan{{ network.1.subnet.split('.')[2] }} type vxlan id {{ network.1.subnet.split('.')[2] }} dev {{ ansible_default_ipv4.interface }} dstport 0 || true
 {% for node in groups['training_lab'] if node | regex_search(ansible_domain) and hostvars[node].ansible_default_ipv4.address != ansible_default_ipv4.address %}
-    pre-up bridge fdb append to 00:00:00:00:00:00 dst {{ hostvars[node].ansible_default_ipv4.address }} dev vxlan{{ networks[network].subnet.split('.')[2] }}
+    pre-up bridge fdb append to 00:00:00:00:00:00 dst {{ hostvars[node].ansible_default_ipv4.address }} dev vxlan{{ network.1.subnet.split('.')[2] }}
 {% endfor %}
-    up ip link set vxlan{{ networks[network].subnet.split('.')[2] }} up || true
-    down ip link set vxlan{{ networks[network].subnet.split('.')[2] }} down
-    post-down ip link del vxlan{{ networks[network].subnet.split('.')[2] }}
+    up ip link set vxlan{{ network.1.subnet.split('.')[2] }} up || true
+    down ip link set vxlan{{ network.1.subnet.split('.')[2] }} down
+    post-down ip link del vxlan{{ network.1.subnet.split('.')[2] }}
 
-auto {{ networks[network].device }}
-iface {{ networks[network].device }} inet static
-  address {{ networks[network].subnet_netmask | ipaddr(ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }}
-  netmask {{ networks[network].netmask }}
-  bridge_ports vxlan{{ networks[network].subnet.split('.')[2] }}
+auto {{ network.1.device }}
+iface {{ network.1.device }} inet static
+  address {{ network.1.subnet_netmask | ipaddr(ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }}
+  netmask {{ network.1.netmask }}
+  bridge_ports vxlan{{ network.1.subnet.split('.')[2] }}
   bridge_stp off
   bridge_fd 0
   bridge_maxwait 0
 
+
 {% endfor %}
+

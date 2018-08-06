@@ -81,8 +81,10 @@
       :POSTROUTING ACCEPT [0:0]
       :PREROUTING ACCEPT [0:0]
 
-      # Masquarade traffic for {{ networks.deploy_network.subnet_netmask }} going out of {{ ansible_default_ipv4.interface }}
-      -A POSTROUTING -s {{ networks.deploy_network.subnet_netmask }} -o {{ ansible_default_ipv4.interface }} -j MASQUERADE
+      {% for network in networks.items() | sort(attribute='1.subnet_netmask') %}
+      # Masquarade traffic for {{ network.0 }} [{{ network.1.subnet_netmask }}] going out of {{ ansible_default_ipv4.interface }}
+      -A POSTROUTING -s {{ network.1.subnet_netmask }} -o {{ ansible_default_ipv4.interface }} -j MASQUERADE
+      {% endfor %}
 
       # Add port forwarding
       # Jenkins: http://{{ inventory_hostname }}:8081 -> http://{{ mcp_salt_master_ip }}:8081
