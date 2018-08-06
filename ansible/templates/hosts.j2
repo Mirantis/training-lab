@@ -8,7 +8,7 @@
 {% for network in networks.items() | sort(attribute='1.subnet_netmask') %}
 ############ Training lab - {{ network.0 }} ({{ network.1.subnet_netmask }}, {{ network.1.gateway }}) [{{ network.1.device }}]
 {% for node in groups['training_lab'] if node | regex_search(ansible_domain) %}
-{{ network.1.subnet_netmask | ipaddr(hostvars[node].ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }} {{ hostvars[node]['ansible_fqdn'] | regex_replace('.*\-(\w{3}\d{2}).*', '\\1') }}-{{ network.1.device | regex_replace('br-(\w)', '\\1') }}.{{ domain }}{% if network.1.device | regex_search('mgm') %} {{ hostvars[node]['ansible_fqdn'] | regex_replace('.*\-(\w{3}\d{2}).*', '\\1') }}.{{ domain }}{% endif %}
+{{ network.1.subnet_netmask | ipaddr(hostvars[node].ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }} {{ hostvars[node]['ansible_fqdn'] | regex_replace('.*\-(\w{3}\d{2}).*', '\\1') }}-{{ network.1.device | regex_replace('br-(\w)', '\\1') }}.{{ domain }} {{ hostvars[node]['ansible_fqdn'] | regex_replace('.*\-(\w{3}\d{2}).*', '\\1') }}-{{ network.1.device | regex_replace('br-(\w)', '\\1') }}{% if network.1.device | regex_search('mgm') %} {{ hostvars[node]['ansible_fqdn'] | regex_replace('.*\-(\w{3}\d{2}).*', '\\1') }}.{{ domain }} {{ hostvars[node]['ansible_fqdn'] | regex_replace('.*\-(\w{3}\d{2}).*', '\\1') }}{% endif %}
 
 {% endfor %}
 
