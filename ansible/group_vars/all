@@ -96,7 +96,7 @@ networks:
     netmask       : 255.255.255.0
     subnet_netmask: 10.0.4.0/24
     gateway       : 10.0.4.11
-    device        : br-stor-repl
+    device        : br-storrepl
 
 
 # Salt Master IP (cfg01)
@@ -180,7 +180,6 @@ packages:
 
 kvm01_packages:
   - chromium-browser
-  - conky
   - genisoimage
   - git
   - gnome-icon-theme-full
