@@ -39,6 +39,7 @@
     state: started
   loop: "{{ start_services }}"
 
+
 ######################################################
 # Optimize Virtualization
 ######################################################
@@ -116,6 +117,16 @@
       PasswordAuthentication yes
   notify: restart sshd
 
+- name: Allow user student to log in using password via ssh
+  blockinfile:
+    path: /etc/ssh/ssh_config
+    block: |4
+            ForwardAgent yes
+            GSSAPIAuthentication no
+            StrictHostKeyChecking no
+            TCPKeepAlive yes
+            UserKnownHostsFile=/dev/null
+
 
 ######################################################
 # Set all passwords and ssh keys
@@ -190,18 +201,6 @@
       - root
       - "{{ default_student_account_name }}"
     changed_when: false
-
-  - name: Configure ssh ~/.ssh/config for all users
-    template:
-      src: templates/config.j2
-      dest: "{{ item }}/.ssh/config"
-      mode: 0600
-      owner: "{{ item | basename }}"
-      group: "{{ item | basename }}"
-    loop:
-      - "/home/{{ default_username }}"
-      - /root
-      - "/home/{{ default_student_account_name }}"
   when: packer_build_name is not defined
 
 - name: Check if symling /var/lib/libvirt/images -> /mnt already exists
