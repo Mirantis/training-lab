@@ -133,7 +133,7 @@ resource "openstack_compute_instance_v2" "vms_cmp" {
 # Create osd nodes
 resource "openstack_compute_instance_v2" "vms_osd" {
   count             = "${var.osd_vm_nodes * var.environment_count}"
-  name              = "${format("%s-osd%02d.%02d.%s", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.cmp_vm_nodes + 1, var.domain)}"
+  name              = "${format("%s-osd%02d.%02d.%s", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.osd_vm_nodes + 1, var.domain)}"
   image_name        = "${var.openstack_compute_instance_osd_image_name}"
   flavor_name       = "${var.openstack_compute_instance_flavor_name_osd}"
   availability_zone = "${var.openstack_availability_zone}"
