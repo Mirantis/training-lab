@@ -133,9 +133,9 @@
 ######################################################
 - block:
   - name: Generate private/public ssh keys for access inside all VMs
-    command: ssh-keygen -t rsa -b 2048 -f /tmp/{{ prefix }}-id_rsa-{{ hostvars[item].ansible_domain }} -N "" -q
+    command: ssh-keygen -t ed25519 -f {{ access_ssh_key_prefix_file }}-{{ hostvars[item].ansible_domain }} -N "" -q -C "{{ prefix }}"
     args:
-      creates: /tmp/{{ prefix }}-id_rsa-{{ hostvars[item].ansible_domain }}
+      creates: "{{ access_ssh_key_prefix_file }}-{{ hostvars[item].ansible_domain }}"
     loop: "{{ groups['training_lab_kvm01'] }}"
     become: false
     delegate_to: localhost
@@ -159,15 +159,25 @@
   - name: Add generated public keys to all accounts
     authorized_key:
       user: "{{ item[1] }}"
-      key:  "{{ lookup('file', '/tmp/{{ prefix }}-id_rsa-{{ hostvars[item[0]].ansible_domain }}.pub') }}"
+      key:  "{{ lookup('file', '{{ access_ssh_key_prefix_file }}-{{ hostvars[item[0]].ansible_domain }}.pub') }}"
     when: item[0] is search(ansible_fqdn)
     loop: "{{ groups['training_lab'] | product ([ default_username, 'root', default_student_account_name ]) | list }}"
 
-  - name: Add generated ssh private key to all users $HOME/.ssh/id_rsa
+  - name: Add generated ssh private key to all users $HOME/.ssh/
     copy:
-      src: "/tmp/{{ prefix }}-id_rsa-{{ hostvars[item[0]].ansible_domain }}"
-      dest: "{{ item[1] }}/.ssh/id_rsa"
+      src: "{{ access_ssh_key_prefix_file }}-{{ hostvars[item[0]].ansible_domain }}"
+      dest: "{{ item[1] }}/.ssh/id_ed25519"
       mode: 0600
+      owner: "{{ item[1] | basename }}"
+      group: "{{ item[1] | basename }}"
+    when: item[0] is search(ansible_fqdn)
+    loop: "{{ groups['training_lab'] | product ([ '/home/' + default_username, '/root', '/home/' + default_student_account_name ]) | list }}"
+
+  - name: Add generated ssh public key to all users $HOME/.ssh/
+    copy:
+      src: "{{ access_ssh_key_prefix_file }}-{{ hostvars[item[0]].ansible_domain }}.pub"
+      dest: "{{ item[1] }}/.ssh/id_ed25519.pub"
+      mode: 0644
       owner: "{{ item[1] | basename }}"
       group: "{{ item[1] | basename }}"
     when: item[0] is search(ansible_fqdn)
@@ -175,7 +185,7 @@
 
   - name: Generate access password for all users
     set_fact:
-      default_access_password: "{{ lookup('password', file_with_generated_access_password_prefix + '-' + ansible_domain + ' chars=ascii_letters,digits,length=6') }}"
+      default_access_password: "{{ lookup('password', access_password_prefix_file + '-' + ansible_domain + ' chars=ascii_letters,digits,length=6') }}"
     delegate_to: localhost
     changed_when: false
 
