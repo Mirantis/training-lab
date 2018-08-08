@@ -2,14 +2,11 @@
 
 [![Build Status](https://travis-ci.org/Mirantis/training-lab.svg?branch=master)](https://travis-ci.org/Mirantis/training-lab)
 
-You will need to have Terrafrom, az-cli and Ansible installed.
+You will need to have Docker installed.
 
 ## Requirements
 
-* [Terraform](https://www.terraform.io/)
-* [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) (Azure CLI)
-* [Ansible](https://www.ansible.com/)
-* few minor packages curl, git, jq, ...
+* [Docker](https://www.docker.com/)
 
 ## Network diagram
 
@@ -23,7 +20,8 @@ You will need to have Terrafrom, az-cli and Ansible installed.
 
 ## Azure related tasks
 
-Few notes how to build the Training environment in Azure using [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest), [Terraform](https://www.terraform.io/) + [Ansible](https://www.ansible.com/).
+Few notes how to build the Training environment in Azure using prebuilded Docker image.
+Docker image contains [az](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest), [Terraform](https://www.terraform.io/) + [Ansible](https://www.ansible.com/).
 
 Create Service Principal and authenticate to Azure - this should be done only once for the new Azure accounts:
 
@@ -118,28 +116,19 @@ Follow these commands to install necessary requirements on latest Ubuntu:
 
 ```bash
 # You can use docker image:
-# docker run -e "USER=$USER" --rm -it ubuntu:latest
+# docker run -e "USER=$USER" --privileged --rm -it ubuntu:latest
 
 sudo apt update -qq
-sudo apt install apt-transport-https ansible curl git gnupg jq lsb-release sudo unzip
+sudo apt install -y curl docker.io git openssh-client sudo
+
+sudo service docker start
 
 test -f $HOME/.ssh/id_rsa || ( install -m 0700 -d $HOME/.ssh && ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N "" )
 
-# https://docs.microsoft.com/cs-cz/cli/azure/install-azure-cli-apt?view=azure-cli-latest
-curl -L https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-AZ_REPO=$(lsb_release -cs)
-echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
-sudo apt-get update && sudo apt-get install azure-cli
-
-LATEST_TERRAFORM_VERISON=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version')
-curl "https://releases.hashicorp.com/terraform/${LATEST_TERRAFORM_VERISON}/terraform_${LATEST_TERRAFORM_VERISON}_linux_amd64.zip" --output /tmp/terraform_linux_amd64.zip
-sudo unzip /tmp/terraform_linux_amd64.zip -d /usr/local/bin/
-
 git clone https://github.com/Mirantis/training-lab.git
 
-test -d ~/.ansible || mkdir ~/.ansible
 read -s -p "Ansible Vault Password for Training Lab: " MY_ANSIBLE_VAULT_TRAINIG_LAB_PASSWORD
-echo "$MY_ANSIBLE_VAULT_TRAINIG_LAB_PASSWORD" > ~/.ansible/vault_training-lab.txt
+echo "$MY_ANSIBLE_VAULT_TRAINIG_LAB_PASSWORD" > training-lab/ansible/vault_training-lab.txt
 
 cd training-lab/ansible
 
@@ -150,7 +139,6 @@ cd training-lab/ansible
 
 or
 
-az login
 # Create Azure training environment
 ./create_azure.sh
 # Delete whole Azure structure

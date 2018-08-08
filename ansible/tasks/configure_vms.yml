@@ -192,6 +192,7 @@
     set_fact:
       default_access_password: "{{ lookup('password', access_password_prefix_file + '-' + ansible_domain + ' chars=ascii_letters,digits,length=6') }}"
     changed_when: false
+    become: false
     delegate_to: localhost
 
   - name: Set passwords for all users (root, student, ubuntu)
@@ -294,5 +295,6 @@
       search_regex: OpenSSH
       delay: 10
     connection: local
+    become: false
   when: ( reboot_required.stat.exists or ( network_interfaces is defined and network_interfaces.changed )) and packer_build_name is not defined
 
