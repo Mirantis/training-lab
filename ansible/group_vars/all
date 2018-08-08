@@ -200,8 +200,3 @@ start_services:
   - acpid
   - haveged
   - salt-minion
-
-# Salt formulas taken from nightly (usually used for features / bug fixes / ...)
-# http://apt.mirantis.com/xenial/pool/salt/s/
-# Example: /(salt-formula-maas|salt-formula-linux|...)/
-#mcp_nightly_salt_formulas_packages: "/salt-formula-maas/"

@@ -15,3 +15,6 @@ packer_cache
 # Packer build directories
 *-qemu
 *-virtualbox-iso
+# Ignore Ansible vault file
+vault_training-lab.txt
+

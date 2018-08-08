@@ -6,6 +6,8 @@ CLOUD_PLATFORM=$(basename $0 | sed 's/.*_\(.*\).sh/\1/')
 # Action create/delete
 ACTION="$(basename $0 | sed 's/^\(.*\)_.*/\1/')"
 
+cd "$(dirname "$0")"
+
 echo "*** Cloud Platform: $CLOUD_PLATFORM, Action: $ACTION"
 
 # Check if Terraform plugins are installed - if not install them

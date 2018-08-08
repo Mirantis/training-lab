@@ -205,7 +205,7 @@
     changed_when: false
   when: packer_build_name is not defined
 
-- name: Check if symling /var/lib/libvirt/images -> /mnt already exists
+- name: Check if symlink /var/lib/libvirt/images -> /mnt already exists
   stat:
     path: /var/lib/libvirt/images
   register: images_stat

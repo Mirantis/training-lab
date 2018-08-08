@@ -5,12 +5,6 @@
     name: "{{ item }}"
   loop: "{{ kvm01_packages }}"
 
-- name: Add vncserver to the systemd
-  template:
-    src: templates/vncserver-service.j2
-    dest: /etc/systemd/system/vncserver@.service
-  notify: reload systemd
-
 - name: Create /home/{{ default_student_account_name }}/.vnc directory
   file:
     path: /home/{{ default_student_account_name }}/.vnc
@@ -36,6 +30,7 @@
     group: "{{ default_student_account_name }}"
     recurse: yes
 
+# TODO - this should be doine using ACME and Let's Encrypt
 - name: Create certificate for novnc
   command: openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/novnc.pem -out /etc/ssl/novnc.pem -days 365 -subj "/C=CZ/ST=Czech/L=Prague/O=Mirantis/CN={{ ansible_domain }}"
   args:
@@ -53,14 +48,6 @@
     - regexp: "^(\\s+)(\\['compress_hi',        -247 \\],)"
       replace: '\1//\2'
 
-- name: Add systemd service for novnc
-  template:
-    src: templates/novnc.service.j2
-    dest: /etc/systemd/system/novnc.service
-  notify:
-    - reload systemd
-    - restart novnc
-
 - name: Enable vncserver + https acces on ufw
   ufw:
     rule: allow
@@ -69,6 +56,20 @@
   loop:
     - 443
     - 5901
+
+- name: Add vncserver to the systemd
+  template:
+    src: templates/vncserver-service.j2
+    dest: /etc/systemd/system/vncserver@.service
+  notify: reload systemd
+
+- name: Add systemd service for novnc
+  template:
+    src: templates/novnc.service.j2
+    dest: /etc/systemd/system/novnc.service
+  notify:
+    - reload systemd
+    - restart novnc
 
 - name: Add port forwarding for Jenkins and MAAS to be accessible form Public IP
   blockinfile:
@@ -158,19 +159,6 @@
     block: |
       sed -i.orig '/gateway/i \ \ mtu $DEPLOY_NETWORK_MTU' /root/interfaces
 
-# - name: Install nightly packages for specific salt-formula
-#   blockinfile:
-#     path: /root/user_data.sh
-#     marker: "# {mark} ANSIBLE MANAGED BLOCK - Install nightly packages for specific salt-formula"
-#     insertafter: "MCP_SALT_REPO > /etc/apt/sources.list.d/mcp_salt.list"
-#     block: |
-#       echo "deb [arch=amd64] http://apt.mirantis.com/xenial nightly salt" > /etc/apt/sources.list.d/mcp_salt_nightly.list
-#       cat > /etc/apt/preferences.d/mcp_nightly_salt_formulas_packages << EOF
-#       Package: {{ mcp_nightly_salt_formulas_packages }}
-#       Pin: release a=nightly
-#       Pin-Priority: 1100
-#       EOF
-
 # This is by default done by Jenkins which is building the .iso
 - name: Change the params in /root/user_data.sh "{{ mcp_master_config_script_url }}"
   lineinfile:
@@ -210,7 +198,6 @@
   - name: Create the iso from salt model
     command: /root/create-config-drive -u /root/user_data.sh -h cfg01 --model /root/model --mk-pipelines /root/mk-pipelines --pipeline-library /root/pipeline-library {{ mcp_cfg01_vm_config_disk }}
     args:
-      chdir: /root
       creates: "{{ mcp_cfg01_vm_config_disk }}"
 
   - name: Define the cfg01 VM
