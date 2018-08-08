@@ -121,6 +121,14 @@ Follow these commands to install necessary requirements on latest Ubuntu:
 sudo apt update -qq
 sudo apt install -y curl docker.io git openssh-client sudo
 
+# Change the default docker networking if needed
+cat > /etc/docker/daemon.json << EOF
+{
+  "bip": "192.168.150.1/24",
+  "fixed-cidr": "192.168.150.0/24"
+}
+EOF
+
 sudo service docker start
 
 test -f $HOME/.ssh/id_rsa || ( install -m 0700 -d $HOME/.ssh && ssh-keygen -b 2048 -t rsa -f $HOME/.ssh/id_rsa -q -N "" )

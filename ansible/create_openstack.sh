@@ -35,7 +35,7 @@ if [ "$CLOUD_PLATFORM" == "azure" ]; then
 fi
 
 if [ "$ACTION" == "delete" ]; then
-  $DOCKER_RUN "ansible-playbook --extra-vars \"cloud_platform=$CLOUD_PLATFORM terraform_state=absent prefix=$USER\" -i 127.0.0.1, site.yml"
+  $DOCKER_RUN "ansible-playbook --private-key \$HOME/.ssh/id_rsa --extra-vars \"cloud_platform=$CLOUD_PLATFORM terraform_state=absent prefix=${USER}2\" -i 127.0.0.1, site.yml"
 else
-  $DOCKER_RUN "ansible-playbook --extra-vars \"cloud_platform=$CLOUD_PLATFORM terraform_state=present prefix=$USER\" -i 127.0.0.1, site.yml"
+  $DOCKER_RUN "ansible-playbook --private-key \$HOME/.ssh/id_rsa --extra-vars \"cloud_platform=$CLOUD_PLATFORM terraform_state=present prefix=${USER}2\" -i 127.0.0.1, site.yml"
 fi
