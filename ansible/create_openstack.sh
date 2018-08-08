@@ -22,7 +22,7 @@ fi
 
 if [ "$CLOUD_PLATFORM" == "azure" ]; then
   # Check if your account is working properly
-  if [ "`az account show 2>&1`" == "ERROR: Please run 'az login' to setup account." ]; then
+  if $DOCKER_RUN "az account show 2>&1" | grep "Please run 'az login' to setup account."; then
     echo "*** Running 'az login'"
     if [ -n "$CLIENT_ID" ] && [ -n "$CLIENT_SECRET" ] && [ -n "$TENANT_ID" ]; then
       # Use non-interactive login using service principal (https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli?view=azure-cli-latest)
@@ -35,7 +35,7 @@ if [ "$CLOUD_PLATFORM" == "azure" ]; then
 fi
 
 if [ "$ACTION" == "delete" ]; then
-  $DOCKER_RUN "ansible-playbook --private-key \$HOME/.ssh/id_rsa --extra-vars \"cloud_platform=$CLOUD_PLATFORM terraform_state=absent prefix=${USER}2\" -i 127.0.0.1, site.yml"
+  $DOCKER_RUN "ansible-playbook --private-key \$HOME/.ssh/id_rsa --extra-vars \"cloud_platform=$CLOUD_PLATFORM terraform_state=absent prefix=${USER}\" -i 127.0.0.1, site.yml"
 else
-  $DOCKER_RUN "ansible-playbook --private-key \$HOME/.ssh/id_rsa --extra-vars \"cloud_platform=$CLOUD_PLATFORM terraform_state=present prefix=${USER}2\" -i 127.0.0.1, site.yml"
+  $DOCKER_RUN "ansible-playbook --private-key \$HOME/.ssh/id_rsa --extra-vars \"cloud_platform=$CLOUD_PLATFORM terraform_state=present prefix=${USER}\" -i 127.0.0.1, site.yml"
 fi
