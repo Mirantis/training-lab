@@ -143,7 +143,7 @@ resource "openstack_compute_instance_v2" "vms_osd" {
   depends_on        = ["openstack_networking_router_interface_v2.router-interface"]
 
   network {
-    uuid           = "${element(openstack_networking_network_v2.private-network.*.id, count.index / var.cmp_vm_nodes )}"
+    uuid           = "${element(openstack_networking_network_v2.private-network.*.id, count.index / var.osd_vm_nodes )}"
     fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 30 + count.index % var.osd_vm_nodes + 1)}"
     access_network = true
   }
