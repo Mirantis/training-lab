@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Docker executable
-DOCKER_RUN="docker run --rm -it -u $(id -u):$(id -g) -v $PWD:/home/docker/training-lab -v $HOME/.ssh:/home/docker/.ssh -v $HOME/.azure:/home/docker/.azure -v /tmp:/tmp -v $SSH_AUTH_SOCK:/ssh-agent --env SSH_AUTH_SOCK=/ssh-agent mirantis/training-lab"
+DOCKER_RUN="docker run --rm -it -u $(id -u):$(id -g) -v $PWD:/home/docker/training-lab -v $HOME/.ssh:/home/docker/.ssh -v $HOME/.azure:/home/docker/.azure -v /tmp:/tmp -v $SSH_AUTH_SOCK:/ssh-agent mirantis/training-lab"
 
 # Cloud Platforms: openstack, azure
 CLOUD_PLATFORM=$(basename $0 | sed 's/.*_\(.*\).sh/\1/')
@@ -16,7 +16,7 @@ echo "*** Cloud Platform: $CLOUD_PLATFORM, Action: $ACTION"
 # Check if Terraform plugins are installed - if not install them
 if [ ! -d "terraform/$CLOUD_PLATFORM/.terraform/plugins/" ]; then
   cd terraform/$CLOUD_PLATFORM/
-  $DOCKER_RUN "terraform init"
+  docker run --rm -it -u $(id -u):$(id -g) -v $PWD:/home/docker/training-lab mirantis/training-lab terraform init
   cd -
 fi
 

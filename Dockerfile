@@ -32,6 +32,9 @@ RUN set -x \
 
 USER docker:docker
 
+ENV HOME /home/docker
+ENV SSH_AUTH_SOCK /ssh-agent
+
 WORKDIR /home/docker/training-lab
 
 ENTRYPOINT ["/docker_startup_script.sh"]
