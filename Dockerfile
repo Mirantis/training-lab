@@ -8,9 +8,14 @@ RUN addgroup --gid 1001 docker && \
 
 RUN set -x \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl git jq openssh-client python python3-pip python3-setuptools python3-wheel unzip \
+    && apt-get install -y --no-install-recommends curl git gnupg2 jq lsb-release openssh-client python python3-pip python3-setuptools python3-wheel unzip \
     \
-    && pip3 --no-cache-dir install ansible ansible[azure] azure-cli netaddr openstacksdk \
+    && curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && AZ_REPO=$(lsb_release -cs) \
+    && echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | tee /etc/apt/sources.list.d/azure-cli.list \
+    && apt-get update && apt-get -y install azure-cli \
+    \
+    && pip3 --no-cache-dir install ansible ansible[azure] netaddr openstacksdk \
     \
     && TERRAFORM_LATEST_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version') \
     && curl https://releases.hashicorp.com/terraform/${TERRAFORM_LATEST_VERSION}/terraform_${TERRAFORM_LATEST_VERSION}_linux_amd64.zip --output /tmp/terraform_linux_amd64.zip \
@@ -23,7 +28,7 @@ RUN set -x \
     && mkdir -p /etc/fixuid \
     && printf "user: docker\ngroup: docker\npaths:\n  - /home/docker" > /etc/fixuid/config.yml \
     \
-    && apt-get purge -y curl git jq python3-pip unzip \
+    && apt-get purge -y curl git gnupg2 jq lsb-release python3-pip unzip \
     && rm -Rf /var/lib/apt/lists/* \
     && rm -Rf /usr/share/doc && rm -Rf /usr/share/man \
     && apt-get clean \
