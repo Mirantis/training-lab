@@ -119,9 +119,9 @@ mcp_mk_pipelines_git_repository    : https://github.com/Mirantis/mk-pipelines.gi
 mcp_pipeline_library_git_repository: https://github.com/Mirantis/pipeline-library.git
 
 # MCP build scripts (https://github.com/Mirantis/mcp-common-scripts)
-mcp_define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/predefine-vm/define-vm.sh
-mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/create_config_drive.sh
-mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
+mcp_define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/predefine-vm/define-vm.sh
+mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/create_config_drive.sh
+mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/master_config.sh
 
 # The file where the generated password (ssh, vnc, ...) will be stored (they are generated for each environment)
 access_password_prefix_file: /tmp/{{ prefix }}-password

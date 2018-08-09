@@ -133,7 +133,7 @@
 ######################################################
 - block:
   - name: Generate private/public ssh keys for access inside all VMs
-    command: ssh-keygen -t ed25519 -f {{ access_ssh_key_prefix_file }}-{{ ansible_domain }} -N "" -q -C "{{ prefix }}"
+    command: ssh-keygen -t ed25519 -f {{ access_ssh_key_prefix_file }}-{{ ansible_domain }} -N "" -q -C "{{ prefix }}@{{ ansible_domain }}"
     args:
       creates: "{{ access_ssh_key_prefix_file }}-{{ ansible_domain }}"
     when: ansible_fqdn in groups['training_lab_kvm01']

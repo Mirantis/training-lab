@@ -196,7 +196,7 @@
       remote_src: yes
 
   - name: Create the iso from salt model
-    command: /root/create-config-drive -u /root/user_data.sh -h cfg01 --model /root/model --mk-pipelines /root/mk-pipelines --pipeline-library /root/pipeline-library {{ mcp_cfg01_vm_config_disk }}
+    command: /root/create-config-drive -u /root/user_data.sh --ssh-key ~/.ssh/id_ed25519.pub -h cfg01 --model /root/model --mk-pipelines /root/mk-pipelines --pipeline-library /root/pipeline-library {{ mcp_cfg01_vm_config_disk }}
     args:
       creates: "{{ mcp_cfg01_vm_config_disk }}"
 
