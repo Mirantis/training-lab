@@ -153,7 +153,7 @@ or
 ./delete_azure.sh
 ```
 
-[![asciicast](https://asciinema.org/a/194279.png)](https://asciinema.org/a/194279)
+[![asciicast](https://asciinema.org/a/195640.png)](https://asciinema.org/a/195640)
 
 ## Deployment steps on kvm01
 

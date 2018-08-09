@@ -1,0 +1,11 @@
+localhost ansible_connection=local
+
+[training_lab]
+
+[training_lab_kvm]
+
+[training_lab_kvm01]
+
+[training_lab_cmp]
+
+[training_lab_osd]
