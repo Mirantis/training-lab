@@ -81,26 +81,32 @@ networks:
     device        : br-ctl
   # Public network
   public_network:
-    subnet        : 10.0.1.0
+    subnet        : 10.0.2.0
     netmask       : 255.255.255.0
     subnet_netmask: 10.0.2.0/24
     gateway       : 10.0.2.11
     device        : br-public
-  # Storage network
-  storage_network:
-    subnet        : 10.0.1.0
+  # Dataplane network
+  dataplane_network:
+    subnet        : 10.0.3.0
     netmask       : 255.255.255.0
     subnet_netmask: 10.0.3.0/24
     gateway       : 10.0.3.11
-    device        : br-storage
-  # Netowrk for storage replication
-  storage_replication_network:
+    device        : br-data
+  # Storage network
+  storage_network:
     subnet        : 10.0.4.0
     netmask       : 255.255.255.0
     subnet_netmask: 10.0.4.0/24
     gateway       : 10.0.4.11
+    device        : br-storage
+  # Netowrk for storage replication
+  storage_replication_network:
+    subnet        : 10.0.5.0
+    netmask       : 255.255.255.0
+    subnet_netmask: 10.0.5.0/24
+    gateway       : 10.0.5.11
     device        : br-storrepl
-
 
 # Salt Master IP (cfg01)
 mcp_salt_master_ip: 10.0.0.15
@@ -108,11 +114,12 @@ mcp_salt_master_ip: 10.0.0.15
 # Salt model
 mcp_salt_model_git_repository: https://github.com/ruzickap/training-lab-salt-model.git
 
-# SaltStack repository version (http://mirror.mirantis.com/2018.7.0-milestone1//saltstack-2017.7//xenial xenial main)
+# SaltStack repository version (http://mirror.mirantis.com/2018.7.0-milestone1/saltstack-2017.7/xenial xenial main)
 saltstack_repository_version: 2017.7
 
 # MCP release tags: https://github.com/Mirantis/mcp-common-scripts/tags, http://images.mirantis.com/
-mcp_release_tag: 2018.7.0-milestone1
+#mcp_release_tag: 2018.7.0-milestone1
+mcp_release_tag: master
 
 # MCP pipelines
 mcp_mk_pipelines_git_repository    : https://github.com/Mirantis/mk-pipelines.git
