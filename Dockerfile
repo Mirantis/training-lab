@@ -15,7 +15,7 @@ RUN set -x \
     && echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | tee /etc/apt/sources.list.d/azure-cli.list \
     && apt-get update && apt-get -y install azure-cli \
     \
-    && pip --no-cache-dir install ansible ansible[azure] netaddr openstacksdk \
+    && pip --no-cache-dir install ansible[azure] netaddr openstacksdk \
     \
     && TERRAFORM_LATEST_VERSION=$(curl -s https://checkpoint-api.hashicorp.com/v1/check/terraform | jq -r -M '.current_version') \
     && curl https://releases.hashicorp.com/terraform/${TERRAFORM_LATEST_VERSION}/terraform_${TERRAFORM_LATEST_VERSION}_linux_amd64.zip --output /tmp/terraform_linux_amd64.zip \
