@@ -93,7 +93,7 @@ resource "azurerm_network_interface" "nic_kvm" {
     name                          = "${format("%s-kvm%02d.%02d.%s-ipconfig", var.prefix, count.index % var.kvm_vm_nodes + 1, count.index / var.kvm_vm_nodes + 1, var.domain)}"
     subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.kvm_vm_nodes)}"
     private_ip_address_allocation = "static"
-    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 10 + count.index % var.kvm_vm_nodes + 1 )}"
+    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 240 + count.index % var.kvm_vm_nodes + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_kvm.*.id, count.index)}"
   }
 }
@@ -111,7 +111,7 @@ resource "azurerm_network_interface" "nic_cmp" {
     name                          = "${format("%s-cmp%02d.%02d.%s-ipconfig", var.prefix, count.index % var.cmp_vm_nodes + 1, count.index / var.cmp_vm_nodes + 1, var.domain)}"
     subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.cmp_vm_nodes)}"
     private_ip_address_allocation = "static"
-    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 20 + count.index % var.cmp_vm_nodes + 1 )}"
+    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 230 + count.index % var.cmp_vm_nodes + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_cmp.*.id, count.index)}"
   }
 }
@@ -129,7 +129,7 @@ resource "azurerm_network_interface" "nic_osd" {
     name                          = "${format("%s-osd%02d.%02d.%s-ipconfig", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.osd_vm_nodes + 1, var.domain)}"
     subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.osd_vm_nodes)}"
     private_ip_address_allocation = "static"
-    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 30 + count.index % var.osd_vm_nodes + 1 )}"
+    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 220 + count.index % var.osd_vm_nodes + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_osd.*.id, count.index)}"
   }
 }

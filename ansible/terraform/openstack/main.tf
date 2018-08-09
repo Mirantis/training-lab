@@ -106,7 +106,7 @@ resource "openstack_compute_instance_v2" "vms_kvm" {
 
   network {
     uuid           = "${element(openstack_networking_network_v2.private-network.*.id, count.index / var.kvm_vm_nodes )}"
-    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 10 + count.index % var.kvm_vm_nodes + 1)}"
+    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 240 + count.index % var.kvm_vm_nodes + 1)}"
     access_network = true
   }
 }
@@ -125,7 +125,7 @@ resource "openstack_compute_instance_v2" "vms_cmp" {
 
   network {
     uuid           = "${element(openstack_networking_network_v2.private-network.*.id, count.index / var.cmp_vm_nodes )}"
-    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 20 + count.index % var.cmp_vm_nodes + 1)}"
+    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 230 + count.index % var.cmp_vm_nodes + 1)}"
     access_network = true
   }
 }
@@ -144,7 +144,7 @@ resource "openstack_compute_instance_v2" "vms_osd" {
 
   network {
     uuid           = "${element(openstack_networking_network_v2.private-network.*.id, count.index / var.osd_vm_nodes )}"
-    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 30 + count.index % var.osd_vm_nodes + 1)}"
+    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 220 + count.index % var.osd_vm_nodes + 1)}"
     access_network = true
   }
 }
