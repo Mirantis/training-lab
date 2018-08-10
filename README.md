@@ -160,8 +160,11 @@ or
 [https://docs.mirantis.com/mcp/master/mcp-deployment-guide/single/index.html](https://docs.mirantis.com/mcp/master/mcp-deployment-guide/single/index.html) (Start from: To create control plane VMs:)
 
 ```bash
-# Log in to the Salt Master node console
-$ virsh console cfg01.tng.mirantis.com
+# or you can ssh to cfg01 once it's installed
+$ ssh root@10.0.0.15
+
+# check if installation process finished successfully (it should ends with "reboot")
+$ tail /var/log/cloud-init-output.log
 
 # Verify that all your Salt Minion nodes are registered on the Salt Master node
 $ salt-key

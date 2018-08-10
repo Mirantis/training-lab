@@ -24,11 +24,15 @@ iface vxlan{{ network.1.subnet.split('.')[2] }} inet manual
 
 {% endfor %}
 
-auto {{ networks['deploy_network'].device }}
-iface {{ networks['deploy_network'].device }} inet static
-  address {{ networks['deploy_network'].subnet_netmask | ipaddr(ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }}
-  netmask {{ networks['deploy_network'].netmask }}
-  bridge_ports vxlan{{ networks['deploy_network'].subnet.split('.')[2] }}
+{% for network in ['deploy_network', 'control_network'] %}
+# {{ network }}
+auto {{ networks[network].device }}
+iface {{ networks[network].device }} inet static
+  address {{ networks[network].subnet_netmask | ipaddr(ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }}
+  netmask {{ networks[network].netmask }}
+  bridge_ports vxlan{{ networks[network].subnet.split('.')[2] }}
   bridge_stp off
   bridge_fd 0
   bridge_maxwait 0
+
+{% endfor %}

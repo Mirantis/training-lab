@@ -11,11 +11,20 @@
     state: directory
     mode: 0700
 
-- name: Set VNC password in /home/{{ default_student_account_name }}/.vnc/passwd
-  shell: umask 077; echo "{{ default_access_password }}" | vncpasswd -f > /home/{{ default_student_account_name }}/.vnc/passwd
-  args:
-    creates: /home/{{ default_student_account_name }}/.vnc/passwd
-  changed_when: false
+- block:
+  - name: Set VNC password in /home/{{ default_student_account_name }}/.vnc/passwd
+    shell: umask 077; echo "{{ default_access_password }}" | vncpasswd -f > /home/{{ default_student_account_name }}/.vnc/passwd
+    args:
+      creates: /home/{{ default_student_account_name }}/.vnc/passwd
+    changed_when: false
+
+  # TODO - this should be doine using ACME and Let's Encrypt
+  - name: Create certificate for novnc
+    command: openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/novnc.pem -out /etc/ssl/novnc.pem -days 365 -subj "/C=CZ/ST=Czech/L=Prague/O=Mirantis/CN={{ ansible_domain }}"
+    args:
+      creates: /etc/ssl/novnc.pem
+    when: ansible_domain != ''
+  when: packer_build_name is not defined
 
 - name: Add xstartup to student account /home/{{ default_student_account_name }}/.vnc/xstartup
   template:
@@ -29,13 +38,6 @@
     owner: "{{ default_student_account_name }}"
     group: "{{ default_student_account_name }}"
     recurse: yes
-
-# TODO - this should be doine using ACME and Let's Encrypt
-- name: Create certificate for novnc
-  command: openssl req -x509 -nodes -newkey rsa:2048 -keyout /etc/ssl/novnc.pem -out /etc/ssl/novnc.pem -days 365 -subj "/C=CZ/ST=Czech/L=Prague/O=Mirantis/CN={{ ansible_domain }}"
-  args:
-    creates: /etc/ssl/novnc.pem
-  when: ansible_domain != ''
 
 - name: Improve VNC output (no jpg compression)
   replace:

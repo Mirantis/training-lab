@@ -45,8 +45,8 @@ openstack_auth_url                                : https://cloud.example.com:50
 openstack_compute_instance_flavor_name_kvm        : m1.xlarge40
 openstack_compute_instance_flavor_name_cmp        : m1.medium
 openstack_compute_instance_flavor_name_osd        : t2.nano
-openstack_compute_instance_kvm01_image_name       : pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180806
-openstack_compute_instance_kvm_image_name         : pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180806
+openstack_compute_instance_kvm01_image_name       : pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180810
+openstack_compute_instance_kvm_image_name         : pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180810
 openstack_compute_instance_cmp_image_name         : "{{ openstack_compute_instance_kvm_image_name }}"
 openstack_compute_instance_osd_image_name         : "{{ openstack_compute_instance_kvm_image_name }}"
 openstack_networking_network_external_network_name: public
@@ -115,7 +115,8 @@ mcp_salt_master_ip: 10.0.0.15
 mcp_salt_model_git_repository: https://github.com/ruzickap/training-lab-salt-model.git
 
 # SaltStack repository version (http://mirror.mirantis.com/2018.7.0-milestone1/saltstack-2017.7/xenial xenial main)
-saltstack_repository_version: 2017.7
+#saltstack_repository_version: {{ mcp_release_tag }}/saltstack-2017.7
+saltstack_repository_version: proposed/saltstack-2017.7
 
 # MCP release tags: https://github.com/Mirantis/mcp-common-scripts/tags, http://images.mirantis.com/
 #mcp_release_tag: 2018.7.0-milestone1
@@ -126,9 +127,9 @@ mcp_mk_pipelines_git_repository    : https://github.com/Mirantis/mk-pipelines.gi
 mcp_pipeline_library_git_repository: https://github.com/Mirantis/pipeline-library.git
 
 # MCP build scripts (https://github.com/Mirantis/mcp-common-scripts)
-mcp_define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/predefine-vm/define-vm.sh
-mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/create_config_drive.sh
-mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/master_config.sh
+mcp_define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/predefine-vm/define-vm.sh
+mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/create_config_drive.sh
+mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
 
 # The file where the generated password (ssh, vnc, ...) will be stored (they are generated for each environment)
 access_password_prefix_file: /tmp/{{ prefix }}-password
@@ -145,8 +146,9 @@ nested_vms_cpu   : 2
 mcp_cfg01_vm_source_disk: /var/lib/libvirt/images/cfg01/system.qcow2
 mcp_cfg01_vm_config_disk: /var/lib/libvirt/images/cfg01/cfg01-config.iso
 mcp_cfg01_vm_mem_kb     : 8388608
-mcp_cfg01_vm_cpus       : 4
-mcp_cfg01_image_url     : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
+mcp_cfg01_vm_cpus       : 2
+#mcp_cfg01_image_url     : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
+mcp_cfg01_image_url     : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-2018.7.0-milestone1.qcow2
 
 packages:
   - acpid
