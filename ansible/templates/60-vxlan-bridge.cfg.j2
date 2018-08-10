@@ -12,15 +12,23 @@ iface vxlan{{ network.1.subnet.split('.')[2] }} inet manual
     down ip link set vxlan{{ network.1.subnet.split('.')[2] }} down
     post-down ip link del vxlan{{ network.1.subnet.split('.')[2] }}
 
-auto {{ network.1.device }}
-iface {{ network.1.device }} inet static
-  address {{ network.1.subnet_netmask | ipaddr(ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }}
-  netmask {{ network.1.netmask }}
-  bridge_ports vxlan{{ network.1.subnet.split('.')[2] }}
-  bridge_stp off
-  bridge_fd 0
-  bridge_maxwait 0
+# auto {{ network.1.device }}
+# iface {{ network.1.device }} inet static
+#   address {{ network.1.subnet_netmask | ipaddr(ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }}
+#   netmask {{ network.1.netmask }}
+#   bridge_ports vxlan{{ network.1.subnet.split('.')[2] }}
+#   bridge_stp off
+#   bridge_fd 0
+#   bridge_maxwait 0
 
 
 {% endfor %}
 
+auto {{ networks['deploy_network'].device }}
+iface {{ networks['deploy_network'].device }} inet static
+  address {{ networks['deploy_network'].subnet_netmask | ipaddr(ansible_default_ipv4.address.split('.')[-1]) | ipaddr('address') }}
+  netmask {{ networks['deploy_network'].netmask }}
+  bridge_ports vxlan{{ networks['deploy_network'].subnet.split('.')[2] }}
+  bridge_stp off
+  bridge_fd 0
+  bridge_maxwait 0
