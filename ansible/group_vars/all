@@ -70,42 +70,42 @@ networks:
     subnet        : 10.0.0.0
     netmask       : 255.255.255.0
     subnet_netmask: 10.0.0.0/24
-    gateway       : 10.0.0.11
+    gateway       : 10.0.0.241
     device        : br-mgm
   # Control network
   control_network:
     subnet        : 10.0.1.0
     netmask       : 255.255.255.0
     subnet_netmask: 10.0.1.0/24
-    gateway       : 10.0.1.11
+    gateway       : 10.0.1.241
     device        : br-ctl
   # Public network
   public_network:
     subnet        : 10.0.2.0
     netmask       : 255.255.255.0
     subnet_netmask: 10.0.2.0/24
-    gateway       : 10.0.2.11
+    gateway       : 10.0.2.241
     device        : br-public
   # Dataplane network
   dataplane_network:
     subnet        : 10.0.3.0
     netmask       : 255.255.255.0
     subnet_netmask: 10.0.3.0/24
-    gateway       : 10.0.3.11
+    gateway       : 10.0.3.241
     device        : br-data
   # Storage network
   storage_network:
     subnet        : 10.0.4.0
     netmask       : 255.255.255.0
     subnet_netmask: 10.0.4.0/24
-    gateway       : 10.0.4.11
+    gateway       : 10.0.4.241
     device        : br-storage
   # Netowrk for storage replication
   storage_replication_network:
     subnet        : 10.0.5.0
     netmask       : 255.255.255.0
     subnet_netmask: 10.0.5.0/24
-    gateway       : 10.0.5.11
+    gateway       : 10.0.5.241
     device        : br-storrepl
 
 # Salt Master IP (cfg01)
