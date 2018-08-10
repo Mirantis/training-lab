@@ -92,17 +92,17 @@ variable "username" {
   default     = "ubuntu"
 }
 
-variable "kvm_vm_nodes" {
+variable "vm_nodes_kvm" {
   description = "Number of VMs which should be created as kvm hosts"
   default     = 3
 }
 
-variable "cmp_vm_nodes" {
+variable "vm_nodes_cmp" {
   description = "Number of VMs which should be created as cmp hosts"
   default     = 3
 }
 
-variable "osd_vm_nodes" {
+variable "vm_nodes_osd" {
   description = "Number of VMs which should be created as osd hosts"
   default     = 3
 }

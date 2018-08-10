@@ -8,13 +8,13 @@ default_student_account_name: student
 environment_count: 1
 
 # Number of kvm VMs (max 9)
-kvm_vm_nodes: 3
+vm_nodes_kvm: 3
 
 # Number of cmp (compute) VMs (max 9)
-cmp_vm_nodes: 1
+vm_nodes_cmp: 1
 
 # Number of osd (ceph) VMs (max 9)
-osd_vm_nodes: 0
+vm_nodes_osd: 0
 
 # Prefix for all names used in Cloud (vms, networks, ...)
 # prefix: training (taken from the main script create_openstack.sh)

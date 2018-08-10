@@ -78,17 +78,17 @@ variable "ssh_public_key" {
   default = "~/.ssh/id_rsa.pub"
 }
 
-variable "kvm_vm_nodes" {
+variable "vm_nodes_kvm" {
   description = "Number of VMs which should be created as kvm hosts"
   default     = 3
 }
 
-variable "cmp_vm_nodes" {
+variable "vm_nodes_cmp" {
   description = "Number of VMs which should be created as cmp hosts"
   default     = 3
 }
 
-variable "osd_vm_nodes" {
+variable "vm_nodes_osd" {
   description = "Number of VMs which should be created as osd hosts"
   default     = 3
 }

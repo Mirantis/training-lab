@@ -51,38 +51,38 @@ resource "azurerm_subnet" "subnet" {
 }
 
 resource "azurerm_public_ip" "pip_kvm" {
-  count                        = "${var.kvm_vm_nodes * var.environment_count}"
-  name                         = "${format("%s-kvm%02d.%02d.%s-pip", var.prefix, count.index % var.kvm_vm_nodes + 1, count.index / var.kvm_vm_nodes + 1, var.domain)}"
+  count                        = "${var.vm_nodes_kvm * var.environment_count}"
+  name                         = "${format("%s-kvm%02d.%02d.%s-pip", var.prefix, count.index % var.vm_nodes_kvm + 1, count.index / var.vm_nodes_kvm + 1, var.domain)}"
   location                     = "${azurerm_resource_group.rg.location}"
   resource_group_name          = "${azurerm_resource_group.rg.name}"
   public_ip_address_allocation = "static"
-  domain_name_label            = "${replace(format("%s-kvm%02d.%02d.%s", var.prefix, count.index % var.kvm_vm_nodes + 1, count.index / var.kvm_vm_nodes + 1, var.domain), ".", "-")}"
+  domain_name_label            = "${replace(format("%s-kvm%02d.%02d.%s", var.prefix, count.index % var.vm_nodes_kvm + 1, count.index / var.vm_nodes_kvm + 1, var.domain), ".", "-")}"
   tags                         = "${var.azure_tags}"
 }
 
 resource "azurerm_public_ip" "pip_cmp" {
-  count                        = "${var.cmp_vm_nodes * var.environment_count}"
-  name                         = "${format("%s-cmp%02d.%02d.%s-pip", var.prefix, count.index % var.cmp_vm_nodes + 1, count.index / var.cmp_vm_nodes + 1, var.domain)}"
+  count                        = "${var.vm_nodes_cmp * var.environment_count}"
+  name                         = "${format("%s-cmp%02d.%02d.%s-pip", var.prefix, count.index % var.vm_nodes_cmp + 1, count.index / var.vm_nodes_cmp + 1, var.domain)}"
   location                     = "${azurerm_resource_group.rg.location}"
   resource_group_name          = "${azurerm_resource_group.rg.name}"
   public_ip_address_allocation = "static"
-  domain_name_label            = "${replace(format("%s-cmp%02d.%02d.%s", var.prefix, count.index % var.cmp_vm_nodes + 1, count.index / var.cmp_vm_nodes + 1, var.domain), ".", "-")}"
+  domain_name_label            = "${replace(format("%s-cmp%02d.%02d.%s", var.prefix, count.index % var.vm_nodes_cmp + 1, count.index / var.vm_nodes_cmp + 1, var.domain), ".", "-")}"
   tags                         = "${var.azure_tags}"
 }
 
 resource "azurerm_public_ip" "pip_osd" {
-  count                        = "${var.osd_vm_nodes * var.environment_count}"
-  name                         = "${format("%s-osd%02d.%02d.%s-pip", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.osd_vm_nodes + 1, var.domain)}"
+  count                        = "${var.vm_nodes_osd * var.environment_count}"
+  name                         = "${format("%s-osd%02d.%02d.%s-pip", var.prefix, count.index % var.vm_nodes_osd + 1, count.index / var.vm_nodes_osd + 1, var.domain)}"
   location                     = "${azurerm_resource_group.rg.location}"
   resource_group_name          = "${azurerm_resource_group.rg.name}"
   public_ip_address_allocation = "static"
-  domain_name_label            = "${replace(format("%s-osd%02d.%02d.%s", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.osd_vm_nodes + 1, var.domain), ".", "-")}"
+  domain_name_label            = "${replace(format("%s-osd%02d.%02d.%s", var.prefix, count.index % var.vm_nodes_osd + 1, count.index / var.vm_nodes_osd + 1, var.domain), ".", "-")}"
   tags                         = "${var.azure_tags}"
 }
 
 resource "azurerm_network_interface" "nic_kvm" {
-  count               = "${var.kvm_vm_nodes * var.environment_count}"
-  name                = "${format("%s-kvm%02d.%02d.%s-nic", var.prefix, count.index % var.kvm_vm_nodes + 1, count.index / var.kvm_vm_nodes + 1, var.domain)}"
+  count               = "${var.vm_nodes_kvm * var.environment_count}"
+  name                = "${format("%s-kvm%02d.%02d.%s-nic", var.prefix, count.index % var.vm_nodes_kvm + 1, count.index / var.vm_nodes_kvm + 1, var.domain)}"
   location            = "${azurerm_resource_group.rg.location}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
 
@@ -90,17 +90,17 @@ resource "azurerm_network_interface" "nic_kvm" {
   tags = "${var.azure_tags}"
 
   ip_configuration {
-    name                          = "${format("%s-kvm%02d.%02d.%s-ipconfig", var.prefix, count.index % var.kvm_vm_nodes + 1, count.index / var.kvm_vm_nodes + 1, var.domain)}"
-    subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.kvm_vm_nodes)}"
+    name                          = "${format("%s-kvm%02d.%02d.%s-ipconfig", var.prefix, count.index % var.vm_nodes_kvm + 1, count.index / var.vm_nodes_kvm + 1, var.domain)}"
+    subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.vm_nodes_kvm)}"
     private_ip_address_allocation = "static"
-    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 240 + count.index % var.kvm_vm_nodes + 1 )}"
+    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 240 + count.index % var.vm_nodes_kvm + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_kvm.*.id, count.index)}"
   }
 }
 
 resource "azurerm_network_interface" "nic_cmp" {
-  count               = "${var.cmp_vm_nodes * var.environment_count}"
-  name                = "${format("%s-cmp%02d.%02d.%s-nic", var.prefix, count.index % var.cmp_vm_nodes + 1, count.index / var.cmp_vm_nodes + 1, var.domain)}"
+  count               = "${var.vm_nodes_cmp * var.environment_count}"
+  name                = "${format("%s-cmp%02d.%02d.%s-nic", var.prefix, count.index % var.vm_nodes_cmp + 1, count.index / var.vm_nodes_cmp + 1, var.domain)}"
   location            = "${azurerm_resource_group.rg.location}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
 
@@ -108,17 +108,17 @@ resource "azurerm_network_interface" "nic_cmp" {
   tags = "${var.azure_tags}"
 
   ip_configuration {
-    name                          = "${format("%s-cmp%02d.%02d.%s-ipconfig", var.prefix, count.index % var.cmp_vm_nodes + 1, count.index / var.cmp_vm_nodes + 1, var.domain)}"
-    subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.cmp_vm_nodes)}"
+    name                          = "${format("%s-cmp%02d.%02d.%s-ipconfig", var.prefix, count.index % var.vm_nodes_cmp + 1, count.index / var.vm_nodes_cmp + 1, var.domain)}"
+    subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.vm_nodes_cmp)}"
     private_ip_address_allocation = "static"
-    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 230 + count.index % var.cmp_vm_nodes + 1 )}"
+    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 230 + count.index % var.vm_nodes_cmp + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_cmp.*.id, count.index)}"
   }
 }
 
 resource "azurerm_network_interface" "nic_osd" {
-  count               = "${var.osd_vm_nodes * var.environment_count}"
-  name                = "${format("%s-osd%02d.%02d.%s-nic", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.osd_vm_nodes + 1, var.domain)}"
+  count               = "${var.vm_nodes_osd * var.environment_count}"
+  name                = "${format("%s-osd%02d.%02d.%s-nic", var.prefix, count.index % var.vm_nodes_osd + 1, count.index / var.vm_nodes_osd + 1, var.domain)}"
   location            = "${azurerm_resource_group.rg.location}"
   resource_group_name = "${azurerm_resource_group.rg.name}"
 
@@ -126,17 +126,17 @@ resource "azurerm_network_interface" "nic_osd" {
   tags = "${var.azure_tags}"
 
   ip_configuration {
-    name                          = "${format("%s-osd%02d.%02d.%s-ipconfig", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.osd_vm_nodes + 1, var.domain)}"
-    subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.osd_vm_nodes)}"
+    name                          = "${format("%s-osd%02d.%02d.%s-ipconfig", var.prefix, count.index % var.vm_nodes_osd + 1, count.index / var.vm_nodes_osd + 1, var.domain)}"
+    subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.vm_nodes_osd)}"
     private_ip_address_allocation = "static"
-    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 220 + count.index % var.osd_vm_nodes + 1 )}"
+    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 220 + count.index % var.vm_nodes_osd + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_osd.*.id, count.index)}"
   }
 }
 
 resource "azurerm_dns_a_record" "dns-record_kvm" {
-  count               = "${var.kvm_vm_nodes * var.environment_count}"
-  name                = "${format("%s-kvm%02d.%02d", var.prefix, count.index % var.kvm_vm_nodes + 1, count.index / var.kvm_vm_nodes + 1)}"
+  count               = "${var.vm_nodes_kvm * var.environment_count}"
+  name                = "${format("%s-kvm%02d.%02d", var.prefix, count.index % var.vm_nodes_kvm + 1, count.index / var.vm_nodes_kvm + 1)}"
   zone_name           = "${var.domain}"
   resource_group_name = "${var.azure_dns_resource_group}"
   ttl                 = 300
@@ -145,8 +145,8 @@ resource "azurerm_dns_a_record" "dns-record_kvm" {
 }
 
 resource "azurerm_dns_a_record" "dns-record_cmp" {
-  count               = "${var.cmp_vm_nodes * var.environment_count}"
-  name                = "${format("%s-cmp%02d.%02d", var.prefix, count.index % var.cmp_vm_nodes + 1, count.index / var.cmp_vm_nodes + 1)}"
+  count               = "${var.vm_nodes_cmp * var.environment_count}"
+  name                = "${format("%s-cmp%02d.%02d", var.prefix, count.index % var.vm_nodes_cmp + 1, count.index / var.vm_nodes_cmp + 1)}"
   zone_name           = "${var.domain}"
   resource_group_name = "${var.azure_dns_resource_group}"
   ttl                 = 300
@@ -155,8 +155,8 @@ resource "azurerm_dns_a_record" "dns-record_cmp" {
 }
 
 resource "azurerm_dns_a_record" "dns-record_osd" {
-  count               = "${var.osd_vm_nodes * var.environment_count}"
-  name                = "${format("%s-osd%02d.%02d", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.osd_vm_nodes + 1)}"
+  count               = "${var.vm_nodes_osd * var.environment_count}"
+  name                = "${format("%s-osd%02d.%02d", var.prefix, count.index % var.vm_nodes_osd + 1, count.index / var.vm_nodes_osd + 1)}"
   zone_name           = "${var.domain}"
   resource_group_name = "${var.azure_dns_resource_group}"
   ttl                 = 300
@@ -165,8 +165,8 @@ resource "azurerm_dns_a_record" "dns-record_osd" {
 }
 
 resource "azurerm_virtual_machine" "vms_kvm" {
-  count                            = "${var.kvm_vm_nodes * var.environment_count}"
-  name                             = "${format("%s-kvm%02d.%02d.%s", var.prefix, count.index % var.kvm_vm_nodes + 1, count.index / var.kvm_vm_nodes + 1, var.domain)}"
+  count                            = "${var.vm_nodes_kvm * var.environment_count}"
+  name                             = "${format("%s-kvm%02d.%02d.%s", var.prefix, count.index % var.vm_nodes_kvm + 1, count.index / var.vm_nodes_kvm + 1, var.domain)}"
   location                         = "${azurerm_resource_group.rg.location}"
   resource_group_name              = "${azurerm_resource_group.rg.name}"
   vm_size                          = "${var.azurerm_virtual_machine_vm_size_kvm}"
@@ -176,7 +176,7 @@ resource "azurerm_virtual_machine" "vms_kvm" {
   tags                             = "${var.azure_tags}"
 
   storage_image_reference {
-    id = "${count.index % var.kvm_vm_nodes == 0 ? data.azurerm_image.image_kvm01.id : data.azurerm_image.image_kvm.id}"
+    id = "${count.index % var.vm_nodes_kvm == 0 ? data.azurerm_image.image_kvm01.id : data.azurerm_image.image_kvm.id}"
 
     #   publisher = "Canonical"
     #   offer     = "UbuntuServer"
@@ -185,14 +185,14 @@ resource "azurerm_virtual_machine" "vms_kvm" {
   }
 
   storage_os_disk {
-    name              = "${format("%s-kvm%02d.%02d.%s-osdisk", var.prefix, count.index % var.kvm_vm_nodes + 1, count.index / var.kvm_vm_nodes + 1, var.domain)}"
+    name              = "${format("%s-kvm%02d.%02d.%s-osdisk", var.prefix, count.index % var.vm_nodes_kvm + 1, count.index / var.vm_nodes_kvm + 1, var.domain)}"
     managed_disk_type = "Standard_LRS"
     caching           = "ReadWrite"
     create_option     = "FromImage"
   }
 
   os_profile {
-    computer_name  = "${format("%s-kvm%02d.%02d.%s", var.prefix, count.index % var.kvm_vm_nodes + 1, count.index / var.kvm_vm_nodes + 1, var.domain)}"
+    computer_name  = "${format("%s-kvm%02d.%02d.%s", var.prefix, count.index % var.vm_nodes_kvm + 1, count.index / var.vm_nodes_kvm + 1, var.domain)}"
     admin_username = "${var.azure_admin_username}"
     admin_password = "not_used-${timestamp()}"
   }
@@ -208,8 +208,8 @@ resource "azurerm_virtual_machine" "vms_kvm" {
 }
 
 resource "azurerm_virtual_machine" "vms_cmp" {
-  count                            = "${var.cmp_vm_nodes * var.environment_count}"
-  name                             = "${format("%s-cmp%02d.%02d.%s", var.prefix, count.index % var.cmp_vm_nodes + 1, count.index / var.cmp_vm_nodes + 1, var.domain)}"
+  count                            = "${var.vm_nodes_cmp * var.environment_count}"
+  name                             = "${format("%s-cmp%02d.%02d.%s", var.prefix, count.index % var.vm_nodes_cmp + 1, count.index / var.vm_nodes_cmp + 1, var.domain)}"
   location                         = "${azurerm_resource_group.rg.location}"
   resource_group_name              = "${azurerm_resource_group.rg.name}"
   vm_size                          = "${var.azurerm_virtual_machine_vm_size_cmp}"
@@ -228,14 +228,14 @@ resource "azurerm_virtual_machine" "vms_cmp" {
   }
 
   storage_os_disk {
-    name              = "${format("%s-cmp%02d.%02d.%s-osdisk", var.prefix, count.index % var.cmp_vm_nodes + 1, count.index / var.cmp_vm_nodes + 1, var.domain)}"
+    name              = "${format("%s-cmp%02d.%02d.%s-osdisk", var.prefix, count.index % var.vm_nodes_cmp + 1, count.index / var.vm_nodes_cmp + 1, var.domain)}"
     managed_disk_type = "Standard_LRS"
     caching           = "ReadWrite"
     create_option     = "FromImage"
   }
 
   os_profile {
-    computer_name  = "${format("%s-cmp%02d.%02d.%s", var.prefix, count.index % var.cmp_vm_nodes + 1, count.index / var.cmp_vm_nodes + 1, var.domain)}"
+    computer_name  = "${format("%s-cmp%02d.%02d.%s", var.prefix, count.index % var.vm_nodes_cmp + 1, count.index / var.vm_nodes_cmp + 1, var.domain)}"
     admin_username = "${var.azure_admin_username}"
     admin_password = "not_used-${timestamp()}"
   }
@@ -251,8 +251,8 @@ resource "azurerm_virtual_machine" "vms_cmp" {
 }
 
 resource "azurerm_virtual_machine" "vms_osd" {
-  count                            = "${var.osd_vm_nodes * var.environment_count}"
-  name                             = "${format("%s-osd%02d.%02d.%s", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.osd_vm_nodes + 1, var.domain)}"
+  count                            = "${var.vm_nodes_osd * var.environment_count}"
+  name                             = "${format("%s-osd%02d.%02d.%s", var.prefix, count.index % var.vm_nodes_osd + 1, count.index / var.vm_nodes_osd + 1, var.domain)}"
   location                         = "${azurerm_resource_group.rg.location}"
   resource_group_name              = "${azurerm_resource_group.rg.name}"
   vm_size                          = "${var.azurerm_virtual_machine_vm_size_osd}"
@@ -271,14 +271,14 @@ resource "azurerm_virtual_machine" "vms_osd" {
   }
 
   storage_os_disk {
-    name              = "${format("%s-osd%02d.%02d.%s-osdisk", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.osd_vm_nodes + 1, var.domain)}"
+    name              = "${format("%s-osd%02d.%02d.%s-osdisk", var.prefix, count.index % var.vm_nodes_osd + 1, count.index / var.vm_nodes_osd + 1, var.domain)}"
     managed_disk_type = "Standard_LRS"
     caching           = "ReadWrite"
     create_option     = "FromImage"
   }
 
   os_profile {
-    computer_name  = "${format("%s-osd%02d.%02d.%s", var.prefix, count.index % var.osd_vm_nodes + 1, count.index / var.osd_vm_nodes + 1, var.domain)}"
+    computer_name  = "${format("%s-osd%02d.%02d.%s", var.prefix, count.index % var.vm_nodes_osd + 1, count.index / var.vm_nodes_osd + 1, var.domain)}"
     admin_username = "${var.azure_admin_username}"
     admin_password = "not_used-${timestamp()}"
   }
