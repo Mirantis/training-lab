@@ -173,7 +173,7 @@
     - { regexp: '^export DEPLOY_NETWORK_GW', line: 'export DEPLOY_NETWORK_GW={{ networks.deploy_network.gateway }}' }
     - { regexp: '^export DEPLOY_NETWORK_NETMASK', line: 'export DEPLOY_NETWORK_NETMASK={{ networks.deploy_network.netmask }}' }
     - { regexp: '^export DEPLOY_NETWORK_MTU', line: 'export DEPLOY_NETWORK_MTU=1450' }
-    #- { regexp: '^export DNS_SERVERS=8.8.8.8', line: 'export DNS_SERVERS=...' }
+    - { regexp: '^export DNS_SERVERS', line: 'export DNS_SERVERS="{{ dns_nameservers | join(" ") }}"' }
     - { regexp: '^export MCP_VERSION', line: 'export MCP_VERSION="{{ saltstack_repository_version }}"' }
     # Fix bug (https://gerrit.mcp.mirantis.net/#/c/22842/) !!!!! xxxx TODO
     - { regexp: '^for i in', line: 'for i in $(salt-key -l accepted | grep -v Accepted | grep -v {{ domain }} | grep -v "$SALT_MASTER_MINION_ID"); do' }
