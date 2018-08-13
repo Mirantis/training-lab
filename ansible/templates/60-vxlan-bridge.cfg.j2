@@ -4,7 +4,7 @@
 # {{ network.0 }}
 auto vxlan{{ network.1.subnet.split('.')[2] }}
 iface vxlan{{ network.1.subnet.split('.')[2] }} inet manual
-    pre-up ip link add vxlan{{ network.1.subnet.split('.')[2] }} type vxlan id {{ network.1.subnet.split('.')[2] }} dev {{ ansible_default_ipv4.interface }} dstport 0 || true
+    pre-up ip link add vxlan{{ network.1.subnet.split('.')[2] }} type vxlan id {{ network.1.subnet.split('.')[2] + 10 }} dev {{ ansible_default_ipv4.interface }} dstport 0 || true
 {% for node in groups['training_lab'] if node | regex_search(ansible_domain) and hostvars[node].ansible_default_ipv4.address != ansible_default_ipv4.address %}
     pre-up bridge fdb append to 00:00:00:00:00:00 dst {{ hostvars[node].ansible_default_ipv4.address }} dev vxlan{{ network.1.subnet.split('.')[2] }}
 {% endfor %}

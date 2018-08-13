@@ -18,6 +18,36 @@ You will need to have Docker installed.
 
 ![Ansible + Terraform + Cloud Architecture](images/ansible_terraform.png)
 
+### Network schema
+
+| Service | IP / FQDN                      |
+|---------|--------------------------------|
+| DNS     | 8.8.8.8, 8.8.4.4               |
+| NTP     | 0.pool.ntp.org, 1.pool.ntp.org |
+
+| Description                            | Usage                                              | vxlan id | CIDR        | Gateway    |
+|----------------------------------------|----------------------------------------------------|----------|-------------|------------|
+| Management (MGMT)                      | Management, PXE boot new bare metal servers (Salt) | 10       | 10.0.0.0/24 | 10.0.0.241 |
+| Control Plane (Control)                | MCP internal (Salt, Services, API, SDN)            | 11       | 10.0.1.0/24 | 10.0.1.241 |
+| Public (Proxy)                         | Users facing (Web UI, API Endpoints)               | 12       | 10.0.2.0/24 | 10.0.2.241 |
+| Data                                   | SDN Data plane (optional, recomended)              | 13       | 10.0.3.0/24 | 10.0.3.241 |
+| Storage Network (Front-End/Access)     | SDS Front                                          | 14       | 10.0.4.0/24 | 10.0.4.241 |
+| Storage Network (Back-End/Replication) | SDS Replication (optional)                         | 15       | 10.0.5.0/24 | 10.0.5.241 |
+
+### Infrastructure overview
+
+| Node type | Hostname        | mgmt network MAC  | FQDN                   | Public FQDN                   | Role/Description   | Cloud IP        | Management IP (br-mgm) | Control IP (br-ctl) | Public/Proxy IP (br-public) | Dataplane IP (br-data) | SDS front IP (br-storage) | SDS Replication IP (br-storrepl) | Type [VM, Nested VM]   | Placement   | RAM | HDD   | CPU |
+|-----------|-----------------|-------------------|------------------------|-------------------------------|--------------------|-----------------|------------------------|---------------------|-----------------------------|------------------------|---------------------------|----------------------------------|:----------------------:|:-----------:|-----|:-----:|-----|
+| kvm01     | kvm01           | ???               | kvm01.tng.mirantis.com | ???-kvm01.??.tng.mirantis.com | MCP Infra          | 192.168.250.241 | 10.0.0.241             | 10.0.1.241          | 10.0.2.241                  | 10.0.3.241             | 10.0.4.241                | 10.0.5.241                       | VM                     | none        | 64  | 128   | 16  |
+| kvm       | kvm02           | ???               | kvm02.tng.mirantis.com | ???-kvm02.??.tng.mirantis.com | MCP Infra          | 192.168.250.242 | 10.0.0.242             | 10.0.1.242          | 10.0.2.242                  | 10.0.3.242             | 10.0.4.242                | 10.0.5.242                       | VM                     | none        | 64  | 128   | 16  |
+| kvm       | kvm03           | ???               | kvm03.tng.mirantis.com | ???-kvm03.??.tng.mirantis.com | MCP Infra          | 192.168.250.243 | 10.0.0.243             | 10.0.1.243          | 10.0.2.243                  | 10.0.3.243             | 10.0.4.243                | 10.0.5.243                       | VM                     | none        | 64  | 128   | 16  |
+| cfg01     | cfg03           | ???               | cfg01.tng.mirantis.com | none                          | MCP Infra          | none            | 10.0.0.15              | 10.0.1.15           | none                        | none                   | none                      | none                             | Nested VM              | kvm01       | 8   | 50    | 4   |
+| cmp01     | cmp01           | ???               | cmp01.tng.mirantis.com | none                          | Compute Node (KVM) | 192.168.250.231 | 10.0.0.231             | 10.0.1.231          | 10.0.2.231                  | 10.0.3.231             | 10.0.4.231                | 10.0.5.231                       | VM                     | none        | 8   | 16    | 2   |
+| osd01     | osd01           | ???               | osd01.tng.mirantis.com | none                          | Ceph OSD node      | 192.168.250.221 | 10.0.0.221             | 10.0.1.221          | 10.0.2.221                  | 10.0.3.221             | 10.0.4.221                | 10.0.5.221                       | VM                     | none        | 4   | 20    | 2   |
+| pxe       | ???-kvm01-pxe01 | 52:54:00:00:01:01 | ???-kvm01-pxe01        | none                          | PXE MAAS test      | none            | MAAS DHCP              | none                | none                        | none                   | none                      | none                             | Nested VM              | kvm01       | 2   | 5     | 2   |
+| pxe       | ???-kvm02-pxe01 | 52:54:00:00:02:01 | ???-kvm02-pxe01        | none                          | PXE MAAS test      | none            | MAAS DHCP              | none                | none                        | none                   | none                      | none                             | Nested VM              | kvm02       | 2   | 5     | 2   |
+| pxe       | ???-kvm03-pxe01 | 52:54:00:00:03:01 | ???-kvm03-pxe01        | none                          | PXE MAAS test      | none            | MAAS DHCP              | none                | none                        | none                   | none                      | none                             | Nested VM              | kvm03       | 2   | 5     | 2   |
+
 ## Azure related tasks
 
 Few notes how to build the Training environment in Azure using prebuilded Docker image.

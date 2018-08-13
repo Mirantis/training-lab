@@ -36,7 +36,7 @@ azurerm_subnet_address_prefix             : "{{ cloud_network }}"
 # Standard_D16s_v3
 azurerm_virtual_machine_vm_size_kvm       : Standard_D4s_v3
 azurerm_virtual_machine_vm_size_cmp       : Standard_D2s_v3
-azurerm_virtual_machine_vm_size_osd       : Basic_A2
+azurerm_virtual_machine_vm_size_osd       : Standard_A2_v2
 azurerm_virtual_network_address_space     : '["{{ cloud_network | string }}"]'
 
 # OpenStack Terraform variables
@@ -51,7 +51,7 @@ openstack_compute_instance_cmp_image_name         : "{{ openstack_compute_instan
 openstack_compute_instance_osd_image_name         : "{{ openstack_compute_instance_kvm_image_name }}"
 openstack_networking_network_external_network_name: public
 openstack_networking_subnet_cidr                  : "{{ cloud_network }}"
-openstack_networking_subnet_dns_nameservers       : '["1.1.1.1"]'
+openstack_networking_subnet_dns_nameservers       : '["8.8.8.8", "8.8.4.4"]'
 openstack_networking_floatingip                   : public
 openstack_password                                : my_secret_password
 openstack_tenant_name                             : my_tenant_name
