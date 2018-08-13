@@ -93,6 +93,7 @@ resource "azurerm_network_interface" "nic_kvm" {
     name                          = "${format("%s-kvm%02d.%02d.%s-ipconfig", var.prefix, count.index % var.vm_nodes_kvm + 1, count.index / var.vm_nodes_kvm + 1, var.domain)}"
     subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.vm_nodes_kvm)}"
     private_ip_address_allocation = "static"
+    # 192.168.250.240
     private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 240 + count.index % var.vm_nodes_kvm + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_kvm.*.id, count.index)}"
   }
@@ -111,6 +112,7 @@ resource "azurerm_network_interface" "nic_cmp" {
     name                          = "${format("%s-cmp%02d.%02d.%s-ipconfig", var.prefix, count.index % var.vm_nodes_cmp + 1, count.index / var.vm_nodes_cmp + 1, var.domain)}"
     subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.vm_nodes_cmp)}"
     private_ip_address_allocation = "static"
+    # 192.168.250.230
     private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 230 + count.index % var.vm_nodes_cmp + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_cmp.*.id, count.index)}"
   }
@@ -129,6 +131,7 @@ resource "azurerm_network_interface" "nic_osd" {
     name                          = "${format("%s-osd%02d.%02d.%s-ipconfig", var.prefix, count.index % var.vm_nodes_osd + 1, count.index / var.vm_nodes_osd + 1, var.domain)}"
     subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.vm_nodes_osd)}"
     private_ip_address_allocation = "static"
+    # 192.168.250.220
     private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 220 + count.index % var.vm_nodes_osd + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_osd.*.id, count.index)}"
   }

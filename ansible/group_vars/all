@@ -115,8 +115,10 @@ mcp_salt_master_ip: 10.0.0.15
 mcp_salt_model_git_repository: https://github.com/ruzickap/training-lab-salt-model.git
 
 # SaltStack repository version (http://mirror.mirantis.com/2018.7.0-milestone1/saltstack-2017.7/xenial xenial main)
-#saltstack_repository_version: {{ mcp_release_tag }}/saltstack-2017.7
-saltstack_repository_version: proposed/saltstack-2017.7
+# It's used for salt-formulas
+#saltstack_repository_version: {{ mcp_release_tag }} / stable / proposed
+saltstack_repository_version: nightly
+saltstack_repository_version_directory: saltstack-2017.7
 
 # MCP release tags: https://github.com/Mirantis/mcp-common-scripts/tags, http://images.mirantis.com/
 #mcp_release_tag: 2018.7.0-milestone1
@@ -129,6 +131,7 @@ mcp_pipeline_library_git_repository: https://github.com/Mirantis/pipeline-librar
 # MCP build scripts (https://github.com/Mirantis/mcp-common-scripts)
 mcp_define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/predefine-vm/define-vm.sh
 mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/create_config_drive.sh
+# user_data.sh
 mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
 
 # The file where the generated password (ssh, vnc, ...) will be stored (they are generated for each environment)
