@@ -34,9 +34,12 @@ azure_tags                                : '{ Environment = "Training", Consume
 azurerm_resource_group_location           : East US 2
 azurerm_subnet_address_prefix             : "{{ cloud_network }}"
 # Standard_D16s_v3
-azurerm_virtual_machine_vm_size_kvm       : Standard_D4s_v3
-azurerm_virtual_machine_vm_size_cmp       : Standard_D2s_v3
-azurerm_virtual_machine_vm_size_osd       : Standard_A2_v2
+#azurerm_virtual_machine_vm_size_kvm       : Standard_D4s_v3
+#azurerm_virtual_machine_vm_size_cmp       : Standard_D2s_v3
+#azurerm_virtual_machine_vm_size_osd       : Standard_A2_v2
+azurerm_virtual_machine_vm_size_kvm       : Basic_A0
+azurerm_virtual_machine_vm_size_cmp       : Basic_A0
+azurerm_virtual_machine_vm_size_osd       : Basic_A0
 azurerm_virtual_network_address_space     : '["{{ cloud_network | string }}"]'
 
 # OpenStack Terraform variables
@@ -51,7 +54,6 @@ openstack_compute_instance_cmp_image_name         : "{{ openstack_compute_instan
 openstack_compute_instance_osd_image_name         : "{{ openstack_compute_instance_kvm_image_name }}"
 openstack_networking_network_external_network_name: public
 openstack_networking_subnet_cidr                  : "{{ cloud_network }}"
-openstack_networking_subnet_dns_nameservers       :
 openstack_networking_floatingip                   : public
 openstack_password                                : my_secret_password
 openstack_tenant_name                             : my_tenant_name
@@ -119,15 +121,15 @@ mcp_salt_master_ip: 10.0.0.15
 # Salt model
 mcp_salt_model_git_repository: https://github.com/ruzickap/training-lab-salt-model.git
 
-# SaltStack repository version (http://mirror.mirantis.com/2018.7.0-milestone1/saltstack-2017.7/xenial xenial main)
+# SaltStack repository version (http://mirror.mirantis.com/2018.8.0/saltstack-2017.7/xenial xenial main)
 # It's used for salt-formulas
-#saltstack_repository_version: {{ mcp_release_tag }} / stable / proposed
-saltstack_repository_version: nightly
+#saltstack_repository_version: nightly
+saltstack_repository_version: "{{ mcp_release_tag }}"
 saltstack_repository_version_directory: saltstack-2017.7
 
 # MCP release tags: https://github.com/Mirantis/mcp-common-scripts/tags, http://images.mirantis.com/
-#mcp_release_tag: 2018.7.0-milestone1
-mcp_release_tag: master
+mcp_release_tag: 2018.8.0
+#mcp_release_tag: master
 
 # MCP pipelines
 mcp_mk_pipelines_git_repository    : https://github.com/Mirantis/mk-pipelines.git
@@ -136,8 +138,10 @@ mcp_pipeline_library_git_repository: https://github.com/Mirantis/pipeline-librar
 # MCP build scripts (https://github.com/Mirantis/mcp-common-scripts)
 mcp_define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/predefine-vm/define-vm.sh
 mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/create_config_drive.sh
+mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/create_config_drive.sh
 # user_data.sh
-mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
+#mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
+mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/master_config.sh
 
 # The file where the generated password (ssh, vnc, ...) will be stored (they are generated for each environment)
 access_password_prefix_file: /tmp/{{ prefix }}-password
@@ -155,8 +159,8 @@ mcp_cfg01_vm_source_disk: /var/lib/libvirt/images/cfg01/system.qcow2
 mcp_cfg01_vm_config_disk: /var/lib/libvirt/images/cfg01/cfg01-config.iso
 mcp_cfg01_vm_mem_kb     : 8388608
 mcp_cfg01_vm_cpus       : 2
-#mcp_cfg01_image_url     : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
-mcp_cfg01_image_url     : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-2018.7.0-milestone1.qcow2
+mcp_cfg01_image_url     : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
+#mcp_cfg01_image_url     : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-2018.8.0.qcow2
 
 packages:
   - acpid
