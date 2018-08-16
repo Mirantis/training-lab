@@ -1,4 +1,4 @@
-- name: Create disk file
+- name: Create disk file for new VMs
   command: qemu-img create -f qcow2 -o size=5G /var/lib/libvirt/images/{{ item }}.qcow2
   args:
     creates: /var/lib/libvirt/images/{{ item }}.qcow2

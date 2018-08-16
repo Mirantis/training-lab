@@ -131,6 +131,12 @@
 ######################################################
 # Set all passwords and ssh keys
 ######################################################
+- name: Remove vagrant public key
+  authorized_key:
+    user: ubuntu
+    key: https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub
+    state: absent
+
 - block:
   - name: Generate private/public ssh keys for access inside all VMs
     command: ssh-keygen -t ed25519 -f {{ access_ssh_key_prefix_file }}-{{ ansible_domain }} -N "" -q -C "{{ prefix }}@{{ ansible_domain }}"
@@ -139,12 +145,6 @@
     when: ansible_fqdn in groups['training_lab_kvm01']
     become: false
     delegate_to: localhost
-
-  - name: Remove vagrant public key
-    authorized_key:
-      user: ubuntu
-      key: https://raw.githubusercontent.com/hashicorp/vagrant/master/keys/vagrant.pub
-      state: absent
 
   - name: Add own public keys "{{ ssh_public_key }}" to all accounts
     authorized_key:
@@ -191,7 +191,6 @@
   - name: Generate new access password and store it to {{ access_password_prefix_file }}
     set_fact:
       default_access_password: "{{ lookup('password', access_password_prefix_file + '-' + ansible_domain + ' chars=ascii_letters,digits,length=6') }}"
-    changed_when: false
     become: false
     delegate_to: localhost
 
