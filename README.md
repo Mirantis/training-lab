@@ -197,9 +197,10 @@ $ ssh root@10.0.0.15
 $ tail /var/log/cloud-init-output.log
 
 # Verify that all your Salt Minion nodes are registered on the Salt Master node
-$ salt-key
+root@cfg01:/# salt-key
 Accepted Keys:
 cfg01.tng.mirantis.com
+cmp01.tng.mirantis.com
 kvm01.tng.mirantis.com
 kvm02.tng.mirantis.com
 kvm03.tng.mirantis.com
@@ -208,14 +209,16 @@ Unaccepted Keys:
 Rejected Keys:
 
 # Check salt versions
-$ salt '*' test.version
-kvm03.tng.mirantis.com:
+root@cfg01:/# salt '*' test.version
+cfg01.tng.mirantis.com:
     2017.7.5
-kvm02.tng.mirantis.com:
+cmp01.tng.mirantis.com:
     2017.7.5
 kvm01.tng.mirantis.com:
     2017.7.5
-cfg01.tng.mirantis.com:
+kvm02.tng.mirantis.com:
+    2017.7.5
+kvm03.tng.mirantis.com:
     2017.7.5
 
 # Verify that the Salt Minion nodes are synchronized by running the following command on the Salt Master node
