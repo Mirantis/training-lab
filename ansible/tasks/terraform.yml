@@ -2,12 +2,17 @@
   template:
     src: templates/terraform.tfvars.j2
     dest: terraform/{{ cloud_platform }}/terraform.tfvars
+  when: terraform_state == 'present'
 
 - name: Change infrastructure using terraform (this may take a long time...)
   terraform:
     state: "{{ terraform_state }}"
     project_path: terraform/{{ cloud_platform }}/
   register: terraform_apply_output
+
+- name: End if terraform state is not absent (stack was deleted)
+  meta: end_play
+  when: terraform_apply_output.state == 'absent'
 
 - name: Add hosts created by terraform and wait for boot to complete
   block:
