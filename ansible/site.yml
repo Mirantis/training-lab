@@ -1,8 +1,8 @@
 ---
 ########################################################################
-# Start Terrafrom to build Cloud infrastructure
+# Build Cloud infrastructure
 ########################################################################
-- name: Use terraform to chnage the infrastructure
+- name: Define the infrastructure
   hosts: localhost
   connection: local
   gather_facts: no

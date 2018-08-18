@@ -93,8 +93,7 @@ resource "azurerm_network_interface" "nic_kvm" {
     name                          = "${format("%s-kvm%02d.%02d.%s-ipconfig", var.prefix, count.index % var.vm_nodes_kvm + 1, count.index / var.vm_nodes_kvm + 1, var.domain)}"
     subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.vm_nodes_kvm)}"
     private_ip_address_allocation = "static"
-    # 192.168.250.240
-    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 240 + count.index % var.vm_nodes_kvm + 1 )}"
+    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, var.vm_nodes_kvm_network_private_ip_last_octet + count.index % var.vm_nodes_kvm + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_kvm.*.id, count.index)}"
   }
 }
@@ -112,8 +111,7 @@ resource "azurerm_network_interface" "nic_cmp" {
     name                          = "${format("%s-cmp%02d.%02d.%s-ipconfig", var.prefix, count.index % var.vm_nodes_cmp + 1, count.index / var.vm_nodes_cmp + 1, var.domain)}"
     subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.vm_nodes_cmp)}"
     private_ip_address_allocation = "static"
-    # 192.168.250.230
-    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 230 + count.index % var.vm_nodes_cmp + 1 )}"
+    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, var.vm_nodes_cmp_network_private_ip_last_octet + count.index % var.vm_nodes_cmp + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_cmp.*.id, count.index)}"
   }
 }
@@ -131,8 +129,7 @@ resource "azurerm_network_interface" "nic_osd" {
     name                          = "${format("%s-osd%02d.%02d.%s-ipconfig", var.prefix, count.index % var.vm_nodes_osd + 1, count.index / var.vm_nodes_osd + 1, var.domain)}"
     subnet_id                     = "${element(azurerm_subnet.subnet.*.id, count.index / var.vm_nodes_osd)}"
     private_ip_address_allocation = "static"
-    # 192.168.250.220
-    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, 220 + count.index % var.vm_nodes_osd + 1 )}"
+    private_ip_address            = "${cidrhost(var.azurerm_subnet_address_prefix, var.vm_nodes_osd_network_private_ip_last_octet + count.index % var.vm_nodes_osd + 1 )}"
     public_ip_address_id          = "${element(azurerm_public_ip.pip_osd.*.id, count.index)}"
   }
 }
@@ -296,62 +293,11 @@ resource "azurerm_virtual_machine" "vms_osd" {
   }
 }
 
-output "vms_kvm_azure_fqdn" {
-  description = "Azure Internal FQDNs for kvm VMs"
-  value       = "${azurerm_public_ip.pip_kvm.*.fqdn}"
+output "vms_name" {
+  value = "${concat(azurerm_virtual_machine.vms_kvm.*.name, azurerm_virtual_machine.vms_cmp.*.name, azurerm_virtual_machine.vms_osd.*.name)}"
 }
 
-output "vms_cmp_azure_fqdn" {
-  description = "Azure Internal FQDNs for cmp VMs"
-  value       = "${azurerm_public_ip.pip_cmp.*.fqdn}"
-}
-
-output "vms_osd_azure_fqdn" {
-  description = "Azure Internal FQDNs for osd VMs"
-  value       = "${azurerm_public_ip.pip_osd.*.fqdn}"
-}
-
-output "vms_kvm_name" {
-  description = "FQDNs for kvm VMs"
-  value       = "${azurerm_virtual_machine.vms_kvm.*.name}"
-}
-
-output "vms_cmp_name" {
-  description = "FQDNs for cmp VMs"
-  value       = "${azurerm_virtual_machine.vms_cmp.*.name}"
-}
-
-output "vms_osd_name" {
-  description = "FQDNs for osd VMs"
-  value       = "${azurerm_virtual_machine.vms_osd.*.name}"
-}
-
-output "vms_kvm_private_ip_address" {
-  description = "Private IPs for kvm VMs"
-  value       = "${azurerm_network_interface.nic_kvm.*.private_ip_address}"
-}
-
-output "vms_cmp_private_ip_address" {
-  description = "Private IPs for cmp VMs"
-  value       = "${azurerm_network_interface.nic_cmp.*.private_ip_address}"
-}
-
-output "vms_osd_private_ip_address" {
-  description = "Private IPs for osd VMs"
-  value       = "${azurerm_network_interface.nic_osd.*.private_ip_address}"
-}
-
-output "vms_kvm_public_ip" {
-  description = "Public IPs for kvm VMs"
-  value       = "${azurerm_public_ip.pip_kvm.*.ip_address}"
-}
-
-output "vms_cmp_public_ip" {
-  description = "Public IPs for cmp VMs"
-  value       = "${azurerm_public_ip.pip_cmp.*.ip_address}"
-}
-
-output "vms_osd_public_ip" {
-  description = "Public IPs for osd VMs"
-  value       = "${azurerm_public_ip.pip_osd.*.ip_address}"
+output "vms_public_ip" {
+  description = "The public IP address for VMs"
+  value       = "${concat(azurerm_public_ip.pip_kvm.*.ip_address, azurerm_public_ip.pip_cmp.*.ip_address, azurerm_public_ip.pip_osd.*.ip_address)}"
 }

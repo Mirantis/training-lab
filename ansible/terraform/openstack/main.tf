@@ -106,7 +106,7 @@ resource "openstack_compute_instance_v2" "vms_kvm" {
 
   network {
     uuid           = "${element(openstack_networking_network_v2.private-network.*.id, count.index / var.vm_nodes_kvm )}"
-    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 240 + count.index % var.vm_nodes_kvm + 1)}"
+    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, var.vm_nodes_kvm_network_private_ip_last_octet + count.index % var.vm_nodes_kvm + 1)}"
     access_network = true
   }
 }
@@ -125,7 +125,7 @@ resource "openstack_compute_instance_v2" "vms_cmp" {
 
   network {
     uuid           = "${element(openstack_networking_network_v2.private-network.*.id, count.index / var.vm_nodes_cmp )}"
-    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 230 + count.index % var.vm_nodes_cmp + 1)}"
+    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, var.vm_nodes_cmp_network_private_ip_last_octet + count.index % var.vm_nodes_cmp + 1)}"
     access_network = true
   }
 }
@@ -144,7 +144,7 @@ resource "openstack_compute_instance_v2" "vms_osd" {
 
   network {
     uuid           = "${element(openstack_networking_network_v2.private-network.*.id, count.index / var.vm_nodes_osd )}"
-    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, 220 + count.index % var.vm_nodes_osd + 1)}"
+    fixed_ip_v4    = "${cidrhost(var.openstack_networking_subnet_cidr, var.vm_nodes_osd_network_private_ip_last_octet + count.index % var.vm_nodes_osd + 1)}"
     access_network = true
   }
 }
@@ -170,44 +170,11 @@ resource "openstack_compute_floatingip_associate_v2" "floatingip-associate_osd" 
   instance_id = "${element(openstack_compute_instance_v2.vms_osd.*.id, count.index)}"
 }
 
-output "vms_kvm_name" {
-  value = "${openstack_compute_instance_v2.vms_kvm.*.name}"
+output "vms_name" {
+  value = "${concat(openstack_compute_instance_v2.vms_kvm.*.name, openstack_compute_instance_v2.vms_cmp.*.name, openstack_compute_instance_v2.vms_osd.*.name)}"
 }
 
-output "vms_cmp_name" {
-  value = "${openstack_compute_instance_v2.vms_cmp.*.name}"
-}
-
-output "vms_osd_name" {
-  value = "${openstack_compute_instance_v2.vms_osd.*.name}"
-}
-
-output "vms_kvm_public_ip" {
-  description = "The actual IP address allocated for the kvm resources"
-  value       = "${openstack_networking_floatingip_v2.floatingip_kvm.*.address}"
-}
-
-output "vms_cmp_public_ip" {
-  description = "The actual IP address allocated for the cmp resources"
-  value       = "${openstack_networking_floatingip_v2.floatingip_cmp.*.address}"
-}
-
-output "vms_osd_public_ip" {
-  description = "The actual IP address allocated for the osd resources"
-  value       = "${openstack_networking_floatingip_v2.floatingip_osd.*.address}"
-}
-
-output "vms_kvm_private_ip" {
-  description = "Private IPs for kvm VMs"
-  value       = "${openstack_compute_instance_v2.vms_kvm.*.network.0.fixed_ip_v4}"
-}
-
-output "vms_cmp_private_ip" {
-  description = "Private IPs for cmp VMs"
-  value       = "${openstack_compute_instance_v2.vms_cmp.*.network.0.fixed_ip_v4}"
-}
-
-output "vms_osd_private_ip" {
-  description = "Private IPs for osd VMs"
-  value       = "${openstack_compute_instance_v2.vms_osd.*.network.0.fixed_ip_v4}"
+output "vms_public_ip" {
+  description = "The public IP address for VMs"
+  value       = "${concat(openstack_networking_floatingip_v2.floatingip_kvm.*.address, openstack_networking_floatingip_v2.floatingip_cmp.*.address, openstack_networking_floatingip_v2.floatingip_osd.*.address)}"
 }

@@ -22,7 +22,7 @@ You will need to have Docker installed.
 
 | Service | IP / FQDN                      |
 |---------|--------------------------------|
-| DNS     | 8.8.8.8, 8.8.4.4               |
+| DNS     | 8.8.8.8, 1.1.1.1               |
 | NTP     | 0.pool.ntp.org, 1.pool.ntp.org |
 
 | Description                            | Usage                                              | vxlan id | CIDR        | Gateway    |
@@ -80,15 +80,19 @@ See the details: [https://docs.microsoft.com/en-us/azure/dns/dns-delegate-domain
 
 ```bash
 # Create resource group
-az group create --name training-lab-dns --location "East US 2"
-az network dns zone create -g training-lab-dns -n tng.mirantis.com
+$ az group create --name training-lab-dns --location "East US 2"
+$ az network dns zone create -g training-lab-dns -n tng.mirantis.com
 
 # List DNS nameservers for zone tng.mirantis.com in Azure
 # You need to ask the domain owner to delegate the zone "tng.mirantis.com" to the Azure nameservers
-az network dns zone show -g training-lab-dns -n tng.mirantis.com -o json
+$ az network dns zone show -g training-lab-dns -n tng.mirantis.com -o json
+
+# Check if DNS servers are forwarding queries to Azure DNS server
+$ dig +short -t SOA tng.mirantis.com
+ns1-04.azure-dns.com. azuredns-hostmaster.microsoft.com. 1 3600 300 2419200 300
 
 # Add default "www" CNAME to training.mirantis.com
-az network dns record-set cname set-record -g training-lab-dns -z tng.mirantis.com -n www -c training.mirantis.com
+$ az network dns record-set cname set-record -g training-lab-dns -z tng.mirantis.com -n www -c training.mirantis.com
 ```
 
 ### Create Resource Group holding the images created by packer (optional)

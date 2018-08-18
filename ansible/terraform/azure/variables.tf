@@ -83,12 +83,27 @@ variable "vm_nodes_kvm" {
   default     = 3
 }
 
+variable "vm_nodes_kvm_network_private_ip_last_octet" {
+  description = "Last octet of kvm inside cloud_network (kvm01: 192.168.250.241, kvm02: 192.168.250.242, kvm03: 192.168.250.243 )"
+  default     = 240
+}
+
 variable "vm_nodes_cmp" {
   description = "Number of VMs which should be created as cmp hosts"
   default     = 3
 }
 
+variable "vm_nodes_cmp_network_private_ip_last_octet" {
+  description = "Last octet of kvm inside cloud_network (cmp01: 192.168.250.231, cmp02: 192.168.250.232, cmp03: 192.168.250.233 )"
+  default     = 230
+}
+
 variable "vm_nodes_osd" {
   description = "Number of VMs which should be created as osd hosts"
   default     = 3
+}
+
+variable "vm_nodes_osd_network_private_ip_last_octet" {
+  description = "Last octet of kvm inside cloud_network (osd01: 192.168.250.221, osd02: 192.168.250.222, osd03: 192.168.250.223 )"
+  default     = 220
 }

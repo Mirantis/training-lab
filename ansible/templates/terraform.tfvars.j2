@@ -5,16 +5,17 @@
 azure_admin_username                  = "{{ default_username }}"
 azure_dns_resource_group              = "{{ azure_dns_resource_group }}"
 azure_images_resource_group           = "{{ azure_images_resource_group }}"
-azure_image_kvm01_name_regex          = "{{ azure_image_kvm01_name_regex }}"
-azure_image_kvm_name_regex            = "{{ azure_image_kvm_name_regex }}"
-azure_image_cmp_name_regex            = "{{ azure_image_cmp_name_regex }}"
-azure_image_osd_name_regex            = "{{ azure_image_osd_name_regex }}"
-azure_tags                            = {{ azure_tags }}
+azure_image_kvm01_name_regex          = "{{ vm_nodes['kvm'].azure_image_kvm01_name_regex }}"
+azure_image_kvm_name_regex            = "{{ vm_nodes['kvm'].azure_image_name_regex }}"
+azure_image_cmp_name_regex            = "{{ vm_nodes['cmp'].azure_image_name_regex }}"
+azure_image_osd_name_regex            = "{{ vm_nodes['osd'].azure_image_name_regex }}"
+azure_tags                            = {{ azure_tags | to_json | regex_replace(':', '=') }}
 azurerm_resource_group_location       = "{{ azurerm_resource_group_location }}"
 azurerm_subnet_address_prefix         = "{{ azurerm_subnet_address_prefix }}"
-azurerm_virtual_machine_vm_size_kvm   = "{{ azurerm_virtual_machine_vm_size_kvm }}"
-azurerm_virtual_machine_vm_size_cmp   = "{{ azurerm_virtual_machine_vm_size_cmp }}"
-azurerm_virtual_machine_vm_size_osd   = "{{ azurerm_virtual_machine_vm_size_osd }}"
+azurerm_virtual_machine_vm_size_kvm   = "{{ vm_nodes['kvm'].azure_virtual_machine_vm_size }}"
+azurerm_virtual_machine_vm_size_cmp   = "{{ vm_nodes['cmp'].azure_virtual_machine_vm_size }}"
+azurerm_virtual_machine_vm_size_osd   = "{{ vm_nodes['osd'].azure_virtual_machine_vm_size }}"
+
 azurerm_virtual_network_address_space = {{ azurerm_virtual_network_address_space }}
 {% endif %}
 
@@ -22,13 +23,13 @@ azurerm_virtual_network_address_space = {{ azurerm_virtual_network_address_space
 # OpenStack
 openstack_auth_url                                 = "{{ openstack_auth_url }}"
 openstack_availability_zone                        = "{{ openstack_availability_zone }}"
-openstack_compute_instance_flavor_name_kvm         = "{{ openstack_compute_instance_flavor_name_kvm }}"
-openstack_compute_instance_flavor_name_cmp         = "{{ openstack_compute_instance_flavor_name_cmp }}"
-openstack_compute_instance_flavor_name_osd         = "{{ openstack_compute_instance_flavor_name_osd }}"
-openstack_compute_instance_kvm01_image_name        = "{{ openstack_compute_instance_kvm01_image_name }}"
-openstack_compute_instance_kvm_image_name          = "{{ openstack_compute_instance_kvm_image_name }}"
-openstack_compute_instance_cmp_image_name          = "{{ openstack_compute_instance_cmp_image_name }}"
-openstack_compute_instance_osd_image_name          = "{{ openstack_compute_instance_osd_image_name }}"
+openstack_compute_instance_flavor_name_kvm         = "{{ vm_nodes['kvm'].openstack_compute_instance_flavor_name }}"
+openstack_compute_instance_flavor_name_cmp         = "{{ vm_nodes['cmp'].openstack_compute_instance_flavor_name }}"
+openstack_compute_instance_flavor_name_osd         = "{{ vm_nodes['osd'].openstack_compute_instance_flavor_name }}"
+openstack_compute_instance_kvm01_image_name        = "{{ vm_nodes['kvm'].openstack_compute_instance_kvm01_image_name }}"
+openstack_compute_instance_kvm_image_name          = "{{ vm_nodes['kvm'].openstack_compute_instance_image_name }}"
+openstack_compute_instance_cmp_image_name          = "{{ vm_nodes['cmp'].openstack_compute_instance_image_name }}"
+openstack_compute_instance_osd_image_name          = "{{ vm_nodes['osd'].openstack_compute_instance_image_name }}"
 openstack_networking_floatingip                    = "{{ openstack_networking_floatingip }}"
 openstack_networking_network_external_network_name = "{{ openstack_networking_network_external_network_name }}"
 openstack_networking_subnet_cidr                   = "{{ openstack_networking_subnet_cidr }}"
@@ -40,11 +41,14 @@ openstack_user_name                                = "{{ openstack_user_name }}"
 {% endif %}
 
 # Common
-domain            = "{{ domain }}"
-environment_count = {{ environment_count }}
-prefix            = "{{ prefix }}"
-ssh_public_key    = "{{ ssh_public_key }}"
-username          = "{{ default_username }}"
-vm_nodes_kvm      = {{ vm_nodes_kvm }}
-vm_nodes_cmp      = {{ vm_nodes_cmp }}
-vm_nodes_osd      = {{ vm_nodes_osd }}
+domain                                     = "{{ domain }}"
+environment_count                          = {{ environment_count }}
+prefix                                     = "{{ prefix }}"
+ssh_public_key                             = "{{ ssh_public_key }}"
+username                                   = "{{ default_username }}"
+vm_nodes_kvm                               = "{{ vm_nodes['kvm'].count }}"
+vm_nodes_cmp                               = "{{ vm_nodes['cmp'].count }}"
+vm_nodes_osd                               = "{{ vm_nodes['osd'].count }}"
+vm_nodes_kvm_network_private_ip_last_octet = "{{ vm_nodes['kvm'].network_private_ip_last_octet }}"
+vm_nodes_cmp_network_private_ip_last_octet = "{{ vm_nodes['cmp'].network_private_ip_last_octet }}"
+vm_nodes_osd_network_private_ip_last_octet = "{{ vm_nodes['osd'].network_private_ip_last_octet }}"

@@ -7,14 +7,33 @@ default_student_account_name: student
 # Number of Training Environment
 environment_count: 1
 
-# Number of kvm VMs (max 9)
-vm_nodes_kvm: 3
-
-# Number of cmp (compute) VMs (max 9)
-vm_nodes_cmp: 1
-
-# Number of osd (ceph) VMs (max 9)
-vm_nodes_osd: 0
+vm_nodes:
+  kvm:
+    count: 3
+    azure_image_name_regex: training-lab_kvm-ubuntu-16.04-server-amd64*
+    azure_image_kvm01_name_regex: training-lab_kvm01-ubuntu-16.04-server-amd64*
+    # Standard_D16s_v3
+    azure_virtual_machine_vm_size: Basic_A0
+    # Last octet of kvm inside cloud_network (kvm01: 192.168.250.241, kvm02: 192.168.250.242, kvm03: 192.168.250.243 )
+    network_private_ip_last_octet: 240
+    #m1.xxlarge80 # m1.xlarge40 # m1.medium
+    openstack_compute_instance_flavor_name: m1.xlarge40
+    openstack_compute_instance_kvm01_image_name: pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180816
+    openstack_compute_instance_image_name: pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180816
+  cmp:
+    count: 1
+    azure_image_name_regex: training-lab_kvm-ubuntu-16.04-server-amd64*
+    network_private_ip_last_octet: 230
+    azure_virtual_machine_vm_size: Basic_A0
+    openstack_compute_instance_flavor_name: m1.medium
+    openstack_compute_instance_image_name: pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180816
+  osd:
+    count: 0
+    azure_image_name_regex: training-lab_kvm-ubuntu-16.04-server-amd64*
+    azure_virtual_machine_vm_size: Basic_A0
+    network_private_ip_last_octet: 220
+    openstack_compute_instance_flavor_name: t2.nano
+    openstack_compute_instance_image_name: pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180816
 
 # Prefix for all names used in Cloud (vms, networks, ...)
 # prefix: training (taken from the main script create_openstack.sh)
@@ -24,34 +43,15 @@ ssh_public_key: ~/.ssh/id_rsa.pub
 
 # Azure Terraform variables
 # Permanent Azure Resource Group which is serving the {{ domain }} should be already exist...
-azure_dns_resource_group                  : training-lab-dns
-azure_images_resource_group               : training-lab-images
-azure_image_kvm01_name_regex              : training-lab_kvm01-ubuntu-16.04-server-amd64*
-azure_image_kvm_name_regex                : training-lab_kvm-ubuntu-16.04-server-amd64*
-azure_image_cmp_name_regex                : "{{ azure_image_kvm_name_regex }}"
-azure_image_osd_name_regex                : "{{ azure_image_kvm_name_regex }}"
-azure_tags                                : '{ Environment = "Training", Consumer = "training@mirantis.com" }'
-azurerm_resource_group_location           : East US 2
-azurerm_subnet_address_prefix             : "{{ cloud_network }}"
-# Standard_D16s_v3
-#azurerm_virtual_machine_vm_size_kvm       : Standard_D4s_v3
-#azurerm_virtual_machine_vm_size_cmp       : Standard_D2s_v3
-#azurerm_virtual_machine_vm_size_osd       : Standard_A2_v2
-azurerm_virtual_machine_vm_size_kvm       : Basic_A0
-azurerm_virtual_machine_vm_size_cmp       : Basic_A0
-azurerm_virtual_machine_vm_size_osd       : Basic_A0
-azurerm_virtual_network_address_space     : '["{{ cloud_network | string }}"]'
+azure_dns_resource_group             : training-lab-dns
+azure_images_resource_group          : training-lab-images
+azure_tags                           : { Environment: "Training", Consumer: "training@example.com" }
+azurerm_resource_group_location      : East US 2
+azurerm_subnet_address_prefix        : "{{ cloud_network }}"
+azurerm_virtual_network_address_space: '["{{ cloud_network | string }}"]'
 
 # OpenStack Terraform variables
 openstack_auth_url                                : https://cloud.example.com:5000/v2.0
-#m1.xxlarge80 # m1.xlarge40 # m1.medium
-openstack_compute_instance_flavor_name_kvm        : m1.xlarge40
-openstack_compute_instance_flavor_name_cmp        : m1.medium
-openstack_compute_instance_flavor_name_osd        : t2.nano
-openstack_compute_instance_kvm01_image_name       : pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180816
-openstack_compute_instance_kvm_image_name         : pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180816
-openstack_compute_instance_cmp_image_name         : "{{ openstack_compute_instance_kvm_image_name }}"
-openstack_compute_instance_osd_image_name         : "{{ openstack_compute_instance_kvm_image_name }}"
 openstack_networking_network_external_network_name: public
 openstack_networking_subnet_cidr                  : "{{ cloud_network }}"
 openstack_networking_floatingip                   : public
@@ -68,7 +68,7 @@ domain: tng.mirantis.com
 # DNS Nameservers
 dns_nameservers:
   - "8.8.8.8"
-  - "8.8.4.4"
+  - "1.1.1.1"
 
 # Network list
 networks:
@@ -107,7 +107,7 @@ networks:
     subnet_netmask: 10.0.4.0/24
     gateway       : 10.0.4.241
     device        : br-storage
-  # Netowrk for storage replication
+  # Network for storage replication
   storage_replication_network:
     subnet        : 10.0.5.0
     netmask       : 255.255.255.0
@@ -155,7 +155,7 @@ access_ssh_key_prefix_file: "{{ temporary_directory }}/{{ prefix }}-id_ed25519"
 nested_vms_count : 1
 # Minimum RAM for nested_vm is 2GB
 nested_vms_memory: 2
-nested_vms_cpu   : 2
+nested_vms_cpu   : 1
 
 # cfg01 VM parameters
 mcp_cfg01_vm_source_disk: /var/lib/libvirt/images/cfg01/system.qcow2
