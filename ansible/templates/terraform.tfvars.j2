@@ -15,8 +15,7 @@ azurerm_subnet_address_prefix         = "{{ azurerm_subnet_address_prefix }}"
 azurerm_virtual_machine_vm_size_kvm   = "{{ vm_nodes['kvm'].azure_virtual_machine_vm_size }}"
 azurerm_virtual_machine_vm_size_cmp   = "{{ vm_nodes['cmp'].azure_virtual_machine_vm_size }}"
 azurerm_virtual_machine_vm_size_osd   = "{{ vm_nodes['osd'].azure_virtual_machine_vm_size }}"
-
-azurerm_virtual_network_address_space = {{ azurerm_virtual_network_address_space }}
+azurerm_virtual_network_address_space = ["{{ azurerm_virtual_network_address_space }}"]
 {% endif %}
 
 {% if cloud_platform == 'openstack' %}
@@ -52,3 +51,4 @@ vm_nodes_osd                               = "{{ vm_nodes['osd'].count }}"
 vm_nodes_kvm_network_private_ip_last_octet = "{{ vm_nodes['kvm'].network_private_ip_last_octet }}"
 vm_nodes_cmp_network_private_ip_last_octet = "{{ vm_nodes['cmp'].network_private_ip_last_octet }}"
 vm_nodes_osd_network_private_ip_last_octet = "{{ vm_nodes['osd'].network_private_ip_last_octet }}"
+

@@ -18,22 +18,22 @@ vm_nodes:
     network_private_ip_last_octet: 240
     #m1.xxlarge80 # m1.xlarge40 # m1.medium
     openstack_compute_instance_flavor_name: m1.xlarge40
-    openstack_compute_instance_kvm01_image_name: pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180816
-    openstack_compute_instance_image_name: pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180816
+    openstack_compute_instance_kvm01_image_name: pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180820
+    openstack_compute_instance_image_name: pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180820
   cmp:
     count: 1
     azure_image_name_regex: training-lab_kvm-ubuntu-16.04-server-amd64*
     network_private_ip_last_octet: 230
     azure_virtual_machine_vm_size: Basic_A0
     openstack_compute_instance_flavor_name: m1.medium
-    openstack_compute_instance_image_name: pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180816
+    openstack_compute_instance_image_name: pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180820
   osd:
     count: 0
     azure_image_name_regex: training-lab_kvm-ubuntu-16.04-server-amd64*
     azure_virtual_machine_vm_size: Basic_A0
     network_private_ip_last_octet: 220
     openstack_compute_instance_flavor_name: t2.nano
-    openstack_compute_instance_image_name: pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180816
+    openstack_compute_instance_image_name: pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180820
 
 # Prefix for all names used in Cloud (vms, networks, ...)
 # prefix: training (taken from the main script create_openstack.sh)
@@ -48,7 +48,7 @@ azure_images_resource_group          : training-lab-images
 azure_tags                           : { Environment: "Training", Consumer: "training@example.com" }
 azurerm_resource_group_location      : East US 2
 azurerm_subnet_address_prefix        : "{{ cloud_network }}"
-azurerm_virtual_network_address_space: '["{{ cloud_network | string }}"]'
+azurerm_virtual_network_address_space: "{{ cloud_network }}"
 
 # OpenStack Terraform variables
 openstack_auth_url                                : https://cloud.example.com:5000/v2.0

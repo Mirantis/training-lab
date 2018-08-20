@@ -151,6 +151,12 @@
     dest: /root/user_data.sh
     mode: 0755
 
+- name: Download define-vm script ({{ mcp_define_vm_script_url }})
+  get_url:
+    url: "{{ mcp_define_vm_script_url }}"
+    dest: /root/define-vm.sh
+    mode: 0755
+
 # This is by default done by Jenkins which is building the .iso
 - name: Change the params in /root/user_data.sh "{{ mcp_master_config_script_url }}"
   lineinfile:
@@ -165,14 +171,6 @@
     - { regexp: '^export DEPLOY_NETWORK_MTU', line: 'export DEPLOY_NETWORK_MTU=1450' }
     - { regexp: '^export DNS_SERVERS', line: 'export DNS_SERVERS="{{ dns_nameservers | join(" ") }}"' }
     - { regexp: '^export MCP_VERSION', line: 'export MCP_VERSION="{{ saltstack_repository_version }}"' }
-    # Fix bug (https://gerrit.mcp.mirantis.net/#/c/22842/) !!!!! xxxx TODO
-    - { regexp: '^for i in', line: 'for i in $(salt-key -l accepted | grep -v Accepted | grep -v {{ domain }} | grep -v "$SALT_MASTER_MINION_ID"); do' }
-
-- name: Download define-vm script ({{ mcp_define_vm_script_url }})
-  get_url:
-    url: "{{ mcp_define_vm_script_url }}"
-    dest: /root/define-vm.sh
-    mode: 0755
 
 - block:
   - name: Create directory /var/lib/libvirt/images/cfg01/
