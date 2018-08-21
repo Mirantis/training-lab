@@ -7,8 +7,6 @@
 - name: Set correct owner/group for the qcow2 disk image
   file:
     path: /var/lib/libvirt/images/{{ item }}.qcow2
-    owner: libvirt-qemu
-    group: kvm
   with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname }}-pxe%02x
 
 - name: Get list of vms
