@@ -2,12 +2,12 @@
   command: qemu-img create -f qcow2 -o size=5G /var/lib/libvirt/images/{{ item }}.qcow2
   args:
     creates: /var/lib/libvirt/images/{{ item }}.qcow2
-  with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname }}-pxe%02x
+  with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname | regex_replace('.*\-(\w{3}\d{2}).*', '\1') }}-pxe%02x
 
 - name: Set correct owner/group for the qcow2 disk image
   file:
     path: /var/lib/libvirt/images/{{ item }}.qcow2
-  with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname }}-pxe%02x
+  with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname | regex_replace('.*\-(\w{3}\d{2}).*', '\1') }}-pxe%02x
 
 - name: Get list of vms
   virt:
@@ -20,4 +20,4 @@
     command: define
     xml: "{{ lookup('template', 'templates/vm-template.xml.j2') }}"
   when: item not in virt_vms.list_vms
-  with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname }}-pxe%02x
+  with_sequence: start=1 end={{ nested_vms_count }} format={{ ansible_hostname | regex_replace('.*\-(\w{3}\d{2}).*', '\1') }}-pxe%02x
