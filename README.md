@@ -198,10 +198,11 @@ or
 $ ssh root@10.0.0.15
 
 # check if installation process finished successfully (it should ends with "reboot")
-$ tail /var/log/cloud-init-output.log
+$ tail -1 /var/log/cloud-init-output.log
++ reboot
 
 # Verify that all your Salt Minion nodes are registered on the Salt Master node
-root@cfg01:/# salt-key
+$ salt-key
 Accepted Keys:
 cfg01.tng.mirantis.com
 cmp01.tng.mirantis.com
@@ -213,7 +214,7 @@ Unaccepted Keys:
 Rejected Keys:
 
 # Check salt versions
-root@cfg01:/# salt '*' test.version
+$ salt '*' test.version
 cfg01.tng.mirantis.com:
     2017.7.5
 cmp01.tng.mirantis.com:
@@ -234,11 +235,21 @@ $ salt '*' saltutil.refresh_pillar
 # Check out your inventory to be able to resolve any inconsistencies in your model:
 $ reclass-salt --top
 
+# Verify that the following states are successfully applied during the execution of cloud-init:
+salt-call state.sls linux.system,linux,openssh,salt
+salt-call state.sls maas.cluster,maas.region,reclass
+
+# Provision MAAS with servers
+salt-call state.sls maas.machines
+
+# Check if cfg01 is configured properly:
+$ salt-call state.apply
+
 # Perform the initial Salt configuration
-$ salt '*kvm*' state.sls salt.minion
+$ salt '*kvm*' state.apply salt.minion
 
 # Set up the network interfaces and the SSH access
 $ salt -C 'I@salt:control' cmd.run 'salt-call state.sls linux.system.user,openssh,linux.network;reboot'
 
-$ salt 'kvm*' state.sls libvirt
+$ salt 'kvm*' state.apply libvirt
 ```
