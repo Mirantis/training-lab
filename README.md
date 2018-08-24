@@ -44,9 +44,9 @@ You will need to have Docker installed.
 | cfg01     | cfg03           | ???               | cfg01.tng.mirantis.com | none                          | MCP Infra          | none            | 10.0.0.15              | 10.0.1.15           | none                        | none                   | none                      | none                             | Nested VM              | kvm01       | 8   | 50    | 4   |
 | cmp01     | cmp01           | ???               | cmp01.tng.mirantis.com | none                          | Compute Node (KVM) | 192.168.250.231 | 10.0.0.231             | 10.0.1.231          | 10.0.2.231                  | 10.0.3.231             | 10.0.4.231                | 10.0.5.231                       | VM                     | none        | 8   | 16    | 2   |
 | osd01     | osd01           | ???               | osd01.tng.mirantis.com | none                          | Ceph OSD node      | 192.168.250.221 | 10.0.0.221             | 10.0.1.221          | 10.0.2.221                  | 10.0.3.221             | 10.0.4.221                | 10.0.5.221                       | VM                     | none        | 4   | 20    | 2   |
-| pxe       | ???-kvm01-pxe01 | 52:54:00:00:01:01 | ???-kvm01-pxe01        | none                          | PXE MAAS test      | none            | MAAS DHCP              | none                | none                        | none                   | none                      | none                             | Nested VM              | kvm01       | 2   | 5     | 2   |
-| pxe       | ???-kvm02-pxe01 | 52:54:00:00:02:01 | ???-kvm02-pxe01        | none                          | PXE MAAS test      | none            | MAAS DHCP              | none                | none                        | none                   | none                      | none                             | Nested VM              | kvm02       | 2   | 5     | 2   |
-| pxe       | ???-kvm03-pxe01 | 52:54:00:00:03:01 | ???-kvm03-pxe01        | none                          | PXE MAAS test      | none            | MAAS DHCP              | none                | none                        | none                   | none                      | none                             | Nested VM              | kvm03       | 2   | 5     | 2   |
+| pxe       | kvm01-pxe01 | 52:54:00:00:01:01 | kvm01-pxe01        | none                          | PXE MAAS test      | none            | MAAS DHCP              | none                | none                        | none                   | none                      | none                             | Nested VM              | kvm01       | 2   | 5     | 1   |
+| pxe       | kvm02-pxe01 | 52:54:00:00:02:01 | kvm02-pxe01        | none                          | PXE MAAS test      | none            | MAAS DHCP              | none                | none                        | none                   | none                      | none                             | Nested VM              | kvm02       | 2   | 5     | 1   |
+| pxe       | kvm03-pxe01 | 52:54:00:00:03:01 | kvm03-pxe01        | none                          | PXE MAAS test      | none            | MAAS DHCP              | none                | none                        | none                   | none                      | none                             | Nested VM              | kvm03       | 2   | 5     | 1   |
 
 ## Azure related tasks
 
@@ -194,8 +194,10 @@ or
 [https://docs.mirantis.com/mcp/master/mcp-deployment-guide/single/index.html](https://docs.mirantis.com/mcp/master/mcp-deployment-guide/single/index.html) (Start from: To create control plane VMs:)
 
 ```bash
+# Check the cfg01 console
+$ virsh console cfg01.tng.mirantis.com
 # or you can ssh to cfg01 once it's installed
-$ ssh root@10.0.0.15
+$ ssh root@cfg01
 
 # check if installation process finished successfully (it should ends with "reboot")
 $ tail -1 /var/log/cloud-init-output.log
@@ -236,8 +238,8 @@ $ salt '*' saltutil.refresh_pillar
 $ reclass-salt --top
 
 # Verify that the following states are successfully applied during the execution of cloud-init:
-salt-call state.sls linux.system,linux,openssh,salt
-salt-call state.sls maas.cluster,maas.region,reclass
+$ salt-call state.sls linux.system,linux,openssh,salt
+$ salt-call state.sls maas.cluster,maas.region,reclass
 
 # Provision MAAS with servers
 salt-call state.sls maas.machines
