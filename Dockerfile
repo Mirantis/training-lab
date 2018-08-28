@@ -22,7 +22,8 @@ RUN set -x \
     && unzip /tmp/terraform_linux_amd64.zip -d /usr/local/bin/ \
     && rm -f /tmp/terraform_linux_amd64.zip \
     \
-    && curl -SsL https://github.com/boxboat/fixuid/releases/download/v0.4/fixuid-0.4-linux-amd64.tar.gz | tar -C /usr/local/bin -xzf - \
+    && FIXUID_VERSION=$(curl --silent "https://api.github.com/repos/boxboat/fixuid/releases/latest" | sed -n 's/.*"tag_name": "v\([^"]*\)",/\1/p') \
+    && curl -SsL https://github.com/boxboat/fixuid/releases/download/v${FIXUID_VERSION}/fixuid-${FIXUID_VERSION}-linux-amd64.tar.gz | tar -C /usr/local/bin -xzf - \
     && chown root:root /usr/local/bin/fixuid \
     && chmod 4755 /usr/local/bin/fixuid \
     && mkdir -p /etc/fixuid \
