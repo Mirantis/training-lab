@@ -104,7 +104,7 @@
 
 - name: Add {{ default_student_account_name }} account to sudoers to skip password questions
   blockinfile:
-    path: /etc/sudoers.d/80-student-account
+    path: /etc/sudoers.d/80-{{ default_student_account_name }}-account
     create:  yes
     block: |
       {{ default_student_account_name }} ALL=(ALL) NOPASSWD:ALL
@@ -117,7 +117,7 @@
       PasswordAuthentication yes
   notify: restart sshd
 
-- name: Allow user student to log in using password via ssh
+- name: Configure ssh /etc/ssh/ssh_config
   blockinfile:
     path: /etc/ssh/ssh_config
     block: |4
