@@ -242,7 +242,20 @@ $ salt-call state.sls linux.system,linux,openssh,salt
 $ salt-call state.sls maas.cluster,maas.region,reclass
 
 # Provision MAAS with servers
-salt-call state.sls maas.machines
+$ salt-call state.sls maas.machines
+
+#https://github.com/Mirantis/pipeline-library/blob/master/src/com/mirantis/mk/Orchestrate.groovy#L115
+$ salt 'kvm01*' state.apply salt.minion
+$ salt 'kvm01*' state.apply linux.system
+$ salt 'kvm01*' state.apply linux.network
+$ salt 'kvm01*' state.apply ntp,rsyslog,libvirt
+$ salt 'kvm01*' state.apply salt.control
+
+#https://github.com/Mirantis/pipeline-library/blob/master/src/com/mirantis/mk/Orchestrate.groovy#L174
+$ salt 'kvm01*' state.apply glusterfs.server.service
+$ salt 'kvm01*' state.apply glusterfs.server.setup
+$ salt 'kvm01*' cmd.run gluster peer status; gluster volume status
+$ salt 'kvm01*' state.apply glusterfs.client
 
 # Check if cfg01 is configured properly:
 $ salt-call state.apply
