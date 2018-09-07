@@ -16,12 +16,12 @@ vm_nodes:
     azure_virtual_machine_vm_size: Basic_A0
     # Last octet of kvm inside cloud_network (kvm01: 192.168.250.241, kvm02: 192.168.250.242, kvm03: 192.168.250.243 )
     network_private_ip_last_octet: 240
-    #m1.xxlarge80 # m1.xlarge40 # m1.medium
+    # m1.xxlarge80 # m1.xlarge40 # m1.medium
     openstack_compute_instance_flavor_name: m1.xlarge40
     openstack_compute_instance_kvm01_image_name: pruzicka-training-lab_kvm01-ubuntu-16.04-server-amd64-20180820
     openstack_compute_instance_image_name: pruzicka-training-lab_kvm-ubuntu-16.04-server-amd64-20180820
   cmp:
-    count: 1
+    count: 2
     azure_image_name_regex: training-lab_kvm-ubuntu-16.04-server-amd64*
     network_private_ip_last_octet: 230
     azure_virtual_machine_vm_size: Basic_A0
@@ -163,6 +163,9 @@ mcp_cfg01_vm_config_disk: /var/lib/libvirt/images/cfg01/cfg01-config.iso
 mcp_cfg01_vm_mem_kb     : 8388608
 mcp_cfg01_vm_cpus       : 2
 mcp_cfg01_image_url     : http://images.mirantis.com.s3.amazonaws.com/cfg01-day01-{{ mcp_release_tag }}.qcow2
+
+# Apt signing key for Mirantis repository
+mirantis_reposigning_key_url: http://apt.mirantis.com/public.gpg
 
 packages:
   - acpid

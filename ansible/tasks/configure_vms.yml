@@ -10,6 +10,16 @@
   apt_repository:
     repo: deb [arch=amd64] http://mirror.mirantis.com/{{ saltstack_repository_version }}/{{ saltstack_repository_version_directory }}/{{ ansible_distribution_release }}/ {{ ansible_distribution_release }} main
 
+- name: Add an Apt signing key for Mirantis repository
+  apt_key:
+    url: "{{ mirantis_reposigning_key_url }}"
+    state: present
+
+# libvirt 4.0 is needed for MCP deployment (Ubuntu Xenial is using old version 1.3)
+- name: Add Mirantis Xenial repository with modified packages
+  apt_repository:
+    repo: deb [arch=amd64] http://apt.mirantis.com/{{ ansible_distribution_release }}/openstack/pike {{ mcp_release_tag }} main
+
 - name: Update all packages
   apt:
     upgrade: dist
@@ -58,7 +68,7 @@
     value: 1
     sysctl_set: yes
 
-- name: Configure libvirt daemon
+- name: Configure libvirt daemon /etc/libvirt/libvirtd.conf
   blockinfile:
     path: /etc/libvirt/libvirtd.conf
     block: |
@@ -69,11 +79,17 @@
   notify:
     - restart libvirt
 
-- name: Configure libvirt daemon
+- name: Check if /etc/default/libvirt-bin exists
+  stat:
+    path: /etc/default/libvirt-bin
+  register: etc_default_libvirt
+
+- name: Configure libvirt daemon /etc/default/libvirt-bin
   lineinfile:
     path: /etc/default/libvirt-bin
     regexp: '^libvirtd_opts'
     line: libvirtd_opts="--listen --config /etc/libvirt/libvirtd.conf"
+  when: etc_default_libvirt.stat.exists
   notify:
     - restart libvirt
 
@@ -296,4 +312,3 @@
     connection: local
     become: false
   when: ( reboot_required.stat.exists or ( network_interfaces is defined and network_interfaces.changed )) and packer_build_name is not defined
-
