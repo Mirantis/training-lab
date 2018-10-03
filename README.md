@@ -231,9 +231,6 @@ kvm03.tng.mirantis.com:
 # Verify that the Salt Minion nodes are synchronized by running the following command on the Salt Master node
 $ salt '*' saltutil.sync_all
 
-# Refresh Salt pillars
-$ salt '*' saltutil.refresh_pillar
-
 # Check out your inventory to be able to resolve any inconsistencies in your model:
 $ reclass-salt --top
 
@@ -245,23 +242,23 @@ $ salt-call state.sls maas.cluster,maas.region,reclass
 $ salt-call state.sls maas.machines
 
 #https://github.com/Mirantis/pipeline-library/blob/master/src/com/mirantis/mk/Orchestrate.groovy#L115
-$ salt 'kvm01*' state.apply salt.minion
-$ salt 'kvm01*' state.apply linux.system
-$ salt 'kvm01*' state.apply linux.network
-$ salt 'kvm01*' state.apply ntp,rsyslog,libvirt
-$ salt 'kvm01*' state.apply salt.control
+$ salt -C 'I@salt:control' state.apply salt.minion
+$ salt -C 'I@salt:control' state.apply linux.system
+$ salt -C 'I@salt:control' state.apply linux.network
+$ salt -C 'I@salt:control' state.apply ntp,rsyslog,libvirt
+$ salt -C 'I@salt:control' state.apply salt.control
 
 #https://github.com/Mirantis/pipeline-library/blob/master/src/com/mirantis/mk/Orchestrate.groovy#L174
-$ salt 'kvm01*' state.apply glusterfs.server.service
-$ salt 'kvm01*' state.apply glusterfs.server.setup
-$ salt 'kvm01*' cmd.run gluster peer status; gluster volume status
-$ salt 'kvm01*' state.apply glusterfs.client
+$ salt -C 'I@salt:control' state.apply glusterfs.server.service
+$ salt -C 'I@salt:control' state.apply glusterfs.server.setup
+$ salt -C 'I@salt:control' cmd.run gluster peer status; gluster volume status
+$ salt -C 'I@salt:control' state.apply glusterfs.client
 
 # Check if cfg01 is configured properly:
 $ salt-call state.apply
 
 # Perform the initial Salt configuration
-$ salt '*kvm*' state.apply salt.minion
+$ salt -C 'I@salt:control' state.apply salt.minion
 
 # Set up the network interfaces and the SSH access
 $ salt -C 'I@salt:control' cmd.run 'salt-call state.sls linux.system.user,openssh,linux.network;reboot'
