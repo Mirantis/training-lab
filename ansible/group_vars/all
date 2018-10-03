@@ -141,7 +141,7 @@ mcp_define_vm_script_url          : https://raw.githubusercontent.com/Mirantis/m
 mcp_create_config_drive_script_url: https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/create_config_drive.sh
 # user_data.sh
 #mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/{{ mcp_release_tag }}/config-drive/master_config.sh
-mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/master_config.sh
+mcp_master_config_script_url      : https://raw.githubusercontent.com/Mirantis/mcp-common-scripts/master/config-drive/master_config.sh.old
 
 # Temporary directory
 temporary_directory: /tmp
