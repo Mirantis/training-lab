@@ -17,4 +17,3 @@ packer_cache
 *-virtualbox-iso
 # Ignore Ansible vault file
 vault_training-lab.txt
-
